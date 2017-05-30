@@ -36,7 +36,7 @@ class Vector:
         self[0] = self[0] * val
         self[1] = self[1] * val
         return self
-                
+
     def __getitem__(self, key):
         if( key == 0):
             return self.x
@@ -54,7 +54,7 @@ class Vector:
             raise Exception("Invalid key to Point")
         
     def __str__(self):
-        return "(" + str(self.x) + "," + str(self.y) + ")"
+        return "(" + str(round(self.x, 1)) + "," + str(round(self.y, 1)) + ")"
 Point = Vector
         
 def DistanceSqrd( point1, point2 ):

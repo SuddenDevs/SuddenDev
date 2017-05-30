@@ -35,13 +35,19 @@ class Game:
         #Timekeeping
         self.time += delta
 
-#New Game
+        #Update Players
+        for p in game.players:
+            p.update(delta)
+
+#Setup New Game
+random.seed(time.time())
 game = Game()
 
 #Game Loop
 time_last = time.time()
 second_timer = 0
 frame_counter = 0
+frame_rate = 0
 while True:
     time_current = time.time()
     delta = time_current - time_last
@@ -49,7 +55,8 @@ while True:
     second_timer += delta
     frame_counter += 1
     if second_timer > 1:
-        print(frame_counter)
+        frame_rate = frame_counter
         frame_counter = 0
         second_timer = 0
+        print((" ").join(map(str, game.players)))
     game.tick(delta)
