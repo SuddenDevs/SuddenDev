@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block body %}
+    homepage spiel
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.key.label }}: {{ form.key() }} {% for error in form.key.errors %}{{ error }}{% endfor %}<br>
+        {{ form.submit() }}
+    </form>
+{% endblock %}
