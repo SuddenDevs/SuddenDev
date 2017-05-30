@@ -1,25 +1,12 @@
-#/usr/bin/python3.5
+#!/usr/bin/python3.5
 
 from vector import Vector
+from color import Color3
+from player import Player
+from enemy import Enemy
+
 import time
-
-class Entity:
-    def __init__(self):
-        self.tag = 0
-        self.pos = Vector(0, 0)
-        self.size = Vector(10, 10)
-        self.healthMax = 100
-        self.health = self.healthMax
-
-class Player(Entity):
-    def __init__(self, name, color):
-        self.name = name
-        self.color = color
-        super().__init__()
-
-class Enemy(Entity):
-    def __init__(self):
-        super().__init__(self)
+import random
 
 class Map:
     def __init__(self, width, height):
@@ -38,7 +25,7 @@ class Game:
         #Players
         self.players = []
         for i in range(3):
-            player = Player('nameless', 'colorless') 
+            player = Player(i, Color3(255, 0, 0))
             self.players.append(player)
 
         #Metadata

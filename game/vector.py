@@ -1,5 +1,3 @@
-#/usr/bin/python3.5
-
 import math
 class Vector:
     'Represents a 2D vector.'
