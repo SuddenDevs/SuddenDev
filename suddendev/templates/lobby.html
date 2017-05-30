@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+    <h1>Open rooms:</h1><br>
+    {% for r in rooms %}
+
+    <form method="POST">
+        <input type="hidden" name="room_key" value={{r.room_key}}>
+        <input type="submit" name="{{r.room_key}}" value="Join {{ r.room_key }}">
+    </form>
+    <br>
+    
+    {% endfor %}
+{% endblock %}

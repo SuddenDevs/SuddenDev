@@ -49,6 +49,27 @@ def victim_chat():
 
     return flask.render_template('victim_chat.html')
 
+@main.route('/lobby', methods=['GET', 'POST'])
+def lobby():
+    """
+    Contains all currently open rooms, along with a button to instantly connect
+    to them.
+    """
+    if flask.request.method == 'GET':
+        flask.session.pop('room_key')
+        flask.session.pop('victim')
+
+    # TODO: filter the database, since it also contains old rooms
+    rooms = ChatRoom.query.all()
+
+    if flask.request.method == 'POST':
+        flask.session['room_key'] = flask.request.form['room_key']
+        flask.session['victim'] = True
+
+        return victim_chat()
+
+    return flask.render_template('lobby.html', rooms=rooms)
+
 
 @main.route('/itsaprankbro', methods=['GET', 'POST'])
 def prank_index():
