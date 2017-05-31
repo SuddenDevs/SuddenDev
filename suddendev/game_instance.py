@@ -92,18 +92,21 @@ class GameInstance:
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
         self.game = Game()
-
-    def update_clients(self):
+    
+    def run(self):
         time_last = time.time()
 
+        #Main Loop
         while True:
             #Timekeeping
             time_current = time.time()
             delta = time_current - time_last
             time_last = time_current
 
+            #Gameplay Update
             self.game.tick(delta)
 
+            #Client Update
             #json = encodeState(state)
             json = sample_json
             with self.app.app_context():

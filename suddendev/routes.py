@@ -142,7 +142,7 @@ def create_room():
            continue
 
         game = GameInstance(game_id, flask.current_app._get_current_object())
-        thread = Thread(target = game.update_clients)
+        thread = Thread(target = game.run)
         thread.start()
        
         return game.game_id
