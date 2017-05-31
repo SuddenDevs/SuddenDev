@@ -22,7 +22,7 @@ class StateEncoder(json.JSONEncoder):
                 'tag': entity.tag,
                 'pos': self.serializeVector(entity.position),
                 'vel': self.serializeVector(entity.vel),
-                'size': self.serializeVector(entity.size),
+                'size': entity.size,
                 'healthMax': entity.healthMax,
                 'health': entity.health
                 }
