@@ -1,4 +1,4 @@
-from vector import Vector
+from .vector import Vector
 
 class Entity:
     def __init__(self):
