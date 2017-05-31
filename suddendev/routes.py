@@ -56,8 +56,8 @@ def lobby():
     to them.
     """
     if flask.request.method == 'GET':
-        flask.session.pop('room_key')
-        flask.session.pop('victim')
+        if 'room_key' in flask.session:
+            flask.session.pop('room_key')
 
     # TODO: filter the database, since it also contains old rooms
     rooms = ChatRoom.query.all()
