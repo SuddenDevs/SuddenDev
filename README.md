@@ -2,7 +2,7 @@
 
 ## Development Environment Setup
 
-Requires Python 3.3+ and [pip](https://pip.pypa.io/en/stable/installing/), [postgres](https://www.postgresql.org/download/) and the [heroku cli](https://devcenter.heroku.com/articles/heroku-cli).
+Requires Python 3 (developed using 3.6) [pip](https://pip.pypa.io/en/stable/installing/), [postgres](https://www.postgresql.org/download/) and the [heroku cli](https://devcenter.heroku.com/articles/heroku-cli).
 
 Using a [virtualenv](https://virtualenv.pypa.io/en/stable/)
 is recommended. Once virtualenv is installed you can create a virtual environment for Python 3 and activate
@@ -37,12 +37,10 @@ heroku local
 
 ## Testing
 
-We use tox to make sure everything is packed correctly as part of our tests.
-
-Simply install tox (doesn't have to be in the development venv):
+Simply install tox and pytest (neither have to be in the development venv):
 
 ```bash
-pip install tox
+pip install tox pytest
 ```
 
 And in the root directory, run:
