@@ -4,6 +4,7 @@
     {% for r in rooms %}
 
     <form method="POST">
+        Start time: {{ r.start_time.ctime() }}  
         <input type="hidden" name="game_id" value={{r.game_id}}>
         <input type="submit" name="{{r.game_id}}" value="Join {{ r.game_id }}">
     </form>
