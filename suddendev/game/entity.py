@@ -15,4 +15,3 @@ class Entity:
 
     def update(self, delta):
         self.pos = self.pos + self.vel * delta
-
