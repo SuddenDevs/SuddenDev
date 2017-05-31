@@ -55,6 +55,7 @@ def lobby():
 
     # TODO: filter the database, since it also contains old rooms
     rooms = GameController.query.all()
+    db.session.close()
 
     if flask.request.method == 'POST':
         flask.session['game_id'] = flask.request.form['game_id']
@@ -78,10 +79,12 @@ def create_room():
             db.session.commit()
         except sqlalchemy.exc.IntegrityError:
            continue
+        db.session.close()
 
-        # game = GameInstance(game_id, flask.current_app._get_current_object())
-        # thread = Thread(target = game.run)
-        # thread.start()
+
+        game = GameInstance(game_id, flask.current_app._get_current_object())
+        thread = Thread(target = game.run)
+        thread.start()
        
         return game_id
 
@@ -89,6 +92,7 @@ def check_room_key(game_id):
     """Check the given room key exists and hasn't expired.
     Returns an error string, or None if the key is ok."""
     game = GameController.query.filter_by(game_id=game_id).one_or_none()
+    db.session.close()
 
     if game is None:
         return "Sorry, that key appears to be invalid. Are you sure it's correct?"
