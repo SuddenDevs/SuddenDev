@@ -19,5 +19,6 @@ setup(
     ],
     tests_require=[
         'pytest',
+        'pytest-env==0.6.0',
     ],
 )

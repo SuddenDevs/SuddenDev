@@ -37,8 +37,18 @@ heroku local
 
 ## Testing
 
+We use tox to make sure everything is packed correctly as part of our tests.
+
+Simply install tox (doesn't have to be in the development venv):
+
 ```bash
-python setup.py test
+pip install tox
+```
+
+And in the root directory, run:
+
+```bash
+tox
 ```
 
 ## Deploying to Heroku

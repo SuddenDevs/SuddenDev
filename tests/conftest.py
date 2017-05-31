@@ -5,7 +5,6 @@ factories for creating an app.
 """
 import os
 import pytest
-import app_config
 from suddendev import create_app
 from suddendev.models import db as _db
 
@@ -13,7 +12,7 @@ from suddendev.models import db as _db
 @pytest.fixture(scope='session')
 def app(request):
     """Session-wide test `Flask` application."""
-    app = create_app(app_config.__file__)
+    app = create_app()
 
     # Establish an application context before running the tests.
     ctx = app.app_context()
