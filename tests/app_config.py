@@ -1,5 +1,4 @@
 TESTING = True
-TESTDB_PATH = "/tmp/test.db"
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + TESTDB_PATH
+SQLALCHEMY_DATABASE_URI = 'postgresql:///suddendev_test'
 DEBUG = True
 SECRET_KEY = 'not a real secret key'
