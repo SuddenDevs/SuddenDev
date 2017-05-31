@@ -79,9 +79,9 @@ def create_room():
         except sqlalchemy.exc.IntegrityError:
            continue
 
-        game = GameInstance(game_id, flask.current_app._get_current_object())
-        thread = Thread(target = game.run)
-        thread.start()
+        # game = GameInstance(game_id, flask.current_app._get_current_object())
+        # thread = Thread(target = game.run)
+        # thread.start()
        
         return game_id
 

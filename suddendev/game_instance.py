@@ -96,8 +96,6 @@ class GameInstance:
         self.game = Game()
     
     def run(self):
-        #TODO DEBUGGING ONLY, REMOVE THIS AFTER
-        return
         time_last = time.time()
 
         #Main Loop
