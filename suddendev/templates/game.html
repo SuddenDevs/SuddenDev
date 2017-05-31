@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block body %}
+  <script type="text/javascript" charset="utf-8">
+    var socket;
+    $(document).ready(function(){
+      socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
+      socket.on('connect', function() {
+        socket.emit('joined', {});
+      });
+      socket.on('status', function(data) {
+        $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+      });
+    });
+    function leave_room() {
+      socket.emit('left', {}, function() {
+        socket.disconnect();
+        // go back to the login page
+        window.location.href = "{{ url_for('main.index') }}";
+      });
+    }
+  </script>
+
+  {% block chat_body %}{% endblock %}
+
+  <br>
+  <textarea id="chat" cols="80" rows="20"></textarea><br><br>
+  <input id="text" size="80" placeholder="Enter your message here"><br><br>
+  <a href="#" onclick="leave_room();">Exit the chat</a>
+{% endblock %}

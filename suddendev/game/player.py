@@ -1,5 +1,5 @@
-from entity import Entity
-from vector import Vector
+from .entity import Entity
+from .vector import Vector
 import random
 
 class Player(Entity):

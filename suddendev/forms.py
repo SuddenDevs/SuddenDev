@@ -8,7 +8,9 @@ class EnterChatForm(Form):
     key = StringField('Key', validators=[Required()])
     submit = SubmitField('Start session.')
 
-
 class SetupChatForm(Form):
     """Accepts a name."""
     submit = SubmitField('Create session.')
+
+class CreateGameForm(Form):
+    submit = SubmitField('Create game.')
