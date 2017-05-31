@@ -17,8 +17,7 @@ class Map:
 class Game:
     #### Config ####
     #Enemy Spawning
-    spawnrate = 0.1
-    spawnrate_variance = 0.05
+    enemy_spawn_delay = 1
 
     def __init__(self):
         #Map
@@ -30,6 +29,11 @@ class Game:
             player = Player(i, Color3(255, 0, 0))
             self.players.append(player)
 
+        #Enemies
+        self.enemies = []
+        self.enemy_limit = 5
+        self.enemy_spawn_timer = 0
+
         #Metadata
         self.time = 0
 
@@ -37,7 +41,23 @@ class Game:
     def tick(self, delta):
         #Timekeeping
         self.time += delta
+        self.enemy_spawn_timer += delta
 
         #Update Players
         for p in self.players:
             p.update(delta)
+
+        #Update Enemies
+        for e in self.enemies:
+            e.update(delta)
+
+        #Enemy Spawning
+        if (self.enemy_spawn_timer > enemy_spawn_delay
+            and len(self.enemies) < self.enemy_limit):
+            #Spawn Enemy
+            enemy = Enemy()
+            self.enemies.append(enemy)
+
+        #Powerup Spawning
+        
+        #Ending Conditions / Wave Conditions
