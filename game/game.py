@@ -14,6 +14,7 @@ class Map:
         self.height = height
 
 class Game:
+    #### Config ####
     #Enemy Spawning
     spawnrate = 0.1
     spawnrate_variance = 0.05
@@ -31,6 +32,7 @@ class Game:
         #Metadata
         self.time = 0
 
+    #### Main Loop ####
     def tick(self, delta):
         #Timekeeping
         self.time += delta
