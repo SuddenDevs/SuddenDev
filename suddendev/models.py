@@ -1,16 +1,13 @@
 import flask_sqlalchemy as flask_sql
 import datetime
 
-
 db = flask_sql.SQLAlchemy()
 
-
-class ChatRoom(db.Model):
+class GameController(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    room_key = db.Column(db.String, unique=True)
-    end_time = db.Column(db.DateTime)
+    game_id = db.Column(db.String, unique=True)
+    start_time = db.Column(db.DateTime)
 
-    def __init__(self, room_key):
-        self.room_key = room_key
-        self.end_time = datetime.datetime.now() + \
-                datetime.timedelta(minutes=30)
+    def __init__(self, game_id):
+        self.game_id = game_id
+        self.start_time = datetime.datetime.now()

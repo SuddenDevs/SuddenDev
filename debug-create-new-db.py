@@ -1,6 +1,6 @@
 import sqlalchemy
 from suddendev import create_app
-from suddendev.models import db, ChatRoom
+from suddendev.models import db, GameController
 from flask_sqlalchemy import SQLAlchemy
 
 
