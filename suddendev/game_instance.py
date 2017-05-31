@@ -6,6 +6,7 @@ import time
 import flask
 import flask_socketio as fsio
 import datetime
+import time
 
 NAMESPACE = '/game-session'
 sample_json="""
@@ -114,6 +115,3 @@ class GameInstance:
             with self.app.app_context():
                 fsio.emit('status', json, namespace=NAMESPACE, room=self.game_id)
                 # fsio.emit('status', json, namespace=NAMESPACE, broadcast=True)
-    # join
-    # leave
-    # def updateClients(self):

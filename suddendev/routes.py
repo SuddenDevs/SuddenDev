@@ -18,7 +18,7 @@ def index():
     """Landing page."""
     return flask.redirect(flask.url_for('.lobby'))
 
-@main.route('/game')
+@main.route('/game', methods=['GET', 'POST'])
 def game_page():
     user_game_id = flask.session.get('game_id', None)
 
