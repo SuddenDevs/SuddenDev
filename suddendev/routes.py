@@ -16,7 +16,7 @@ from . import socketio
 @main.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page."""
-    return flask.redirect(flask.url_for('.lobby'))
+    return flask.render_template('index.html')
 
 @main.route('/game', methods=['GET', 'POST'])
 def game_page():
