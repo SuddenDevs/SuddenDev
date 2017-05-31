@@ -4,7 +4,7 @@ import string
 import sqlalchemy
 import datetime
 from . import main
-from .forms import EnterChatForm, SetupChatForm, CreateGameForm
+from .forms import CreateGameForm
 from .models import db, GameController
 from .game_instance import GameInstance
 import flask_socketio as fsio
@@ -15,18 +15,22 @@ from . import socketio
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    """Landing page. Includes form for joining a chat session."""
-    form = EnterChatForm()
-    if form.validate_on_submit():
-        flask.session['game_id'] = form.key.data
-        return flask.redirect(flask.url_for('.victim_chat'))
+    """Landing page."""
+    return flask.redirect(flask.url_for('.lobby'))
 
-    elif flask.request.method == 'GET':
-        form.key.data = flask.session.get('game_id', '')
-    return flask.render_template('index.html', form=form)
-
-@main.route('/game', methods=['GET', 'POST'])
+@main.route('/game')
 def game_page():
+    user_game_id = flask.session.get('game_id', None)
+
+    if user_game_id is None:
+        flask.flash('Invalid game id!')
+        return flask.redirect(flask.url_for('.lobby'))
+
+    error = check_room_key(user_game_id)
+    if error:
+        flask.flash(error)
+        return flask.redirect(flask.url_for('.lobby'))
+
     return flask.render_template('game.html')
 
 @main.route('/game_create', methods=['GET', 'POST'])
@@ -38,31 +42,6 @@ def game_create():
             return flask.redirect(flask.url_for('.game_page'))
     else:
         return flask.render_template('game_create.html', form=form)
-
-@main.route('/chat')
-def victim_chat():
-    """Checks for a valid room key and victim flag in session.
-    Redirects back to index if key is invalid or expired, and back to
-    to homepage with an error. Otherwise, serves the chat page."""
-
-    # check the prankster isn't on the wrong page
-    victim_flag = flask.session.get('victim', False)
-    if not victim_flag:
-        return flask.redirect(flask.url_for('.prankster_chat'))  # TODO: notify them?
-
-    # check the user *has* a room key
-    user_game_id = flask.session.get('game_id', None)
-    if user_game_id is None:
-        flask.flash('Invalid game id!')
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
-
-    # check the user has a valid room key
-    error = check_room_key(user_game_id)
-    if error:
-        flask.flash(error)
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
-
-    return flask.render_template('victim_chat.html')
 
 @main.route('/lobby', methods=['GET', 'POST'])
 def lobby():
@@ -79,50 +58,9 @@ def lobby():
 
     if flask.request.method == 'POST':
         flask.session['game_id'] = flask.request.form['game_id']
-        return victim_chat()
+        return flask.redirect(flask.url_for('.game_page'))
 
     return flask.render_template('lobby.html', rooms=rooms)
-
-@main.route('/itsaprankbro', methods=['GET', 'POST'])
-def prank_index():
-    """Page revaealing the prank.
-    Includes a form for starting a new session."""
-    form = CreateGameForm()
-    if form.validate_on_submit():
-            game_id = create_room()
-            flask.session['game_id'] = game_id
-            return flask.redirect(flask.url_for('.prankster_chat'))
-    else:
-        return flask.render_template('prank_index.html', form=form)
-
-
-# TODO: eliminate check duplication against victim_chat
-@main.route('/itsaprankbro/chat')
-def prankster_chat():
-    """Checks for a valid room key and victim flag in session.
-    Redirects back to index if key is invalid or expired, and back to
-    to homepage with an error. Otherwise, serves the prankster's chat page."""
-
-    # check the user *has* a room key
-    user_game_id = flask.session.get('game_id', None)
-    if user_game_id is None:
-        flask.flash('Invalid game id.')
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
-
-    # check the user has a valid room key
-    error = check_room_key(user_game_id)
-    if error:
-        flask.flash(error)
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
-
-    # check the user has a valid room key
-    error = check_room_key(user_game_id)
-    if error:
-        flask.flash(error)
-        return flask.redirect(flask.url_for('.prank_index'), form=EnterChatForm())
-
-    return flask.render_template('prankster_chat.html', game_id=user_game_id)
-
 
 def create_room():
     """Creates a new chat room and returns the key."""
@@ -145,8 +83,7 @@ def create_room():
         thread = Thread(target = game.run)
         thread.start()
        
-        return game.game_id
-
+        return game_id
 
 def check_room_key(game_id):
     """Check the given room key exists and hasn't expired.

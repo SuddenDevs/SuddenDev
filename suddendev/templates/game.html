@@ -8,13 +8,14 @@
         socket.emit('joined', {});
       });
       socket.on('status', function(data) {
-        $('#chat').val($('#chat').val() +  data\n');
+        $('#chat').val($('#chat').val() + data + '\n');
+        $('#chat').scrollTop($('#chat')[0].scrollHeight);
       });
     });
     function leave_room() {
       socket.emit('left', {}, function() {
         socket.disconnect();
-        // go back to the login page
+        // go back to the main page
         window.location.href = "{{ url_for('main.index') }}";
       });
     }
@@ -24,6 +25,5 @@
 
   <br>
   <textarea id="chat" cols="80" rows="20"></textarea><br><br>
-  <input id="text" size="80" placeholder="Enter your message here"><br><br>
   <a href="#" onclick="leave_room();">Exit the chat</a>
 {% endblock %}

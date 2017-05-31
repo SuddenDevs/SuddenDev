@@ -109,8 +109,10 @@ class GameInstance:
             #Client Update
             #json = encodeState(state)
             json = sample_json
+            self.game.tick(10)
+
             with self.app.app_context():
-                fsio.emit('status', json, namespace=NAMESPACE, room=self.game_id)
+                fsio.emit('status', sample_json, namespace=NAMESPACE, room=self.game_id)
                 # fsio.emit('status', json, namespace=NAMESPACE, broadcast=True)
     # join
     # leave
