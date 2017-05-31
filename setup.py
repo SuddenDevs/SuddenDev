@@ -10,6 +10,7 @@ setup(
         'flask_socketio',
         'flask_wtf',
         'wtforms',
+        'gunicorn==19.7.1',
     ],
     setup_requires=[
         'pytest-runner',
