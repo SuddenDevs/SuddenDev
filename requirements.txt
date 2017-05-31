@@ -1,3 +1,0 @@
-.
-# '.' specifies look for the setup.py in the current directory
-# heroku relies on a requirements.txt to set-up the environment, so we need this
