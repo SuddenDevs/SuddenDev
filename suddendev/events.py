@@ -15,5 +15,5 @@ def joined(message):
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
     """Sent by clients when they leave a room."""
-    room = flask.session.get('room_key')
+    room = flask.session.get('game_id')
     fsio.leave_room(room)
