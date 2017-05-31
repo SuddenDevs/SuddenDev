@@ -7,6 +7,8 @@ def create_app(config_filename=None):
 
     if not config_filename:
         config_filename = default_config.__file__
+
+        # make the .pyc .py instead
         if config_filename[-1] == 'c':
             config_filename = config_filename[:-1]
 
