@@ -26,7 +26,7 @@ A useful guide for getting started with postgres and creating databases can be f
 To setup the development database - and clear it out - run:
 
 ```bash
-# TODO
+heroku local:run python clear-db.py
 ```
 
 Finally to run the app locally, simply run:
