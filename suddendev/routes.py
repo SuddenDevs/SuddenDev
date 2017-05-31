@@ -4,98 +4,63 @@ import string
 import sqlalchemy
 import datetime
 from . import main
-from .forms import EnterChatForm, SetupChatForm
-from .models import db, ChatRoom
+from .forms import CreateGameForm
+from .models import db, GameController
+from .game_instance import GameInstance
+import flask_socketio as fsio
+from threading import Thread
+from . import socketio
 
 # TODO: deal with pranksters setting up multiple pranks
 
-
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    """Landing page. Includes form for joining a chat session."""
-    form = EnterChatForm()
-    if form.validate_on_submit():
-        flask.session['room_key'] = form.key.data
-        flask.session['victim'] = True
-        return flask.redirect(flask.url_for('.victim_chat'))
+    """Landing page."""
+    return flask.redirect(flask.url_for('.lobby'))
 
-    elif flask.request.method == 'GET':
-        form.key.data = flask.session.get('room_key', '')
-    return flask.render_template('index.html', form=form)
+@main.route('/game', methods=['GET', 'POST'])
+def game_page():
+    user_game_id = flask.session.get('game_id', None)
 
+    if user_game_id is None:
+        flask.flash('Invalid game id!')
+        return flask.redirect(flask.url_for('.lobby'))
 
-@main.route('/chat')
-def victim_chat():
-    """Checks for a valid room key and victim flag in session.
-    Redirects back to index if key is invalid or expired, and back to
-    to homepage with an error. Otherwise, serves the chat page."""
-
-    # check the prankster isn't on the wrong page
-    victim_flag = flask.session.get('victim', False)
-    if not victim_flag:
-        return flask.redirect(flask.url_for('.prankster_chat'))  # TODO: notify them?
-
-    # check the user *has* a room key
-    user_room_key = flask.session.get('room_key', None)
-    if user_room_key is None:
-        flask.flash('You need to enter a key to join a chat!')
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
-
-    # check the user has a valid room key
-    error = check_room_key(user_room_key)
+    error = check_room_key(user_game_id)
     if error:
         flask.flash(error)
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
+        return flask.redirect(flask.url_for('.lobby'))
 
-    return flask.render_template('victim_chat.html')
+    return flask.render_template('game.html')
 
-
-@main.route('/itsaprankbro', methods=['GET', 'POST'])
-def prank_index():
-    """Page revaealing the prank.
-    Includes a form for starting a new session."""
-    form = SetupChatForm()
+@main.route('/game_create', methods=['GET', 'POST'])
+def game_create():
+    form = CreateGameForm()
     if form.validate_on_submit():
-            room_key = create_room()
-            flask.session['room_key'] = room_key
-            flask.session['victim'] = False
-            return flask.redirect(flask.url_for('.prankster_chat'))
+            game_id = create_room()
+            flask.session['game_id'] = game_id
+            return flask.redirect(flask.url_for('.game_page'))
     else:
-        return flask.render_template('prank_index.html', form=form)
+        return flask.render_template('game_create.html', form=form)
 
+@main.route('/lobby', methods=['GET', 'POST'])
+def lobby():
+    """
+    Contains all currently open rooms, along with a button to instantly connect
+    to them.
+    """
+    if flask.request.method == 'GET':
+        if 'game_id' in flask.session:
+            flask.session.pop('game_id')
 
-# TODO: eliminate check duplication against victim_chat
-@main.route('/itsaprankbro/chat')
-def prankster_chat():
-    """Checks for a valid room key and victim flag in session.
-    Redirects back to index if key is invalid or expired, and back to
-    to homepage with an error. Otherwise, serves the prankster's chat page."""
+    # TODO: filter the database, since it also contains old rooms
+    rooms = GameController.query.all()
 
-    # check the victim isn't on the wrong page
-    victim_flag = flask.session.get('victim', True)
-    if victim_flag:
-        return flask.redirect(flask.url_for('.victim_chat'))  # TODO: notify them?
+    if flask.request.method == 'POST':
+        flask.session['game_id'] = flask.request.form['game_id']
+        return flask.redirect(flask.url_for('.game_page'))
 
-    # check the user *has* a room key
-    user_room_key = flask.session.get('room_key', None)
-    if user_room_key is None:
-        flask.flash('You need to enter a key to join a chat!')
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
-
-    # check the user has a valid room key
-    error = check_room_key(user_room_key)
-    if error:
-        flask.flash(error)
-        return flask.redirect(flask.url_for('.index'), form=EnterChatForm())
-
-    # check the user has a valid room key
-    error = check_room_key(user_room_key)
-    if error:
-        flask.flash(error)
-        return flask.redirect(flask.url_for('.prank_index'), form=EnterChatForm())
-
-    return flask.render_template('prankster_chat.html', room_key=user_room_key)
-
+    return flask.render_template('lobby.html', rooms=rooms)
 
 def create_room():
     """Creates a new chat room and returns the key."""
@@ -106,24 +71,26 @@ def create_room():
             string.ascii_uppercase + string.digits) for _ in range(n))
 
     while True:
-        room = ChatRoom(room_key=gen_random_string(5))
-        db.session.add(room)
+        game_id=gen_random_string(5)
+        game = GameController(game_id)
+        db.session.add(game)
         try:
             db.session.commit()
         except sqlalchemy.exc.IntegrityError:
            continue
-        return room.room_key
 
+        game = GameInstance(game_id, flask.current_app._get_current_object())
+        thread = Thread(target = game.run)
+        thread.start()
+       
+        return game_id
 
-def check_room_key(room_key):
+def check_room_key(game_id):
     """Check the given room key exists and hasn't expired.
     Returns an error string, or None if the key is ok."""
-    room = ChatRoom.query.filter_by(room_key=room_key).one_or_none()
+    game = GameController.query.filter_by(game_id=game_id).one_or_none()
 
-    if room is None:
+    if game is None:
         return "Sorry, that key appears to be invalid. Are you sure it's correct?"
-
-    if room.end_time < datetime.datetime.now():
-        return "Sorry, it looks like your session has timed-out."
 
     return None
