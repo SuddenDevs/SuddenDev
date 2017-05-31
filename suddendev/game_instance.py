@@ -94,14 +94,21 @@ class GameInstance:
         self.game = Game()
 
     def update_clients(self):
+        time_last = time.time()
+
         while True:
-            self.game.tick(10)
+            #Timekeeping
+            time_current = time.time()
+            delta = time_current - time_last
+            time_last = time_current
+
+            self.game.tick(delta)
+
             #json = encodeState(state)
             json = sample_json
             with self.app.app_context():
                 fsio.emit('status', json, namespace=NAMESPACE, room=self.game_id)
                 # fsio.emit('status', json, namespace=NAMESPACE, broadcast=True)
-
     # join
     # leave
     # def updateClients(self):
