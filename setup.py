@@ -11,6 +11,7 @@ setup(
         'flask_wtf',
         'wtforms',
         'gunicorn==19.7.1',
+        'eventlet==0.21.0',
     ],
     setup_requires=[
         'pytest-runner',
