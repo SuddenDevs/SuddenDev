@@ -6,10 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 if __name__=='__main__':
-    app = create_app()
+    app = create_app(heroku_config.__file__)
 
     # create an app context
-    ctx = app.app_context(heroku_config.__file__)
+    ctx = app.app_context()
     ctx.push()
 
     db.drop_all()
