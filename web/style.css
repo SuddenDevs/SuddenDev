@@ -1,0 +1,13 @@
+.gameCanvas{
+  border-style: solid;
+  border-width: thin;
+}
+
+.controls{
+  margin: 0 auto;
+  width: 580px;
+}
+
+.outer{
+  width: 960px;
+}
