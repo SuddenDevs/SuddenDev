@@ -11,12 +11,12 @@ import time
 NAMESPACE = '/game-session'
 
 class GameInstance:
-    states = []
     
     def __init__(self, game_id):
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
         self.game = Game()
+        self.states = []
     
     def run(self):
         time_last = time.time()
