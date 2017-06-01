@@ -52,12 +52,23 @@
       function socketInit() {
         $(document).ready(function(){
           socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
-          socket.on('connect', connectToGame());
-          socket.on('result', processStates(data));
-          socket.on('game_start', readyGame());
-          socket.on('player_count', updatePlayersLeft(data));
+          socket.on('connect', function() {
+            connectToGame();
+          });
+          socket.on('result', function(data) {
+            processStates(data);
+          });
+          socket.on('game_start', function() {
+            readyGame();
+          });
+          socket.on('player_count', function(data) {
+            updatePlayersLeft(data);
+          });
         });
-        window.onbeforeunload = exitGame(e);
+        window.onbeforeunload = function(e) {
+            socket.emit('left', {});
+            socket.disconnect();
+        }
       }
 
       //Tell the server when the player has joined
@@ -132,7 +143,7 @@
 
       //Function to display waiting text on canvas
       function drawWaiting() {
-        if (!gameStarted) {
+        if (!gameReady) {
           waitingText.x = 100;
           waitingText.y = 100;
           stage.addChild(waitingText);
