@@ -11,11 +11,16 @@
       var FRAMERATE = 60;
       var editor = null;
       var socket = null;
+      var gameReady = false;
+      var playersLeft = 3;
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var shape = new createjs.Shape();
       var stage = null;
-      var text = null;
+      var fpsText = null;
+      var waitingText = new createjs.Text("Waiting for " + playersLeft +
+                                    " more players!", "20px Arial", "x000000");
+      var playerNames = [];
 
       //Game state
       var playerList = [];
@@ -25,12 +30,11 @@
       var states = [];
       var statei = 0;
 
-      //Initialisation and update functions
-
       //Initialise gameCanvas - initialise stage, add shape drawer
       function init() {
         stage = new createjs.Stage("gameCanvas");
         stage.addChild(shape);
+        drawWaiting();
         createjs.Ticker.framerate = FRAMERATE;
         createjs.Ticker.addEventListener("tick", handleTick);
       }
@@ -48,26 +52,70 @@
       function socketInit() {
         $(document).ready(function(){
           socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
-          socket.on('connect', function() {
-            socket.emit('joined', {});
-          });
-          socket.on('result', function(data) {
-            processData(data);
-          });
+          socket.on('connect', connectToGame());
+          socket.on('result', processStates(data));
+          socket.on('game_start', readyGame());
+          socket.on('player_count', updatePlayersLeft(data));
         });
-        window.onbeforeunload = function(e) {
-            socket.emit('left', {});
-            socket.disconnect();
-        }
+        window.onbeforeunload = exitGame(e);
+      }
 
+      //Tell the server when the player has joined
+      function connectToGame() {
+        socket.emit('joined', {});
+      }
+
+      //Get list of states from server reply
+      function processStates(data) {
+        states = JSON.parse(data).result;
+        setState(states[0]);
+        for (i = 0; i < playerList.length; i++) {
+          var name = playerNames.push(new createjs.Text(playerList[i].name, "12px Arial", "x000000"));
+          stage.addChild(name);
+        }
+      }
+
+      //Function to allow the game to start when enough players are waiting
+      function readyGame(data) {
+        waitingText.off();
+        gameReady = true;
+      }
+
+      //Function to update player count
+      function updatePlayersLeft(data) {
+        playersLeft = JSON.parse(data).count;
+        if (playersLeft > 0) {
+          waitingText.text = "Waiting for " + playersLeft + " more players!";
+        } else {
+          waitingText.text = "Ready to start!";
+        }
+      }
+
+      //Function called when leaving the game
+      function exitGame(e) {
+        socket.emit('left', {});
+        socket.disconnect();
       }
 
       //Tick handler, clears graphics, draws FPS, updates canvas
       function handleTick(event) {
-        if (!event.paused) {
+        if (!event.paused && gameReady) {
           shape.graphics.clear();
           drawFPS();
           displayNextState();
+        }
+      }
+
+      //Function to draw the ticker's FPS to the screen
+      function drawFPS() {
+        var fps = createjs.Ticker.getMeasuredFPS();
+        if (FPStext == null) {
+          fpsText = new createjs.Text(fps, "20px Arial", "x000000");
+          fpsText.x = 10;
+          fpsText.y = 10;
+          stage.addChild(FPStext);
+        } else {
+          fpsText.text = fps;
         }
       }
 
@@ -82,9 +130,50 @@
         stage.update();
       }
 
+      //Function to display waiting text on canvas
+      function drawWaiting() {
+        if (!gameStarted) {
+          waitingText.x = 100;
+          waitingText.y = 100;
+          stage.addChild(waitingText);
+        }
+      }
+
+      //Draws a triangle facing the direction from vector vel
+      function drawTriangle(pos, vel, radius, color) {
+        var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
+        shape.graphics.beginFill(color).drawPolyStar(pos.x, pos.y, radius, 3, 0,
+                                                      angle);
+      }
+
+      /* Draw every object in a list - if color not provided then color is
+       * obtained from the list objects */
+      function drawList(list, color) {
+        var isPlayer = false;
+        if (color == null)
+          isPlayer = true;
+
+        for (i = 0; i < list.length; i++) {
+          if (isPlayer) {
+            color = list[i].color;
+            playerNames[i].x = list[i].pos.x;
+            playerNames[i].y = list[i].pos.y;
+          }
+          drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
+        }
+      }
+
+      //Convert JSON string json to object, set game state accordingly
+      function setState(state) {
+        playerList = state.players;
+        enemyList = state.enemies;
+        powerupList = state.powerups;
+        core = state.core;
+      }
+
       //Pause game, update pause button
       function togglePause() {
-        createjs.Ticker.paused = !createjs.Ticker.paused;
+        cFPStextreatejs.Ticker.paused = !createjs.Ticker.paused;
         var b = document.getElementById("pauseBtn");
         b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
       }
@@ -107,57 +196,6 @@
         editor.resize();
       }
 
-      //Drawing Functions
-
-      //Function to draw the ticker's FPS to the screen
-      function drawFPS() {
-        var fps = createjs.Ticker.getMeasuredFPS();
-        if (text == null) {
-          text = new createjs.Text(fps, "20px Arial", "x000000");
-          text.x = 10;
-          text.y = 10;
-          stage.addChild(text);
-        } else {
-          text.text = fps;
-        }
-      }
-
-      //Draws a triangle facing the direction from vector vel
-      function drawTriangle(pos, vel, radius, color) {
-        var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
-        shape.graphics.beginFill(color).drawPolyStar(pos.x, pos.y, radius, 3, 0,
-                                                      angle);
-      }
-
-      /* Draw every object in a list - if color not provided then color is
-       * obtained from the list objects */
-      function drawList(list, color) {
-        var isPlayer = false;
-        if (color == null)
-          isPlayer = true;
-
-        for (i = 0; i < list.length; i++) {
-          if (isPlayer)
-            color = list[i].color;
-          drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
-        }
-      }
-
-      //Game state altering functions
-
-      //Convert JSON string json to object, set game state accordingly
-      function setState(state) {
-        playerList = state.players;
-        enemyList = state.enemies;
-        powerupList = state.powerups;
-        core = state.core;
-      }
-
-      //Get list of states from server reply
-      function processData(data) {
-        states = JSON.parse(data).result;
-      }
-
       //Display the next state
       function displayNextState() {
         setState(states[statei]);
@@ -168,63 +206,14 @@
         updateCanvas();
       }
 
-      function displayPrevState() {
-        setState(states[statei]);
-        statei--;
-        if (statei < 0) {
-          statei = states.length - 1;
-        }
-        updateCanvas();
-      }
-
-      //Function to reset game state
-      function resetState() {
-        playerList = [];
-        enemyList = [];
-        powerupList = [];
-        core = null;
-      }
-
-      //Function to tell server to play the game
-      function startGame() {
-        socket.emit('startgame', {});
+      function submitCode() {
+        socket.emit('submit_code', editor.getValue());
       }
 
       //Function to leave the game
       function leaveGame() {
         window.location.href = "{{ url_for('main.lobby') }}";
       }
-
-      //Test Functions
-      //Set game state to test config
-      // function testCanvas() {
-      //   playerList = [{"tag": 0, "healthMax": 100, "health": 100, "ammo": 10,
-      //                 "name": "Bob", "color": "#5dfc5d",
-      //                 "pos": { "x": 50, "y": 100 },
-      //                 "vel": { "x": 1, "y": 0 }, "radius": 10 }];
-      //   enemyList = [{ "tag": 0, "healthMax": 100, "health": 100,
-      //                 "pos": { "x": 234, "y": 323 },
-      //                 "vel": { "x": 0, "y": 1 }, "radius": 10 }];
-      //   powerupList = [{ "tag": 0, "healthMax": 100, "health": 100,
-      //                 "pos": { "x": 546, "y": 121 },
-      //                 "vel": { "x": 0, "y": -1 }, "radius": 10 }];
-      //   core = { "tag": 0, "healthMax": 100, "health": 100,
-      //                 "pos": { "x": 900, "y": 400 },
-      //                 "vel": { "x": -1, "y": 0 }, "radius": 10 };
-      //   updateCanvas();
-      // }
-
-      // /* Set game state to test config, convert to JSON, then clear game state
-      //  * and set game state by JSON parsing */
-      // function testJSON() {
-      //   testCanvas();
-      //   var obj = {"players": playerList, "enemies": enemyList,
-      //               "powerups": powerupList, "core": core};
-      //   var sjson = JSON.stringify(obj);
-      //   resetState();
-      //   processJSON(sjson);
-      //   updateCanvas();
-      // }
 
     </script>
 {% endblock %}
@@ -239,16 +228,12 @@
         <canvas id="gameCanvas" class="gameCanvas" width="1000px"
                 height="900px"></canvas>
         <div class="controls">
-          <button id="resetStateBtn" onclick="resetState()">Clear Game State
-            </button>
           <button onclick="toggleEditor()">Toggle Editor</button>
           <button id="pauseBtn" onclick="togglePause()">Pause</button>
-          <button id="startBtn" onclick="startGame()">Start Game</button>
-          <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
           <button id="nextStateBtn" onclick="displayNextState()">Next State
             </button>
-          <button id="prevStateBtn" onclick="displayPrevState()">Previous State
-            </button>
+          <button id="submitBtn" onclick="submitCode()">Submit Code</button>
+          <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
         </div>
       </div>
     </div>
