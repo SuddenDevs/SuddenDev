@@ -11,7 +11,6 @@ import time
 NAMESPACE = '/game-session'
 
 class GameInstance:
-    
     def __init__(self, game_id):
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
@@ -35,5 +34,4 @@ class GameInstance:
             #Client Update
             self.states.append(encodeState(self.game))
 
-            with self.app.app_context():
-                fsio.emit('status', json, namespace=NAMESPACE, room=self.game_id)
+        return self.states
