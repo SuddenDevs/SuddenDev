@@ -17,13 +17,14 @@ def joined(message):
 
     # TODO: move to database and guard against errors
     player_count = GLOBAL_DICT[game_id]['player_count']
+    player_names = GLOBAL_DICT[game_id]['players']
 
     fsio.emit('player_count', '{\"count\" : ' + str(REQUIRED_PLAYER_COUNT-player_count) + '}', room=game_id, namespace=NAMESPACE)
 
     # If there are enough players, start the game
     if player_count == REQUIRED_PLAYER_COUNT:
         fsio.emit('game_start', {}, room=game_id, namespace=NAMESPACE)
-        result = play_game.delay(game_id).get()
+        result = play_game.delay(game_id, player_names).get()
         fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
