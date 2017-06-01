@@ -20,22 +20,22 @@ class Game:
     #Enemy Spawning
     enemy_spawn_delay = 1
 
-    def __init__(self):
+    def __init__(self, player_names):
         #Map
         self.map = Map(600, 600)
 
         script = """
-something = 1
-someparam = 2
+                something = 1
+                someparam = 2
 
-def update(self, delta):
-    self.vel = Vector(1,1)
-"""
+                def update(self, delta):
+                    self.vel = Vector(1,1)
+                """
 
         #Players
         self.players = []
-        for i in range(3):
-            player = Player(i, Color3(255, 0, 0), self, script)
+        for i in range(4):
+            player = Player(player_names[i], Color3(255, 0, 0), self, script)
             player.pos = Vector(random.random()*self.map.width,
                                 random.random()*self.map.height)
             self.players.append(player)
