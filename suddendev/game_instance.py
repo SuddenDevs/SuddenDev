@@ -22,7 +22,7 @@ class GameInstance:
         time_last = time.time()
 
         #Main Loop
-        for i in range(100):
+        for i in range(1000):
             #Timekeeping
             time_current = time.time()
             delta = time_current - time_last

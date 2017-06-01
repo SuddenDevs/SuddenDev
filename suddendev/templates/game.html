@@ -1,31 +1,261 @@
 {% extends "base.html" %}
-{% block body %}
-  <script type="text/javascript" charset="utf-8">
-    var socket;
-    $(document).ready(function(){
-      socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
-      socket.on('connect', function() {
-        socket.emit('joined', {});
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
+  <script type="text/javascript" src="{{url_for('static', filename='createjs-2015.11.26.min.js')}}"></script>
+  <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
+  <script>
+      //Colors and static variables
+      var ENEMYC = "#bf1818";
+      var PICKUPC = "#edd95c";
+      var COREC = "#47d7f7";
+      var FRAMERATE = 15;
+      var editor = null;
+      var socket = null;
+
+      //Stage/shape drawer initialised, can be used in multiple functions
+      var shape = new createjs.Shape();
+      var stage = null;
+      var text = null;
+
+      //Game state
+      var playerList = [];
+      var enemyList = [];
+      var powerupList = [];
+      var core = null;
+      var states = [];
+      var statei = 0;
+
+      //Initialisation and update functions
+
+      //Initialise gameCanvas - initialise stage, add shape drawer
+      function init() {
+        stage = new createjs.Stage("gameCanvas");
+        stage.addChild(shape);
+        createjs.Ticker.paused = true;
+        createjs.Ticker.framerate = FRAMERATE;
+        createjs.Ticker.addEventListener("tick", handleTick);
+      }
+
+      //Initialise the editor
+      function editorInit() {
+        editor = ace.edit("editor");
+        editor.getSession().setMode("ace/mode/python");
+        var e = document.getElementById("editor");
+        e.style.height = "0%";
+        editor.resize();
+      }
+
+      //Initialise connection to server
+      function socketInit() {
+        $(document).ready(function(){
+          socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
+          socket.on('connect', function() {
+            socket.emit('joined', {});
+          });
+          socket.on('result', function(data) {
+            processData(data);
+          });
+        });
+        window.onbeforeunload = function(e) {
+            socket.emit('left', {});
+            socket.disconnect();
+        }
+
+      }
+
+      //Tick handler, clears graphics, draws FPS, updates canvas
+      function handleTick(event) {
+        if (!event.paused) {
+          shape.graphics.clear();
+          drawFPS();
+          displayNextState();
+        }
+      }
+
+      //Clear shape drawer, then draw game state to gameCanvas
+      function updateCanvas() {
+        drawList(playerList, null);
+        drawList(enemyList, ENEMYC);
+        drawList(powerupList, PICKUPC);
+        if (core != null) {
+          drawTriangle(core.pos, core.vel, core.radius, COREC);
+        }
+        stage.update();
+      }
+
+      //Pause game, update pause button
+      function togglePause() {
+        createjs.Ticker.paused = !createjs.Ticker.paused;
+        var b = document.getElementById("pauseBtn");
+        b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
+      }
+
+      //Display editor over game canvas
+      function toggleEditor() {
+        var e = document.getElementById("editor");
+        var editorOn = e.style.height == "0%";
+        if (editorOn) {
+          e.focus();
+          e.style.height = "100%";
+          e.style.pointerEvents = "auto";
+          e.style.borderStyle = "solid";
+          e.style.borderWidth = "thin";
+        } else {
+          e.style.height = "0%";
+          e.style.pointerEvents = "none";
+          e.style.borderStyle = "hidden";
+        }
+        editor.resize();
+      }
+
+      //Drawing Functions
+
+      //Function to draw the ticker's FPS to the screen
+      function drawFPS() {
+        var fps = createjs.Ticker.getMeasuredFPS();
+        if (text == null) {
+          text = new createjs.Text(fps, "20px Arial", "x000000");
+          text.x = 10;
+          text.y = 10;
+          stage.addChild(text);
+        } else {
+          text.text = fps;
+        }
+      }
+
+      //Draws a triangle facing the direction from vector vel
+      function drawTriangle(pos, vel, radius, color) {
+        var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
+        shape.graphics.beginFill(color).drawPolyStar(pos.x, pos.y, radius, 3, 0,
+                                                      angle);
+      }
+
+      /* Draw every object in a list - if color not provided then color is
+       * obtained from the list objects */
+      function drawList(list, color) {
+        var isPlayer = false;
+        if (color == null)
+          isPlayer = true;
+
+        for (i = 0; i < list.length; i++) {
+          if (isPlayer)
+            color = list[i].color;
+          drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
+        }
+      }
+
+      //Game state altering functions
+
+      //Convert JSON string json to object, set game state accordingly
+      function processJSON(json) {
+        var obj = JSON.parse(json);
+        playerList = obj.players;
+        enemyList = obj.enemies;
+        powerupList = obj.powerups;
+        core = obj.core;
+      }
+
+      //Get list of states from server reply
+      function processData(data) {
+        states = JSON.parse(data);
+      }
+
+      //Display the next state
+      function displayNextState() {
+        processJSON(states[statei]);
+        console.log("x: " + playerList[0].pos.x + ", y: " + playerList[0].pos.y);
+        statei++;
+        if (statei >= states.length) {
+          statei = 0;
+        }
+        updateCanvas();
+      }
+
+      function displayPrevState() {
+        processJSON(states[statei]);
+        console.log("x: " + playerList[0].pos.x + ", y: " + playerList[0].pos.y);
+        statei--;
+        if (statei < 0) {
+          statei = states.length - 1;
+        }
+        updateCanvas();
+      }
+
+      //Function to reset game state
+      function resetState() {
+        playerList = [];
+        enemyList = [];
+        powerupList = [];
+        core = null;
+      }
+
+      //Function to tell server to play the game
+      function startGame() {
         socket.emit('startgame', {});
-      });
-      socket.on('result', function(data) {
-        $('#chat').val($('#chat').val() + data + '\n');
-        $('#chat').scrollTop($('#chat')[0].scrollHeight);
-      });
-    });
-    function leave_room() {
-      window.location.href = "{{ url_for('main.lobby') }}";
-    }
-    window.onbeforeunload = function(e) {
-        socket.emit('left', {});
-        socket.disconnect();
+        createjs.Ticker.paused = false;
+      }
 
-    }
-  </script>
+      //Function to leave the game
+      function leaveGame() {
+        window.location.href = "{{ url_for('main.lobby') }}";
+      }
 
-  {% block chat_body %}{% endblock %}
+      //Test Functions
+      //Set game state to test config
+      // function testCanvas() {
+      //   playerList = [{"tag": 0, "healthMax": 100, "health": 100, "ammo": 10,
+      //                 "name": "Bob", "color": "#5dfc5d",
+      //                 "pos": { "x": 50, "y": 100 },
+      //                 "vel": { "x": 1, "y": 0 }, "radius": 10 }];
+      //   enemyList = [{ "tag": 0, "healthMax": 100, "health": 100,
+      //                 "pos": { "x": 234, "y": 323 },
+      //                 "vel": { "x": 0, "y": 1 }, "radius": 10 }];
+      //   powerupList = [{ "tag": 0, "healthMax": 100, "health": 100,
+      //                 "pos": { "x": 546, "y": 121 },
+      //                 "vel": { "x": 0, "y": -1 }, "radius": 10 }];
+      //   core = { "tag": 0, "healthMax": 100, "health": 100,
+      //                 "pos": { "x": 900, "y": 400 },
+      //                 "vel": { "x": -1, "y": 0 }, "radius": 10 };
+      //   updateCanvas();
+      // }
 
-  <br>
-  <textarea id="chat" cols="80" rows="20"></textarea><br><br>
-  <a href="#" onclick="leave_room();">Exit the chat</a>
+      // /* Set game state to test config, convert to JSON, then clear game state
+      //  * and set game state by JSON parsing */
+      // function testJSON() {
+      //   testCanvas();
+      //   var obj = {"players": playerList, "enemies": enemyList,
+      //               "powerups": powerupList, "core": core};
+      //   var sjson = JSON.stringify(obj);
+      //   resetState();
+      //   processJSON(sjson);
+      //   updateCanvas();
+      // }
+
+    </script>
+{% endblock %}
+{% block body %}
+    <div class="outer">
+      <div id="editorContainer" class="editorContainer">
+        <div id="editor"></div>
+      </div>
+      <script>socketInit()</script>
+      <script>editorInit();</script>
+      <div id="gameDiv" class="gameDiv">
+        <canvas id="gameCanvas" class="gameCanvas" width="1000px"
+                height="900px"></canvas>
+        <div class="controls">
+          <button id="resetStateBtn" onclick="resetState()">Clear Game State
+            </button>
+          <button onclick="toggleEditor()">Toggle Editor</button>
+          <button id="pauseBtn" onclick="togglePause()">Pause</button>
+          <button id="startBtn" onclick="startGame()">Start Game</button>
+          <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
+          <button id="nextStateBtn" onclick="displayNextState()">Next State
+            </button>
+          <button id="prevStateBtn" onclick="displayPrevState()">Previous State
+            </button>
+        </div>
+      </div>
+    </div>
+    <script>init();console.log("init");</script>
 {% endblock %}
