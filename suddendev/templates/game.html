@@ -184,7 +184,7 @@
 
       //Pause game, update pause button
       function togglePause() {
-        cFPStextreatejs.Ticker.paused = !createjs.Ticker.paused;
+        createjs.Ticker.paused = !createjs.Ticker.paused;
         var b = document.getElementById("pauseBtn");
         b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
       }
