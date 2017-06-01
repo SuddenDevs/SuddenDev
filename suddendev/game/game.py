@@ -25,11 +25,11 @@ class Game:
         self.map = Map(600, 600)
 
         script = """
-                something = 1
-                someparam = 2
+something = 1
+someparam = 2
 
-                def update(self, delta):
-                    self.vel = Vector(1,1)
+def update(self, delta):
+    self.vel = Vector(1,1)
                 """
 
         #Players
