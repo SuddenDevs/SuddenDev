@@ -31,7 +31,6 @@
       function init() {
         stage = new createjs.Stage("gameCanvas");
         stage.addChild(shape);
-        createjs.Ticker.paused = true;
         createjs.Ticker.framerate = FRAMERATE;
         createjs.Ticker.addEventListener("tick", handleTick);
       }
@@ -78,7 +77,7 @@
         drawList(enemyList, ENEMYC);
         drawList(powerupList, PICKUPC);
         if (core != null) {
-          drawTriangle(core.pos, core.vel, core.radius, COREC);
+          drawTriangle(core.pos, core.vel, core.size, COREC);
         }
         stage.update();
       }
@@ -147,23 +146,24 @@
       //Game state altering functions
 
       //Convert JSON string json to object, set game state accordingly
-      function processJSON(json) {
-        var obj = JSON.parse(json);
-        playerList = obj.players;
-        enemyList = obj.enemies;
-        powerupList = obj.powerups;
-        core = obj.core;
+      function setState(state) {
+        playerList = state.players;
+        enemyList = state.enemies;
+        powerupList = state.powerups;
+        core = state.core;
       }
 
       //Get list of states from server reply
       function processData(data) {
-        states = JSON.parse(data);
+        states = JSON.parse(data).result;
       }
 
       //Display the next state
       function displayNextState() {
-        processJSON(states[statei]);
-        console.log("x: " + playerList[0].pos.x + ", y: " + playerList[0].pos.y);
+        setState(states[statei]);
+        console.log("State: " + statei);
+        console.log("length: " + states.length);
+        console.log("Core: x: " + core.pos.x + ", y: " + core.pos.y);
         statei++;
         if (statei >= states.length) {
           statei = 0;
@@ -172,7 +172,7 @@
       }
 
       function displayPrevState() {
-        processJSON(states[statei]);
+        setState(states[statei]);
         console.log("x: " + playerList[0].pos.x + ", y: " + playerList[0].pos.y);
         statei--;
         if (statei < 0) {
@@ -192,7 +192,6 @@
       //Function to tell server to play the game
       function startGame() {
         socket.emit('startgame', {});
-        createjs.Ticker.paused = false;
       }
 
       //Function to leave the game
