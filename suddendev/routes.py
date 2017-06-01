@@ -46,6 +46,12 @@ def lobby():
 
     if flask.request.method == 'POST':
 
+        if flask.request.form['name'] != "":
+            flask.session['name'] = flask.request.form['name']
+        else:
+            flask.session['name'] = 'anon'
+
+
         if flask.request.form['submit'] == 'create':
             flask.session['game_id'] = create_room()
 

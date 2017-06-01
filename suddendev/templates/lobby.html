@@ -2,18 +2,21 @@
 {% block body %}
 
     <form method="POST">
-        Create new lobby
-        <input type="submit" name="submit" value="create">
+
+        <label for="usr">Name:</label>
+        <input type="text" class="form-control" name="name">
+	
+	<br>
+
+        <button type="submit" class="btn btn-lg btn-success" name="submit" value="create">
+	create new room!
+	</button>
+
+
+	{% for r in rooms %}
+	    <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r.game_id }}">
+		join {{ r.game_id }}</button>
+	{% endfor %}
     </form>
 
-    <h1>Open rooms:</h1><br>
-    {% for r in rooms %}
-
-    <form method="POST">
-        Start time: {{ r.start_time.ctime() }}  
-        <input type="submit" name="submit" value="{{ r.game_id }}">
-    </form>
-    <br>
-    
-    {% endfor %}
 {% endblock %}
