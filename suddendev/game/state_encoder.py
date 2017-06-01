@@ -5,6 +5,9 @@ import json
 def encodeState(game):
     return json.dumps(game, cls=StateEncoder)
 
+def clamp(x): 
+    return max(0, min(x, 255))
+
 class StateEncoder(json.JSONEncoder):
     def default(self, o):
         return self.serializeState(o)
@@ -41,11 +44,7 @@ class StateEncoder(json.JSONEncoder):
         return {'x' : pos.x, 'y': pos.y}
 
     def serializeColor(self, color):
-        return {
-                'r': color.r,
-                'g': color.g,
-                'b': color.b
-                }
+        return "#{0:02x}{1:02x}{2:02x}".format(clamp(color.r), clamp(color.g), clamp(color.b))
 
     #TODO
     #Duplication, will extend if enemies or powerups start to differ
