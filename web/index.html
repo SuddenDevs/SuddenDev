@@ -39,10 +39,9 @@
       //Initialise the editor
       function editorInit() {
         editor = ace.edit("editor");
-        editor.setTheme("ace/theme/monokai");
         editor.getSession().setMode("ace/mode/python");
         var e = document.getElementById("editor");
-        e.style.height = "0px";
+        e.style.height = "0%";
         editor.resize();
       }
 
@@ -76,11 +75,17 @@
       //Display editor over game canvas
       function toggleEditor() {
         var e = document.getElementById("editor");
-        if (e.style.height == "0px") {
+        var editorOn = e.style.height == "0%";
+        if (editorOn) {
           e.focus();
-          e.style.height = "600px";
+          e.style.height = "100%";
+          e.style.pointerEvents = "auto";
+          e.style.borderStyle = "solid";
+          e.style.borderWidth = "thin";
         } else {
-          e.style.height = "0px";
+          e.style.height = "0%";
+          e.style.pointerEvents = "none";
+          e.style.borderStyle = "hidden";
         }
         editor.resize();
       }
@@ -174,18 +179,23 @@
 
   <body onload="init()">
     <div class="outer">
-    <div id="editorContainer" class="editorContainer">
-      <div id="editor"></div>
-    </div>
-    <script>editorInit();</script>
-    <canvas id="gameCanvas" class="gameCanvas" width="960px" height="600px">
-    </canvas>
-      <div class="controls">
-        <button onclick="testCanvas()">Test Canvas No JSON</button>
-        <button onclick="testJSON()">Test Canvas JSON</button>
-        <button onclick="resetState()">Clear Game State</button>
-        <button onclick="toggleEditor()">Toggle Editor</button>
-        <button id="pauseButton" onclick="togglePause()">Pause</button>
+      <div id="editorContainer" class="editorContainer">
+        <div id="editor"></div>
+      </div>
+      <script>editorInit();</script>
+      <div id="gameDiv" class="gameDiv">
+        <canvas id="gameCanvas" class="gameCanvas" width="1000px"
+                height="900px"></canvas>
+        <div class="controls">
+          <button id="testCanvasBtn" onclick="testCanvas()">Test Canvas No JSON
+            </button>
+          <button id="testJSONBtn" onclick="testJSON()">Test Canvas JSON
+            </button>
+          <button id="resetStateBtn" onclick="resetState()">Clear Game State
+            </button>
+          <button onclick="toggleEditor()">Toggle Editor</button>
+          <button id="pauseBtn" onclick="togglePause()">Pause</button>
+        </div>
       </div>
     </div>
   </body>
