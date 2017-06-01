@@ -1,9 +1,16 @@
 language: python
 python:
-  - "3.6"
-install: "pip install tox pytest"
+- '3.6'
+install: pip install tox pytest
 services:
-  - postgresql
+- postgresql
 before_script:
-  - psql -c 'create database suddendev_test;' -U postgres
+- psql -c 'create database suddendev_test;' -U postgres
 script: tox
+deploy:
+  provider: heroku
+  api_key:
+    secure: wjLQ2uQAXiGzWPYLG51KNVgkJbf6L6d9iE6V1AkI18fyCNBiru4KU412DP4bHF4R1aFe+vTdGUXpNcV+DNo9zh/IOZ9T1avqtUI87Ep00RVQ1DzDvTTWCfmypYpGakLLFsHTaNq7auXgbI8W91XT4JMLXPsRUlh0iXaIF8tdelEPaRqgEHwGQPhkc9KbVt+Z9vYn+vQRb4v8g2sJenMk9BpOMmeWWNC+ZFz2RDyxv4a649fAS9hSiysHPxmjvDoVAfljdI5qsuZbbGxAFfLR3H2b8W68oejy/ICiMzgYvjXq1N4SaGpbj5+E0xSgTqSCtYo67z1rdD8RM/OH/iK25alqCSBiMrLTjKChgw0GnoU3HNgy7nB6ZzcFuT0XtqVQlnB9zfII9+3xw4FTZhA0foOYuKccD5KTPWmKRYv1xwqNYjop1OpKc5DULcnVqZvQK8BJLrNvMW3+yMDF2Ns5oyWqCO8HuaWJ/tLnZ3PLUevn6Eyz+X0BmWCPtpTFDuK4G2IcPEJ5Pn+Hw16ZTWBT3C0vwOBOYafQwERWjdzfi8Rba+9XsqLflO68WYl2N/Ie1xGuvsxiZ+UHEoImD5lXzSQEVcEX9pHLuxmPW18nE5yCtFbZvMlRfJOA4trLkzrRwrWUuAMv92x2BEMM4IJ76rvZyIBJ0JtOTkspm8WJaKw=
+  app: suddendev-staging
+  on:
+    repo: SuddenDevs/SuddenDev
