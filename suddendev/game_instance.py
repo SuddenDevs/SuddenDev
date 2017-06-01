@@ -27,6 +27,7 @@ class GameInstance:
             time_current = time.time()
             delta = time_current - time_last
             time_last = time_current
+            time.sleep(100/1000)
 
             #Gameplay Update
             self.game.tick(delta)
