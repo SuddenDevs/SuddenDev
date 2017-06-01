@@ -6,4 +6,4 @@ import json
 @celery.task
 def play_game(game_id):
     game = GameInstance(game_id)
-    return json.dumps(game.run())
+    return '{\"result\": [ ' + ','.join(game.run()) + ']}'
