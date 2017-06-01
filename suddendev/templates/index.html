@@ -1,9 +1,30 @@
 {% extends "base.html" %}
 {% block body %}
-    homepage spiel
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        {{ form.key.label }}: {{ form.key() }} {% for error in form.key.errors %}{{ error }}{% endfor %}<br>
-        {{ form.submit() }}
-    </form>
+  <div class="container">
+      <div class="page-header">
+        <h1>S U D D E N _ D E V</h1>
+        <p class="lead">Strategize. Script. Survive.</p>
+      </div>
+
+      <h3>About</h3>
+      <p> SUDDEN_DEV is a co-op survival game with a twist; you don't play.
+      Each player writes a script that controls their character.
+      The aim of the game is to clear all the waves and protect the <i>core</i>.</p>
+
+      Scripting lets you:</p>
+      <ul>
+        <li>See everything near your character</li>
+        <li>Control your character's movements</li>
+        <li>Message other characters</li>
+        <li>Attack enemies that are in range</li>
+      </ul>
+
+      <p>Clearing stages will require not only strong AI but clever team strategies.
+      How effectively your characters play roles and communicate with each other will be vital.</p>
+
+      <p>Currently, SUDDEN_DEV is in very early in development. You can check the code out
+      on GitHub <a href="https://github.com/SuddenDevs/SuddenDev">here</a></p>
+
+      <b> Watch this space!</b>
+  </div>
 {% endblock %}
