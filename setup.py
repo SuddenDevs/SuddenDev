@@ -13,12 +13,13 @@ setup(
         'gunicorn==19.7.1',
         'eventlet==0.21.0',
         'psycopg2==2.7.1',
+        'celery==4.0.2',
+        'redis==2.10.5',
     ],
     setup_requires=[
         'pytest-runner',
     ],
     tests_require=[
         'pytest',
-        'pytest-env==0.6.0',
     ],
 )

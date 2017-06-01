@@ -7,6 +7,9 @@ __pycache__/
 tags
 .DS_Store
 
+# Redis directory
+redis*
+
 # C extensions
 *.so
 

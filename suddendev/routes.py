@@ -3,20 +3,19 @@ import random
 import string
 import sqlalchemy
 import datetime
+import flask_socketio as fsio
+from threading import Thread
 from . import main
+from . import socketio
+from .tasks import run_game_task
 from .forms import CreateGameForm
 from .models import db, GameController
 from .game_instance import GameInstance
-import flask_socketio as fsio
-from threading import Thread
-from . import socketio
-
-# TODO: deal with pranksters setting up multiple pranks
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page."""
-    return flask.redirect(flask.url_for('.lobby'))
+    return flask.render_template('index.html')
 
 @main.route('/game', methods=['GET', 'POST'])
 def game_page():
@@ -78,12 +77,15 @@ def create_room():
             db.session.commit()
         except sqlalchemy.exc.IntegrityError:
            continue
+        break
 
-        game = GameInstance(game_id, flask.current_app._get_current_object())
-        thread = Thread(target = game.run)
-        thread.start()
-       
-        return game_id
+    print('running game')
+    result = run_game_task.delay()
+    print(result.backend)
+    while not result.ready():
+        continue
+    print('game done')
+    return game_id
 
 def check_room_key(game_id):
     """Check the given room key exists and hasn't expired.

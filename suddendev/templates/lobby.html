@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
+    <a href="{{ url_for('main.game_create') }}">Create game</a>
     <h1>Open rooms:</h1><br>
     {% for r in rooms %}
 

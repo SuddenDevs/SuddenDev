@@ -2,8 +2,8 @@
 
 import json
 
-def encodeState(state):
-    return json.dumps(state, cls=StateEncoder)
+def encodeState(game):
+    return json.dumps(game, cls=StateEncoder)
 
 class StateEncoder(json.JSONEncoder):
     def default(self, o):
@@ -20,7 +20,7 @@ class StateEncoder(json.JSONEncoder):
     def serializeEntity(self, entity):
         return {
                 'tag': entity.tag,
-                'pos': self.serializeVector(entity.position),
+                'pos': self.serializeVector(entity.pos),
                 'vel': self.serializeVector(entity.vel),
                 'size': entity.size,
                 'healthMax': entity.healthMax,
@@ -32,7 +32,7 @@ class StateEncoder(json.JSONEncoder):
         for p in players:
             json = self.serializeEntity(p)
             json['name'] = p.name;
-            json['ammo'] = p.ammo;
+            #json['ammo'] = p.ammo;
             json['color'] = self.serializeColor(p.color);
             result.append(json)
         return result
