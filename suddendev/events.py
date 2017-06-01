@@ -3,7 +3,7 @@ import flask_socketio as fsio
 from . import socketio
 from .tasks import play_game
 from .models import db, GameSetup
-from .routes import GLOBAL_DICT
+from .routes import GLOBAL_DICT # TODO: need to get rid of
 import sqlalchemy
 
 NAMESPACE = '/game-session'
@@ -15,9 +15,14 @@ def joined(message):
     game_id = flask.session.get('game_id')
     fsio.join_room(game_id)
 
-    # TODO: move to database and guard against errors
+    # TODO global dict needs to go
+    if game_id not in GLOBAL_DICT:
+        flask.flash("sorry something isn't quite right... try joining another game")
+        return flask.redirect(flask.url_for('.lobby'))
+
     player_count = GLOBAL_DICT[game_id]['player_count']
 
+    # TODO: use json dumps and make less ugly
     fsio.emit('player_count', '{\"count\" : ' + str(REQUIRED_PLAYER_COUNT-player_count) + '}', room=game_id, namespace=NAMESPACE)
 
     # If there are enough players, start the game
