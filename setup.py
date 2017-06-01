@@ -12,6 +12,7 @@ setup(
         'wtforms',
         'gunicorn==19.7.1',
         'eventlet==0.21.0',
+        'psycopg2==2.7.1',
     ],
     setup_requires=[
         'pytest-runner',

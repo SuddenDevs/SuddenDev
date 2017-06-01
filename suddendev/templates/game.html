@@ -13,10 +13,12 @@
       });
     });
     function leave_room() {
-      socket.emit('left', {});
-      socket.disconnect();
-      // go back to the main page
       window.location.href = "{{ url_for('main.lobby') }}";
+    }
+    window.onbeforeunload = function(e) {
+        socket.emit('left', {});
+        socket.disconnect();
+
     }
   </script>
 

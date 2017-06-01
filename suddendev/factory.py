@@ -1,18 +1,11 @@
 import flask
-from . import default_config
+import os
 
 
-def create_app(config_filename=None):
+def create_app():
     app = flask.Flask(__name__)
 
-    if not config_filename:
-        config_filename = default_config.__file__
-
-        # make the .pyc .py instead
-        if config_filename[-1] == 'c':
-            config_filename = config_filename[:-1]
-
-    app.config.from_pyfile(config_filename)
+    app.config.from_object(os.environ['APP_SETTINGS'])
 
     from suddendev.models import db
     db.init_app(app)
