@@ -14,7 +14,7 @@ def joined(message):
     room = flask.session.get('game_id')
     fsio.join_room(room)
     game = GameController.query.filter_by(game_id=user_game_id).one_or_none()
-    fsio.emit('player_count', {'count' : game.player_count}, room=game_id, namespace=NAMESPACE)
+    fsio.emit('player_count', {'count' : REQUIRED_PLAYER_COUNT-game.player_count}, room=game_id, namespace=NAMESPACE)
 
     # If there are enough players, start the game
     if game.player_count == REQUIRED_PLAYER_COUNT:
