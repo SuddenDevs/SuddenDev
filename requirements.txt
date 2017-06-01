@@ -1,2 +1,0 @@
-# Specifies that heroku needs to run 'python setup.py develop'
--e .
