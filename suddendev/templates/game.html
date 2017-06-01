@@ -8,7 +8,7 @@
       var ENEMYC = "#bf1818";
       var PICKUPC = "#edd95c";
       var COREC = "#47d7f7";
-      var FRAMERATE = 15;
+      var FRAMERATE = 60;
       var editor = null;
       var socket = null;
 
@@ -161,9 +161,6 @@
       //Display the next state
       function displayNextState() {
         setState(states[statei]);
-        console.log("State: " + statei);
-        console.log("length: " + states.length);
-        console.log("Core: x: " + core.pos.x + ", y: " + core.pos.y);
         statei++;
         if (statei >= states.length) {
           statei = 0;
@@ -173,7 +170,6 @@
 
       function displayPrevState() {
         setState(states[statei]);
-        console.log("x: " + playerList[0].pos.x + ", y: " + playerList[0].pos.y);
         statei--;
         if (statei < 0) {
           statei = states.length - 1;
@@ -256,5 +252,5 @@
         </div>
       </div>
     </div>
-    <script>init();console.log("init");</script>
+    <script>init();</script>
 {% endblock %}
