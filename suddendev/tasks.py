@@ -1,7 +1,9 @@
 from . import celery
+from .game_instance import GameInstance
 import time
+import json
 
 @celery.task
-def run_game_task():
-    time.sleep(4)
-    return {'status' : 'game is done', 'result' : 'dasf'}
+def play_game(game_id):
+    game = GameInstance(game_id)
+    return '{\"result\": [ ' + ','.join(game.run()) + ']}'
