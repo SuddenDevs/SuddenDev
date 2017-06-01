@@ -111,8 +111,5 @@ class GameInstance:
             #Client Update
             json = encodeState(self.game)
 
-            #json = sample_json
-
             with self.app.app_context():
                 fsio.emit('status', json, namespace=NAMESPACE, room=self.game_id)
-                # fsio.emit('status', json, namespace=NAMESPACE, broadcast=True)

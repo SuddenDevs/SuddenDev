@@ -24,10 +24,18 @@ class Game:
         #Map
         self.map = Map(600, 600)
 
+        script = """
+something = 1
+someparam = 2
+
+def update(self, delta):
+    self.vel = Vector(1,1)
+"""
+
         #Players
         self.players = []
         for i in range(3):
-            player = Player(i, Color3(255, 0, 0), self)
+            player = Player(i, Color3(255, 0, 0), self, script)
             player.pos = Vector(random.random()*self.map.width,
                                 random.random()*self.map.height)
             self.players.append(player)
@@ -42,6 +50,7 @@ class Game:
 
         #Core
         self.core = Core()
+        self.core.pos = Vector(self.map.width/2, self.map.height/2)
 
         #Metadata
         self.time = 0
