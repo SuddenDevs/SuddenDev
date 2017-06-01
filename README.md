@@ -35,7 +35,7 @@ Finally to run the app locally, simply run:
 heroku local
 ```
 
-## Testing
+## Locally Testing
 
 Simply install tox and pytest (neither have to be in the development venv):
 
@@ -49,6 +49,20 @@ And in the root directory, run:
 tox
 ```
 
-## Deploying to Heroku
+## Deploying
 
-TODO
+We are using Heroku to host the application, and Travis for CI.
+
+The deployment workflow we've set-up is:
+
+- Commit to master
+- Travis runs the tests
+- If the build is successful, Travis deploys to the staging area
+- One of us may choose to promote the application in the staging area to production
+
+If you are looking to try deploying the code to a Heroku app yourself you'll need to:
+
+- add the postgresql add-on to your heroku app
+- run 'heroku run python clear-db.py' to initialise the database
+- set the APP_SETTINGS and SECRET_KEY envvars on the app, e.g. 'heroku config:set APP_SETTINGS=suddendev.config.ProductionConfig'
+- update the deploy settings in .travis.yml to deploy to your Heroku app and use your own encrypted Heroku API key
