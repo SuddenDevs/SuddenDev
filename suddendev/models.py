@@ -6,8 +6,10 @@ db = flask_sql.SQLAlchemy()
 class GameController(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.String, unique=True)
+    player_count = db.Column(db.Integer, unique=True)
     start_time = db.Column(db.DateTime)
 
     def __init__(self, game_id):
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
+        self.player_count = 0
