@@ -8,8 +8,6 @@ setup(
         'flask==0.12',
         'flask_sqlalchemy',
         'flask_socketio',
-        'flask_wtf',
-        'wtforms',
         'gunicorn==19.7.1',
         'eventlet==0.21.0',
         'psycopg2==2.7.1',

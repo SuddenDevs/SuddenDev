@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 {% block body %}
-    <a href="{{ url_for('main.game_create') }}">Create game</a>
+
+    <form method="POST">
+        Create new lobby
+        <input type="submit" name="submit" value="create">
+    </form>
+
     <h1>Open rooms:</h1><br>
     {% for r in rooms %}
 
     <form method="POST">
         Start time: {{ r.start_time.ctime() }}  
-        <input type="hidden" name="game_id" value={{r.game_id}}>
-        <input type="submit" name="{{r.game_id}}" value="Join {{ r.game_id }}">
+        <input type="submit" name="submit" value="{{ r.game_id }}">
     </form>
     <br>
     
