@@ -4,9 +4,10 @@ python:
 install: pip install tox pytest
 services:
 - postgresql
+- redis-server
 before_script:
 - psql -c 'create database suddendev_test;' -U postgres
-script: tox
+script: run-tests.sh
 deploy:
   provider: heroku
   api_key:
