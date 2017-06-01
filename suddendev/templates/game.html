@@ -57,9 +57,10 @@
           });
           socket.on('result', function(data) {
             processStates(data);
+            readyGame();
           });
           socket.on('game_start', function() {
-            readyGame();
+            //May not need this signal
           });
           socket.on('player_count', function(data) {
             updatePlayersLeft(data);
@@ -81,14 +82,15 @@
         states = JSON.parse(data).result;
         setState(states[0]);
         for (i = 0; i < playerList.length; i++) {
-          var name = playerNames.push(new createjs.Text(playerList[i].name, "12px Arial", "x000000"));
+          var name = new createjs.Text(playerList[i].name, "12px Arial", "x000000")
+          playerNames.push(name);
           stage.addChild(name);
         }
       }
 
       //Function to allow the game to start when enough players are waiting
       function readyGame(data) {
-        waitingText.off();
+        stage.removeChild(waitingText);
         gameReady = true;
       }
 
@@ -100,7 +102,7 @@
         } else {
           waitingText.text = "Ready to start!";
         }
-        drawWaiting();
+        stage.update();
       }
 
       //Function called when leaving the game
@@ -125,7 +127,7 @@
           fpsText = new createjs.Text(fps, "20px Arial", "x000000");
           fpsText.x = 10;
           fpsText.y = 10;
-          stage.addChild(FPStext);
+          stage.addChild(fpsText);
         } else {
           fpsText.text = fps;
         }
@@ -220,6 +222,7 @@
       }
 
       function submitCode() {
+        console.log(editor.getValue());
         socket.emit('submit_code', editor.getValue());
       }
 
