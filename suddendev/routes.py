@@ -8,8 +8,11 @@ from threading import Thread
 from . import main
 from . import socketio
 from .tasks import play_game
-from .models import db, GameController
+from .models import db, GameSetup
 from .game_instance import GameInstance
+
+# TODO: get rid of and use databases
+GLOBAL_DICT = dict()
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -18,16 +21,34 @@ def index():
 
 @main.route('/game', methods=['GET', 'POST'])
 def game_page():
-    user_game_id = flask.session.get('game_id', None)
+    game_id = flask.session.get('game_id', None)
+    name = flask.session.get('name', None)
 
-    if user_game_id is None:
+    if game_id is None:
         flask.flash('Invalid game id!')
         return flask.redirect(flask.url_for('.lobby'))
 
-    error = check_room_key(user_game_id)
+    if name is None:
+        flask.flash('You must have a name!')
+        return flask.redirect(flask.url_for('.lobby'))
+
+    error = check_room_key(game_id)
     if error:
         flask.flash(error)
         return flask.redirect(flask.url_for('.lobby'))
+
+    # TODO: move to db
+    if game_id in GLOBAL_DICT:
+        GLOBAL_DICT[game_id]['player_count'] += 1
+        GLOBAL_DICT[game_id]['players'].append(name)
+
+    else:
+        GLOBAL_DICT[game_id] = dict()
+        GLOBAL_DICT[game_id]['player_count'] = 1
+        GLOBAL_DICT[game_id]['players'] = [name]
+
+
+    # keep track of names
 
     return flask.render_template('game.html')
 
@@ -42,7 +63,7 @@ def lobby():
             flask.session.pop('game_id')
 
     # TODO: filter the database, since it also contains old rooms
-    rooms = GameController.query.all()
+    rooms = GameSetup.query.all()
 
     if flask.request.method == 'POST':
 
@@ -72,7 +93,7 @@ def create_room():
 
     while True:
         game_id=gen_random_string(5)
-        game = GameController(game_id)
+        game = GameSetup(game_id)
         db.session.add(game)
         try:
             db.session.commit()
@@ -85,7 +106,7 @@ def create_room():
 def check_room_key(game_id):
     """Check the given room key exists and hasn't expired.
     Returns an error string, or None if the key is ok."""
-    game = GameController.query.filter_by(game_id=game_id).one_or_none()
+    game = GameSetup.query.filter_by(game_id=game_id).one_or_none()
 
     if game is None:
         return "Sorry, that key appears to be invalid. Are you sure it's correct?"
