@@ -100,6 +100,7 @@
         } else {
           waitingText.text = "Ready to start!";
         }
+        drawWaiting();
       }
 
       //Function called when leaving the game
@@ -120,7 +121,7 @@
       //Function to draw the ticker's FPS to the screen
       function drawFPS() {
         var fps = createjs.Ticker.getMeasuredFPS();
-        if (FPStext == null) {
+        if (fpsText == null) {
           fpsText = new createjs.Text(fps, "20px Arial", "x000000");
           fpsText.x = 10;
           fpsText.y = 10;
