@@ -6,8 +6,9 @@
       socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
       socket.on('connect', function() {
         socket.emit('joined', {});
+        socket.emit('startgame', {});
       });
-      socket.on('status', function(data) {
+      socket.on('result', function(data) {
         $('#chat').val($('#chat').val() + data + '\n');
         $('#chat').scrollTop($('#chat')[0].scrollHeight);
       });
