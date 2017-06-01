@@ -144,9 +144,10 @@
       //Function to display waiting text on canvas
       function drawWaiting() {
         if (!gameReady) {
-          waitingText.x = 100;
-          waitingText.y = 100;
+          waitingText.x = 350;
+          waitingText.y = 350;
           stage.addChild(waitingText);
+          stage.update();
         }
       }
 
