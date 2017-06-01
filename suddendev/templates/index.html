@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block body %}
+    <script>
+        function goToLobby() {
+            window.location.href = "{{ url_for('main.lobby') }}";
+        }
+    </script>
   <div class="container">
       <div class="page-header">
         <h1>S U D D E N _ D E V</h1>
@@ -25,6 +30,8 @@
       <p>Currently, SUDDEN_DEV is in very early in development. You can check the code out
       on GitHub <a href="https://github.com/SuddenDevs/SuddenDev">here</a></p>
 
-      <b> Watch this space!</b>
+      <br>
+      <button id="lobbyBtn" onclick="goToLobby()">Play the game!</button>
+
   </div>
 {% endblock %}
