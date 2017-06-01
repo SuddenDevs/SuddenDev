@@ -11,12 +11,12 @@ import time
 NAMESPACE = '/game-session'
 
 class GameInstance:
-    states = []
     
     def __init__(self, game_id):
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
         self.game = Game()
+        self.states = []
     
     def run(self):
         time_last = time.time()
@@ -27,6 +27,7 @@ class GameInstance:
             time_current = time.time()
             delta = time_current - time_last
             time_last = time_current
+            time.sleep(100/1000)
 
             #Gameplay Update
             self.game.tick(delta)
@@ -34,7 +35,5 @@ class GameInstance:
             #Client Update
             self.states.append(encodeState(self.game))
 
-            # with self.app.app_context():
-                # fsio.emit('status', json, namespace=NAMESPACE, room=self.game_id)
-
-        return self.states
+            with self.app.app_context():
+                fsio.emit('status', json, namespace=NAMESPACE, room=self.game_id)
