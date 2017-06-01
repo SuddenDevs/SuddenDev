@@ -8,7 +8,6 @@ from threading import Thread
 from . import main
 from . import socketio
 from .tasks import play_game
-from .forms import CreateGameForm
 from .models import db, GameController
 from .game_instance import GameInstance
 
@@ -32,16 +31,6 @@ def game_page():
 
     return flask.render_template('game.html')
 
-@main.route('/game_create', methods=['GET', 'POST'])
-def game_create():
-    form = CreateGameForm()
-    if form.validate_on_submit():
-            game_id = create_room()
-            flask.session['game_id'] = game_id
-            return flask.redirect(flask.url_for('.game_page'))
-    else:
-        return flask.render_template('game_create.html', form=form)
-
 @main.route('/lobby', methods=['GET', 'POST'])
 def lobby():
     """
@@ -56,7 +45,13 @@ def lobby():
     rooms = GameController.query.all()
 
     if flask.request.method == 'POST':
-        flask.session['game_id'] = flask.request.form['game_id']
+
+        if flask.request.form['submit'] == 'create':
+            flask.session['game_id'] = create_room()
+
+        else:
+            flask.session['game_id'] = flask.request.form['submit']
+
         return flask.redirect(flask.url_for('.game_page'))
 
     return flask.render_template('lobby.html', rooms=rooms)
