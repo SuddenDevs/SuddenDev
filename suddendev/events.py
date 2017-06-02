@@ -1,7 +1,6 @@
 import flask
 import flask_socketio as fsio
 from . import socketio
-from .tasks import play_game
 from .models import db, GameSetup
 from .routes import GLOBAL_DICT, REQUIRED_PLAYER_COUNT # TODO: need to get rid of
 import sqlalchemy
