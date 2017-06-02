@@ -45,6 +45,7 @@
       function editorInit() {
         editor = ace.edit("editor");
         editor.getSession().setMode("ace/mode/python");
+        editor.getSession().setUseWrapMode(true);
         editor.setValue("def update(self, delta):\n\t", 1);
         var e = document.getElementById("editor");  
         e.style.height = "0%";
