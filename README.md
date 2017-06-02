@@ -29,10 +29,16 @@ To initially setup the created development database - and clear it out when deve
 heroku local:run python clear-db.py
 ```
 
-Finally to run the app locally, simply run:
+Finally to run the app locally as it would be run on Heroku, simply run:
 
 ```bash
-heroku local
+./run-local-heroku.sh
+```
+
+Often for debugging, it useful to run a single app (using the dev db):
+
+```bash
+./run-local-flask.sh
 ```
 
 ## Locally Testing
