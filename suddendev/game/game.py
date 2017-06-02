@@ -69,10 +69,12 @@ class Game:
         #Update Players
         for p in self.players:
             p.update(delta)
+            p.pos = self.clamp_pos(p.pos)
 
         #Update Enemies
         for e in self.enemies:
             e.update(delta)
+            e.pos = self.clamp_pos(e.pos)
 
         #Enemy Spawning
         if (self.enemy_spawn_timer > self.enemy_spawn_delay
@@ -84,3 +86,15 @@ class Game:
         #Powerup Spawning
         
         #Ending Conditions / Wave Conditions
+
+    def clamp_pos(self, pos):
+        if pos.x < 0:
+            pos.x = 0
+        if pos.y < 0:
+            pos.y = 0
+        if pos.x > self.map.width:
+            pos.x = self.map.width
+        if pos.y > self.map.height:
+            pos.y = self.map.height
+        return pos
+
