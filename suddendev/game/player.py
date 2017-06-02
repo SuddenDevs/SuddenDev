@@ -13,7 +13,11 @@ class Player(Entity):
 
         #Create isolated namespace for player code
         #Include libraries, classes, relevant game info
-        self.scope = {'Vector' : Vector}
+        self.scope = {
+                'Vector' : Vector,
+                'core' : game.core,
+                'enemies' : game.enemies
+            }
 
         #Compile supplied script
         self.script = compile(script, str(name), 'exec')

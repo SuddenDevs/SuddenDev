@@ -24,11 +24,22 @@ class Game:
         #Map
         self.map = Map(600, 600)
 
+        #Core
+        self.core = Core()
+        self.core.pos = Vector(self.map.width/2, self.map.height/2)
+
+        #Enemies
+        self.enemies = []
+        self.enemy_limit = 5
+        self.enemy_spawn_timer = 0
+
         script = """
 something = 1
 someparam = 2
 
 def update(self, delta):
+    centre = core.pos
+    fromCentre = Vector.Normalize(self.pos - centre) * self.speed
     self.vel = Vector(1,1)
                 """
 
@@ -40,17 +51,9 @@ def update(self, delta):
                                 random.random()*self.map.height)
             self.players.append(player)
 
-        #Enemies
-        self.enemies = []
-        self.enemy_limit = 5
-        self.enemy_spawn_timer = 0
 
         #Powerups
         self.powerups = []
-
-        #Core
-        self.core = Core()
-        self.core.pos = Vector(self.map.width/2, self.map.height/2)
 
         #Metadata
         self.time = 0

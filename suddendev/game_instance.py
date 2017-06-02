@@ -29,7 +29,7 @@ class GameInstance:
             #time.sleep(100/1000)
 
             #Gameplay Update
-            self.game.tick(0.2)
+            self.game.tick(0.5)
 
             #Client Update
             self.states.append(encodeState(self.game))
