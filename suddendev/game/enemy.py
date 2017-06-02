@@ -11,5 +11,18 @@ class Enemy(Entity):
                             random.random() * self.game.map.height)
     
     def update(self, delta):
-        target = Vector(self.game.map.width/2, self.game.map.height/2)
-        self.vel = Vector(1,1)
+        #Find Nearest Player
+        ps = self.game.players
+        target = ps[0].pos
+        mag_min = Vector.Length(self.pos - target)
+        for p in ps:
+            mag = Vector.Length(self.pos - p.pos)
+            if mag < mag_min:
+                target = p.pos
+                mag_min = mag
+
+        to = target - self.pos
+        mag = Vector.Length(to)
+
+        self.vel = Vector.Normalize(to) * min(mag, self.speed)
+        super().update(delta)

@@ -5,6 +5,7 @@ class Entity:
         self.tag = 0
         self.pos = Vector(0, 0)
         self.vel = Vector(0, 0)
+        self.speed = 10
         self.size = 10
         self.healthMax = 100
         self.health = self.healthMax

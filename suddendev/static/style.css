@@ -1,5 +1,12 @@
-.heading{
-  text-align: center;
+.title{
+  width: 450px;
+  margin: 0 auto;
+}
+
+.mainHeading{
+  text-align: right;
+  display: inline-block;
+  white-space: pre;
 }
 
 .outer{
@@ -24,6 +31,23 @@
   position: absolute;
   display: inline-block;
   right: 0px;
+}
+
+.instructionDiv {
+  width: 600px;
+  height: 800px;
+  top: 10px;
+  right: 15px;
+  position: absolute;
+}
+
+.instructionHeading {
+  text-align: center;
+}
+
+.instructionList {
+  margin-top: 20px;
+  font-size: 20px;
 }
 
 .editorContainer {
