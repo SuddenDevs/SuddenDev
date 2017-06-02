@@ -9,7 +9,7 @@ class Player(Entity):
         self.color = color
         self.vel = Vector(random.random(), random.random())
         self.game = game
-        self.speed = 50
+        self.speed = 15
 
         #Create isolated namespace for player code
         #Include libraries, classes, relevant game info

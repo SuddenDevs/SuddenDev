@@ -40,13 +40,19 @@ someparam = 2
 def update(self, delta):
     centre = core.pos
     fromCentre = Vector.Normalize(self.pos - centre) * self.speed
-    self.vel = Vector(1,1)
-                """
+    self.vel = Vector.Normalize(Vector(1,1)) * self.speed
+"""
 
+        colors = [
+            Color3(255, 0, 0),
+            Color3(0, 255, 0),
+            Color3(0, 0, 255),
+            Color3(255, 0, 0)
+        ]
         #Players
         self.players = []
         for i in range(4):
-            player = Player(player_names[i], Color3(255, 0, 0), self, script)
+            player = Player(player_names[i], colors[i], self, script)
             player.pos = Vector(random.random()*self.map.width,
                                 random.random()*self.map.height)
             self.players.append(player)
