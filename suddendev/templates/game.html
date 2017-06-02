@@ -34,7 +34,6 @@
       function init() {
         stage = new createjs.Stage("gameCanvas");
         stage.addChild(shape);
-        drawWaiting();
         createjs.Ticker.framerate = FRAMERATE;
         createjs.Ticker.addEventListener("tick", handleTick);
       }
@@ -102,6 +101,11 @@
         } else {
           waitingText.text = "Ready to start!";
         }
+        if (!stage.contains(waitingText)) {
+          waitingText.x = 350;
+          waitingText.y = 350;
+          stage.addChild(waitingText);
+        }
         stage.update();
       }
 
@@ -144,16 +148,6 @@
         stage.update();
       }
 
-      //Function to display waiting text on canvas
-      function drawWaiting() {
-        if (!gameReady) {
-          waitingText.x = 350;
-          waitingText.y = 350;
-          stage.addChild(waitingText);
-          stage.update();
-        }
-      }
-
       //Draws a triangle facing the direction from vector vel
       function drawTriangle(pos, vel, radius, color) {
         var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
@@ -171,8 +165,8 @@
         for (i = 0; i < list.length; i++) {
           if (isPlayer) {
             color = list[i].color;
-            playerNames[i].x = list[i].pos.x;
-            playerNames[i].y = list[i].pos.y;
+            playerNames[i].x = list[i].pos.x + 10;
+            playerNames[i].y = list[i].pos.y - 10;
           }
           drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
         }
@@ -234,6 +228,9 @@
     </script>
 {% endblock %}
 {% block body %}
+    <div id="title" class="title">
+      <h1 id="heading" class="heading">Sudden Dev</h1>
+    </div>
     <div class="outer">
       <div id="editorContainer" class="editorContainer">
         <div id="editor"></div>
@@ -241,8 +238,8 @@
       <script>socketInit()</script>
       <script>editorInit();</script>
       <div id="gameDiv" class="gameDiv">
-        <canvas id="gameCanvas" class="gameCanvas" width="1000px"
-                height="900px"></canvas>
+        <canvas id="gameCanvas" class="gameCanvas" width="1200px"
+                height="800px"></canvas>
         <div class="controls">
           <button onclick="toggleEditor()">Toggle Editor</button>
           <button id="pauseBtn" onclick="togglePause()">Pause</button>
