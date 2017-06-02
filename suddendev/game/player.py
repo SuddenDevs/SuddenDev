@@ -8,8 +8,10 @@ timer = 1
 
 def update(self, delta):
     self.locals['timer'] += delta
-    if self.locals['timer'] > 0.5:
+    print(self.locals['timer'])
+    if self.locals['timer'] > 2:
         self.vel = Vector.Normalize(Vector(random.random()-0.5, random.random()-0.5)) * self.speed
+        self.locals['timer']  = 0
 """
 
 class Player(Entity):
