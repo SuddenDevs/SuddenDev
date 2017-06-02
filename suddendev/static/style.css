@@ -1,5 +1,12 @@
-.heading{
-  text-align: center;
+.title{
+  width: 450px;
+  margin: 0 auto;
+}
+
+.mainHeading{
+  text-align: right;
+  display: inline-block;
+  white-space: pre;
 }
 
 .outer{
@@ -32,6 +39,10 @@
   top: 10px;
   right: 15px;
   position: absolute;
+}
+
+.instructionHeading {
+  text-align: center;
 }
 
 .instructionList {

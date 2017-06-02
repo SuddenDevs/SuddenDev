@@ -5,7 +5,7 @@
   <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
   <script>
       //Colors and static variables
-      var ENEMYC = "#bf1818";
+      var ENEMYC = "#000000";
       var PICKUPC = "#edd95c";
       var COREC = "#47d7f7";
       var FRAMERATE = 60;
@@ -230,11 +230,12 @@
 {% endblock %}
 {% block body %}
     <div id="title" class="title">
-      <h1 id="heading" class="heading">S U D D E N _ D E V</h1>
+      <img src="{{ url_for('static', filename='favicon_64.png')}}">
+      <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
     </div>
     <div class="outer">
       <div id="instructionDiv" class="instructionDiv">
-        <h1 class="heading">Instructions</h1>
+        <h1 class="instructionHeading">Instructions</h1>
         <ul id="instructionList" class="instructionList">
           <li>Write code in the editor</li>
           <li>Submit code before game begins</li>
