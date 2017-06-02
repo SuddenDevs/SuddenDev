@@ -33,18 +33,18 @@ class Game:
         self.enemy_limit = 5
         self.enemy_spawn_timer = 0
 
-
         colors = [
             Color3(255, 0, 0),
             Color3(0, 255, 0),
             Color3(0, 0, 255),
             Color3(255, 0, 0)
         ]
+
         #Players
         self.players = []
         for i in range(4):
             name = player_names[i]
-            script = ""
+            script = None
             if name in scripts:
                 script = scripts[name]
 

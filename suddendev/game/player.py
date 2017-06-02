@@ -1,5 +1,6 @@
 from .entity import Entity
 from .vector import Vector
+import math
 import random
 
 DEFAULT_SCRIPT = """
@@ -25,24 +26,28 @@ class Player(Entity):
             self.try_apply_script(DEFAULT_SCRIPT, game)
 
     def try_apply_script(self, script, game):
+        if script is None:
+            return False
+
         self.scope = {
+                'Math' : math,
                 'Vector' : Vector,
                 'core' : game.core,
                 'enemies' : game.enemies
             }
+        self.locals = {}
 
         #Compile supplied script
         self.script = compile(script, str(self.name), 'exec')
 
         #Execute in the context of the special namespace
-        exec(self.script, self.scope)
+        exec(self.script, self.scope, self.locals)
 
         return 'update' in self.scope
 
-
     def update(self, delta):
         #Perform player-specific movement calculation
-        self.scope['update'](self, delta)
+        self.locals['update'](self, delta)
         
         #Check for sanity (restrict velocity)
 
