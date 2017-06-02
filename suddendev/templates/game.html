@@ -20,6 +20,9 @@
       var fpsText = null;
       var waitingText = new createjs.Text("Waiting for " + playersLeft +
                                     " more players!", "20px Arial", "x000000");
+      waitingText.x = 600;
+      waitingText.y = 300;
+      waitingText.textAlign = "center";
       var playerNames = [];
 
       //Game state
@@ -102,8 +105,6 @@
           waitingText.text = "Ready to start!";
         }
         if (!stage.contains(waitingText)) {
-          waitingText.x = 350;
-          waitingText.y = 350;
           stage.addChild(waitingText);
         }
         stage.update();
@@ -229,9 +230,17 @@
 {% endblock %}
 {% block body %}
     <div id="title" class="title">
-      <h1 id="heading" class="heading">Sudden Dev</h1>
+      <h1 id="heading" class="heading">S U D D E N _ D E V</h1>
     </div>
     <div class="outer">
+      <div id="instructionDiv" class="instructionDiv">
+        <h1 class="heading">Instructions</h1>
+        <ul id="instructionList" class="instructionList">
+          <li>Write code in the editor</li>
+          <li>Submit code before game begins</li>
+          <li>Watch your AI fight to survive</li>
+        </ul>
+      </div>
       <div id="editorContainer" class="editorContainer">
         <div id="editor"></div>
       </div>

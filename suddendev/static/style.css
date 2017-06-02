@@ -26,6 +26,19 @@
   right: 0px;
 }
 
+.instructionDiv {
+  width: 600px;
+  height: 800px;
+  top: 10px;
+  right: 15px;
+  position: absolute;
+}
+
+.instructionList {
+  margin-top: 20px;
+  font-size: 20px;
+}
+
 .editorContainer {
   width: 600px;
   height: 800px;
