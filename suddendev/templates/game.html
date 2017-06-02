@@ -120,7 +120,6 @@
       //Tick handler, clears graphics, draws FPS, updates canvas
       function handleTick(event) {
         if (!event.paused && gameReady) {
-          shape.graphics.clear();
           drawFPS();
           displayNextState();
         }
@@ -210,6 +209,7 @@
 
       //Display the next state
       function displayNextState() {
+        shape.graphics.clear();
         setState(states[statei]);
         statei++;
         if (statei >= states.length) {
