@@ -8,7 +8,6 @@ timer = 1
 
 def update(self, delta):
     self.locals['timer'] += delta
-    print(self.locals['timer'])
     if self.locals['timer'] > 2:
         self.vel = Vector.Normalize(Vector(random.random()-0.5, random.random()-0.5)) * self.speed
         self.locals['timer']  = 0
@@ -21,7 +20,7 @@ class Player(Entity):
         self.color = color
         self.vel = Vector(random.random(), random.random())
         self.game = game
-        self.speed = 15
+        self.speed = 20
 
         if not self.try_apply_script(script, game):
             self.try_apply_script(DEFAULT_SCRIPT, game)
