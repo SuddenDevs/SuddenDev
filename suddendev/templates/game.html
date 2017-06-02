@@ -144,7 +144,7 @@
         drawList(enemyList, ENEMYC);
         drawList(powerupList, PICKUPC);
         if (core != null) {
-          drawTriangle(core.pos, core.vel, core.size, COREC);
+          shape.graphics.beginFill(COREC).drawCircle(core.pos.x, core.pos.y, core.size);
         }
         stage.update();
       }
