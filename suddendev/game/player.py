@@ -4,13 +4,12 @@ import math
 import random
 
 DEFAULT_SCRIPT = """
-something = 1
-someparam = 2
+timer = 1
 
 def update(self, delta):
-    centre = core.pos
-    fromCentre = Vector.Normalize(self.pos - centre) * self.speed
-    self.vel = Vector.Normalize(Vector(1,1)) * self.speed
+    self.locals['timer'] += delta
+    if self.locals['timer'] > 0.5:
+        self.vel = Vector.Normalize(Vector(random.random()-0.5, random.random()-0.5)) * self.speed
 """
 
 class Player(Entity):
@@ -30,9 +29,10 @@ class Player(Entity):
             return False
 
         self.scope = {
-                'Math' : math,
+                'math' : math,
                 'Vector' : Vector,
                 'core' : game.core,
+                'random' : random,
                 'enemies' : game.enemies
             }
         self.locals = {}
@@ -43,7 +43,7 @@ class Player(Entity):
         #Execute in the context of the special namespace
         exec(self.script, self.scope, self.locals)
 
-        return 'update' in self.scope
+        return 'update' in self.locals
 
     def update(self, delta):
         #Perform player-specific movement calculation
