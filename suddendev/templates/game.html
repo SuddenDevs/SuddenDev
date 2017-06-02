@@ -45,7 +45,8 @@
       function editorInit() {
         editor = ace.edit("editor");
         editor.getSession().setMode("ace/mode/python");
-        var e = document.getElementById("editor");
+        editor.setValue("def update(self, delta):\n\t", 1);
+        var e = document.getElementById("editor");  
         e.style.height = "0%";
         editor.resize();
       }
@@ -193,7 +194,8 @@
         var e = document.getElementById("editor");
         var editorOn = e.style.height == "0%";
         if (editorOn) {
-          e.focus();
+          editor.focus();
+          editor.setFontSize(20);
           e.style.height = "100%";
           e.style.pointerEvents = "auto";
           e.style.borderStyle = "solid";
@@ -240,6 +242,9 @@
           <li>Write code in the editor</li>
           <li>Submit code before game begins</li>
           <li>Watch your AI fight to survive</li>
+          <li>Write your code in an update(self, delta) function</li>
+          <li>Access your character through the object "self" <br>(e.g. self.vel = Vector(1,1))</li>
+          <li>"Delta" contains time passed since the last update</li>
         </ul>
       </div>
       <div id="editorContainer" class="editorContainer">
