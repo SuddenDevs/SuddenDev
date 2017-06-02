@@ -7,7 +7,6 @@ import flask_socketio as fsio
 from threading import Thread
 from . import main
 from . import socketio
-from .tasks import play_game
 from .models import db, GameSetup
 from .game_instance import GameInstance
 
@@ -52,6 +51,7 @@ def game_page():
 
         else:
             GLOBAL_DICT[game_id] = dict()
+            GLOBAL_DICT[game_id]['scripts'] = dict()
             GLOBAL_DICT[game_id]['player_count'] = 1
             GLOBAL_DICT[game_id]['players'] = [name]
 

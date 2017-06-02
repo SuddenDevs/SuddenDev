@@ -9,6 +9,16 @@ from .core import Core
 import time
 import random
 
+DEFAULT_SCRIPT = """
+something = 1
+someparam = 2
+
+def update(self, delta):
+    centre = core.pos
+    fromCentre = Vector.Normalize(self.pos - centre) * self.speed
+    self.vel = Vector.Normalize(Vector(1,1)) * self.speed
+"""
+
 class Map:
     def __init__(self, width, height):
         random.seed(time.time())
@@ -20,7 +30,7 @@ class Game:
     #Enemy Spawning
     enemy_spawn_delay = 1
 
-    def __init__(self, player_names):
+    def __init__(self, player_names, scripts):
         #Map
         self.map = Map(600, 600)
 
@@ -33,15 +43,6 @@ class Game:
         self.enemy_limit = 5
         self.enemy_spawn_timer = 0
 
-        script = """
-something = 1
-someparam = 2
-
-def update(self, delta):
-    centre = core.pos
-    fromCentre = Vector.Normalize(self.pos - centre) * self.speed
-    self.vel = Vector.Normalize(Vector(1,1)) * self.speed
-"""
 
         colors = [
             Color3(255, 0, 0),
@@ -52,7 +53,12 @@ def update(self, delta):
         #Players
         self.players = []
         for i in range(4):
-            player = Player(player_names[i], colors[i], self, script)
+            name = player_names[i]
+            script = DEFAULT_SCRIPT
+            if name in scripts:
+                script = scripts[name]
+
+            player = Player(name, colors[i], self, script)
             player.pos = Vector(random.random()*self.map.width,
                                 random.random()*self.map.height)
             self.players.append(player)
