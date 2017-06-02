@@ -29,8 +29,14 @@ def joined(message):
     # If there are enough players, start the game
     if player_count == REQUIRED_PLAYER_COUNT:
         fsio.emit('game_start', {}, room=game_id, namespace=NAMESPACE)
-        game = GameInstance(game_id, player_names, player_scripts)
-        result = '{\"result\": [ ' + ','.join(game.run()) + ']}'
+
+        if 'result' not in GLOBAL_DICT[game_id]:
+            game = GameInstance(game_id, player_names, player_scripts)
+            result = '{\"result\": [ ' + ','.join(game.run()) + ']}'
+            GLOBAL_DICT[game_id]['result'] = result
+        else:
+            result = GLOBAL_DICT[game_id]['result']
+
         fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
