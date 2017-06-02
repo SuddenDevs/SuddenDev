@@ -1,11 +1,6 @@
 {% extends "base.html" %}
 {% from 'macros.html' import suddendev_header %}
 {% block body %}
-    <script>
-        function goToLobby() {
-            window.location.href = "{{ url_for('main.lobby') }}";
-        }
-    </script>
 
   <div class="container">
         
@@ -31,7 +26,7 @@
       on GitHub <a href="https://github.com/SuddenDevs/SuddenDev">here</a></p>
 
       <br>
-      <button id="lobbyBtn" onclick="goToLobby()">Play the game!</button>
+      <a class="btn btn-lg btn-success" href="{{ url_for('main.lobby') }}">Play the game!</a>
 
   </div>
 {% endblock %}
