@@ -1,22 +1,44 @@
 {% extends "base.html" %}
+{% from 'macros.html' import suddendev_header %}
+
 {% block body %}
 
-    <form method="POST">
+  <div class="container">
+    {{ suddendev_header() }}
 
-        <label for="usr">Name:</label>
-        <input type="text" class="form-control" name="name">
-	
-	<br>
+    <h3>Lobby</h3>
+    <p>Join an open game, or create a new one. At the moment anyone can join your game
+    and we won't keep track of your scripts and statistics.
+    Don't worry though; <b>it's all coming soon!</b></p>
 
-        <button type="submit" class="btn btn-lg btn-success" name="submit" value="create">
-	create new room!
-	</button>
+    <br>
 
+    <div class="panel panel-default">
+      <div class="panel-heading">Games</div>
+      <div class="panel-body">
+        <form method="POST">
+          <label for="usr">Name (this is just what other people will see):</label>
+          <input type="text" class="form-control" name="name" value="anon">
+          
+          <br>
 
-	{% for r in rooms %}
-	    <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r.game_id }}">
-		join {{ r.game_id }}</button>
-	{% endfor %}
-    </form>
+          <center>
+            {% for r in rooms %}
+                <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r.game_id }}">
+            	Join {{ r.game_id }}</button>
+            {% endfor %}
+
+            <br>
+            <br>
+
+            <button type="submit" class="btn btn-lg btn-success" name="submit" value="create">
+            Create new game!
+            </button>
+          </center>
+        </form>
+      </div>
+    </div>
+
+  </div>
 
 {% endblock %}
