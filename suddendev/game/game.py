@@ -9,16 +9,6 @@ from .core import Core
 import time
 import random
 
-DEFAULT_SCRIPT = """
-something = 1
-someparam = 2
-
-def update(self, delta):
-    centre = core.pos
-    fromCentre = Vector.Normalize(self.pos - centre) * self.speed
-    self.vel = Vector.Normalize(Vector(1,1)) * self.speed
-"""
-
 class Map:
     def __init__(self, width, height):
         random.seed(time.time())
@@ -54,7 +44,7 @@ class Game:
         self.players = []
         for i in range(4):
             name = player_names[i]
-            script = DEFAULT_SCRIPT
+            script = ""
             if name in scripts:
                 script = scripts[name]
 

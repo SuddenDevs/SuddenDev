@@ -2,6 +2,16 @@ from .entity import Entity
 from .vector import Vector
 import random
 
+DEFAULT_SCRIPT = """
+something = 1
+someparam = 2
+
+def update(self, delta):
+    centre = core.pos
+    fromCentre = Vector.Normalize(self.pos - centre) * self.speed
+    self.vel = Vector.Normalize(Vector(1,1)) * self.speed
+"""
+
 class Player(Entity):
     def __init__(self, name, color, game, script):
         super().__init__()
@@ -11,8 +21,10 @@ class Player(Entity):
         self.game = game
         self.speed = 15
 
-        #Create isolated namespace for player code
-        #Include libraries, classes, relevant game info
+        if not self.try_apply_script(script, game):
+            self.try_apply_script(DEFAULT_SCRIPT, game)
+
+    def try_apply_script(self, script, game):
         self.scope = {
                 'Vector' : Vector,
                 'core' : game.core,
@@ -20,15 +32,13 @@ class Player(Entity):
             }
 
         #Compile supplied script
-        self.script = compile(script, str(name), 'exec')
-
-        #Check for errors?
+        self.script = compile(script, str(self.name), 'exec')
 
         #Execute in the context of the special namespace
         exec(self.script, self.scope)
 
-        #Check that a function 'update(self)' has been defined
-        assert self.scope['update'] is not None
+        return 'update' in self.scope
+
 
     def update(self, delta):
         #Perform player-specific movement calculation
