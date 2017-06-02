@@ -1,15 +1,15 @@
 {% extends "base.html" %}
+{% from 'macros.html' import suddendev_header %}
 {% block body %}
     <script>
         function goToLobby() {
             window.location.href = "{{ url_for('main.lobby') }}";
         }
     </script>
+
   <div class="container">
-      <div class="page-header">
-        <h1>S U D D E N _ D E V</h1>
-        <p class="lead">Strategize. Script. Survive.</p>
-      </div>
+        
+      {{ suddendev_header() }}
 
       <h3>About</h3>
       <p> SUDDEN_DEV is a co-op survival game with a twist; you don't play.
