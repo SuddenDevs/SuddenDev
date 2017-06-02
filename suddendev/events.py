@@ -3,11 +3,10 @@ import flask_socketio as fsio
 from . import socketio
 from .tasks import play_game
 from .models import db, GameSetup
-from .routes import GLOBAL_DICT # TODO: need to get rid of
+from .routes import GLOBAL_DICT, REQUIRED_PLAYER_COUNT # TODO: need to get rid of
 import sqlalchemy
 
 NAMESPACE = '/game-session'
-REQUIRED_PLAYER_COUNT = 4
 
 @socketio.on('joined', namespace=NAMESPACE)
 def joined(message):
@@ -18,7 +17,7 @@ def joined(message):
     # TODO global dict needs to go
     if game_id not in GLOBAL_DICT:
         flask.flash("sorry something isn't quite right... try joining another game")
-        return flask.redirect(flask.url_for('.lobby'))
+        return flask.redirect(flask.url_for('.main.lobby'))
 
     player_count = GLOBAL_DICT[game_id]['player_count']
     player_names = GLOBAL_DICT[game_id]['players']
@@ -37,3 +36,4 @@ def left(message):
     """Sent by clients when they leave a room."""
     room = flask.session.get('game_id')
     fsio.leave_room(room)
+    flask.session['joined_game'] = False

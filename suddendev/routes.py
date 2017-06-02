@@ -13,6 +13,7 @@ from .game_instance import GameInstance
 
 # TODO: get rid of and use databases
 GLOBAL_DICT = dict()
+REQUIRED_PLAYER_COUNT = 4
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -37,16 +38,24 @@ def game_page():
         flask.flash(error)
         return flask.redirect(flask.url_for('.lobby'))
 
-    # TODO: move to db
-    if game_id in GLOBAL_DICT:
-        GLOBAL_DICT[game_id]['player_count'] += 1
-        GLOBAL_DICT[game_id]['players'].append(name)
+    joined_game = flask.session.get('joined_game', False)
+    if not joined_game:
 
-    else:
-        GLOBAL_DICT[game_id] = dict()
-        GLOBAL_DICT[game_id]['player_count'] = 1
-        GLOBAL_DICT[game_id]['players'] = [name]
+        # TODO: move to db
+        if game_id in GLOBAL_DICT:
+            if GLOBAL_DICT[game_id]['player_count'] >= REQUIRED_PLAYER_COUNT:
+                flask.flash('Sorry, game room is full. Try a different room.')
+                return flask.redirect(flask.url_for('.lobby'))
 
+            GLOBAL_DICT[game_id]['player_count'] += 1
+            GLOBAL_DICT[game_id]['players'].append(name)
+
+        else:
+            GLOBAL_DICT[game_id] = dict()
+            GLOBAL_DICT[game_id]['player_count'] = 1
+            GLOBAL_DICT[game_id]['players'] = [name]
+
+        flask.session['joined_game'] = True
 
     # keep track of names
 
@@ -59,8 +68,11 @@ def lobby():
     to them.
     """
     if flask.request.method == 'GET':
+        # TODO: how to do this better?
         if 'game_id' in flask.session:
             flask.session.pop('game_id')
+        if 'joined_game' in flask.session:
+            flask.session.pop('joined_game')
 
     # TODO: filter the database, since it also contains old rooms
     rooms = GameSetup.query.all()
@@ -71,7 +83,6 @@ def lobby():
             flask.session['name'] = flask.request.form['name']
         else:
             flask.session['name'] = 'anon'
-
 
         if flask.request.form['submit'] == 'create':
             flask.session['game_id'] = create_room()
