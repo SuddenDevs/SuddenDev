@@ -1,0 +1,72 @@
+.header{
+	width: 100%;
+	margin-bottom: 50px;
+	padding: 25px;
+	margin:0 auto;
+}
+
+.title{
+  width: 500px;
+  display: inline-block;
+}
+
+.mainHeading{
+  display: inline-block;
+  white-space: pre;
+}
+
+.loginCell{
+	display:inline-block;
+	vertical-align:middle;
+}
+
+.displayPicCell{
+	width: 45px;
+	height: 45px;
+}
+
+div.loginDetails{
+	display: inline-block;
+	float: right;
+}
+
+img.loginDetails{
+	border-radius: 50%;
+	width: 100%;
+	height: 100%;
+	display:inline-block;
+}
+
+h3.loginDetails{
+	display:inline-block;
+}
+
+.mainGrid{
+	width:100%;
+	height:calc(100% - 200px);
+	position: absolute;
+}
+
+.lobbyCol{
+	padding: 25px;
+	min-width: 600px;
+	height: 100%;
+	position: relative;
+}
+
+.editorContainer{
+	position: relative;
+	border-style:solid;
+	border-width:thin;
+  border-color: #ccc;
+  margin: 0 auto;
+  height: 90%;
+  width: 100%;
+}
+
+@media screen {
+  #editor {
+    height: 100%;
+    width: 100%;
+  }
+}

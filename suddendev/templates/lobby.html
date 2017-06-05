@@ -1,47 +1,88 @@
 {% extends "base.html" %}
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_lobby.css')}}">
+  <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
+
+  <script>
+    var editor = null;
+
+    function initEditor(){
+        editor = ace.edit("editor");
+        console.log(editor);
+        editor.$blockScrolling = Infinity;
+        editor.getSession().setMode("ace/mode/python");
+        editor.getSession().setUseWrapMode(true);
+        editor.setFontSize(20);
+        editor.setValue(`{{user.script}}`, 1);
+        editor.resize();
+    }
+
+  </script>
+
+{% endblock %}
 {% from 'macros.html' import suddendev_header %}
 
 {% block body %}
+  <div class="header">
+    <div id="title" class="title">
+      <img src="{{ url_for('static', filename='logo_64.png')}}">
+      <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
+    </div>
+  
+    <div class="container-fluid loginDetails">
+      <div class="row loginDetails">
+        <div class="col-sm loginCell displayPicCell">
+          <img class="loginDetails" src="{{user.picture}}">
+        </div>
+        <div class="col-sm loginCell">
+          <h3 class="loginDetails">{{ user.name }}<br>{{ user.email }}</h3>
+        </div>
+        <div class="col-sm loginCell">
+          <a class="btn" href="{{url_for('main.logout')}}">Log out</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <div class="container">
-    {{ suddendev_header() }}
+  <div class="container-fluid mainGrid">
+    <div class="row" style="height:100%">
+      <div class="col-sm-6 lobbyCol">
+        <h3>Lobby</h3>
+        <p>Join an open game, or create a new one. At the moment anyone can join your game
+        and we won't keep track of your scripts and statistics.
+        Don't worry though; <b>it's all coming soon!</b></p>
 
-    <h3><img src="{{user.picture}}" style="border-radius:50%; width:10%; display:inline-block">
-        {{ user.name }}<br>{{ user.email }}
-    </h3>
-    Your script is 
-    <pre>{{ user.script }}</pre>
-    <h3>Lobby</h3>
-    <p>Join an open game, or create a new one. At the moment anyone can join your game
-    and we won't keep track of your scripts and statistics.
-    Don't worry though; <b>it's all coming soon!</b></p>
-    <a class="btn btn-lg btn-success" href="{{url_for('main.logout')}}">Log out</a>
-
-    <br>
-
-    <div class="panel panel-default">
-      <div class="panel-heading">Games</div>
-      <div class="panel-body">
-        <form method="POST">
-          <label for="usr">Name (this is just what other people will see):</label>
-          <input type="text" class="form-control" name="name" value="anon">
-          
-          <br>
-
-          <center>
-            {% for r in rooms %}
-                <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r.game_id }}">
-            	Join {{ r.game_id }}</button>
-            {% endfor %}
-
+        <br>
+        <h1">Games</h1>
+        <div>
+          <form method="POST">
+            <label for="usr">Name (this is just what other people will see):</label>
+            <input type="text" class="form-control" name="name" value="anon">
+            
             <br>
-            <br>
 
-            <button type="submit" class="btn btn-lg btn-success" name="submit" value="create">
-            Create new game!
-            </button>
-          </center>
-        </form>
+            <center>
+              {% for r in rooms %}
+                  <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r.game_id }}">
+              	Join {{ r.game_id }}</button>
+              {% endfor %}
+
+              <br>
+              <br>
+
+              <button type="submit" class="btn btn-lg btn-success" name="submit" value="create">
+              Create new game!
+              </button>
+            </center>
+          </form>
+        </div>
+      </div>
+      <div class="col-sm-6 lobbyCol">
+        <h4>Your script:</h4>
+        <div class="editorContainer">
+          <div id="editor"></div>
+          <script>initEditor()</script>
+        </div>
       </div>
     </div>
 
