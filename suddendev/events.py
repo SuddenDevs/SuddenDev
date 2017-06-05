@@ -36,6 +36,7 @@ def joined(message):
             GLOBAL_DICT[game_id]['result'] = result
         else:
             result = GLOBAL_DICT[game_id]['result']
+        fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
