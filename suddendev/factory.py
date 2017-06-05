@@ -17,4 +17,7 @@ def create_app():
     from suddendev import socketio
     socketio.init_app(app)
 
+    from suddendev import celery
+    celery.conf.update(app.config)
+
     return app

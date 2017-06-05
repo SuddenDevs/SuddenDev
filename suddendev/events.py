@@ -1,10 +1,11 @@
 import flask
 import flask_socketio as fsio
+import sqlalchemy
 from . import socketio
 from .models import db, GameSetup
 from .routes import GLOBAL_DICT, REQUIRED_PLAYER_COUNT # TODO: need to get rid of
-import sqlalchemy
 from .game_instance import GameInstance
+from .tasks import play_game
 
 NAMESPACE = '/game-session'
 
@@ -29,8 +30,12 @@ def joined(message):
     # If there are enough players, start the game
     if player_count == REQUIRED_PLAYER_COUNT:
         fsio.emit('game_start', {}, room=game_id, namespace=NAMESPACE)
-        game = GameInstance(game_id, player_names, player_scripts)
-        result = '{\"result\": [ ' + ','.join(game.run()) + ']}'
+
+        if 'result' not in GLOBAL_DICT[game_id]:
+            result = play_game.delay(game_id, player_names, player_scripts).get()
+            GLOBAL_DICT[game_id]['result'] = result
+        else:
+            result = GLOBAL_DICT[game_id]['result']
         fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
