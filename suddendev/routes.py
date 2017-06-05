@@ -111,6 +111,12 @@ def game_page():
 
     return flask.render_template('game.html')
 
+@main.route('/logout', methods=['GET', 'POST'])
+@flask_login.login_required
+def logout():
+    flask_login.logout_user()
+    return flask.redirect(flask.url_for('.index'))
+
 @main.route('/lobby', methods=['GET', 'POST'])
 @flask_login.login_required
 def lobby():

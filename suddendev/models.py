@@ -22,5 +22,6 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String)
     email = db.Column(db.String(100), unique=True, nullable=False)
     picture = db.Column(db.String, nullable=True)
+    script = db.Column(db.String, default="")
     active = db.Column(db.Boolean, default=False)
     tokens = db.Column(db.Text)
