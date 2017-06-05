@@ -13,6 +13,8 @@ setup(
         'psycopg2==2.7.1',
         'requests-oauthlib==0.8.0',
         'Flask-Login==0.4.0',
+        'celery==4.0.2',
+        'redis==2.10.5',
     ],
     setup_requires=[
         'pytest-runner',
