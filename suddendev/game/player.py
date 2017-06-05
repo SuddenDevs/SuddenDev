@@ -75,7 +75,6 @@ class Player(Entity):
         }
 
         exec(script, self.scope)
-        print(self.scope)
 
         # Check update method existence and signature of update function
         update = self.scope['update']

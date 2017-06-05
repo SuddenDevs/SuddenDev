@@ -62,6 +62,7 @@ class Game:
 
         #Metadata
         self.time = 0
+        self.active = True
 
     #### Main Loop ####
     def tick(self, delta):
@@ -89,6 +90,8 @@ class Game:
         #Powerup Spawning
         
         #Ending Conditions / Wave Conditions
+        if self.time >= 10:
+            self.active = False
 
     def clamp_pos(self, pos):
         if pos.x < 0:
