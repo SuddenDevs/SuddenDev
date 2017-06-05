@@ -11,6 +11,7 @@ from threading import Thread
 from . import main
 from . import socketio
 from . import login_manager
+from .config import Config
 from .models import db, GameSetup, User
 from .game_instance import GameInstance
 from requests_oauthlib import OAuth2Session
@@ -19,15 +20,6 @@ from requests_oauthlib import OAuth2Session
 GLOBAL_DICT = dict()
 REQUIRED_PLAYER_COUNT = 4
 
-CLIENT_ID = '690133088753-kk72josco183eb8smpq4dgkrqmd0eovm.apps.googleusercontent.com'
-CLIENT_SECRET = os.environ['CLIENT_SECRET']
-REDIRECT_URI = 'http://localhost:5000/gcallback'
-AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
-TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
-USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
-SCOPE = ['https://www.googleapis.com/auth/userinfo.email',
-             'https://www.googleapis.com/auth/userinfo.profile']
-
 @main.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page."""
@@ -35,7 +27,7 @@ def index():
         auth_url = flask.url_for('.lobby')
     else:
         google = get_google_auth()
-        auth_url, state = google.authorization_url(AUTH_URI, access_type='offline')
+        auth_url, state = google.authorization_url(Config.AUTH_URI, access_type='offline')
         flask.session['oauth_state'] = state
     return flask.render_template('index.html', auth_url=auth_url)
 
@@ -47,12 +39,12 @@ def g_callback():
         return flask.redirect(flask.url_for('.index'))
     else:
         google = get_google_auth(state=flask.session['oauth_state'])
-        token = google.fetch_token(TOKEN_URI, client_secret=CLIENT_SECRET,
+        token = google.fetch_token(Config.TOKEN_URI, client_secret=Config.CLIENT_SECRET,
                 authorization_response=flask.request.url)
         google = get_google_auth(token=token)
-        resp = google.get(USER_INFO)
-        if resp.status_code == 200:
-            user_data = resp.json()
+        response = google.get(Config.USER_INFO)
+        if response.status_code == 200:
+            user_data = response.json()
             user = User.query.filter_by(email=user_data['email']).first()
 
             if user is None:
@@ -149,8 +141,7 @@ def lobby():
 
         return flask.redirect(flask.url_for('.game_page'))
 
-    user = flask_login.current_user
-    return flask.render_template('lobby.html', rooms=rooms, user=user)
+    return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
 
 def create_room():
     """Creates a new chat room and returns the key."""
@@ -183,11 +174,12 @@ def check_room_key(game_id):
     return None
 
 def get_google_auth(state=None, token=None):
+    redirect_uri = flask.url_for('.g_callback', _external=True)
     if token:
-        return OAuth2Session(CLIENT_ID, token=token)
+        return OAuth2Session(Config.CLIENT_ID, token=token)
     if state:
-        return OAuth2Session(CLIENT_ID, state=state, redirect_uri=REDIRECT_URI)
-    return OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
+        return OAuth2Session(Config.CLIENT_ID, state=state, redirect_uri=redirect_uri)
+    return OAuth2Session(Config.CLIENT_ID, redirect_uri=redirect_uri, scope=Config.SCOPE)
 
 @login_manager.user_loader
 def load_user(user_id):
