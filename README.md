@@ -1,4 +1,5 @@
 # SuddenDev
+[![Build Status](https://travis-ci.org/SuddenDevs/SuddenDev.svg?branch=master)](https://travis-ci.org/SuddenDevs/SuddenDev)
 
 ## Development Environment Setup
 

@@ -1,4 +1,5 @@
 import flask
+import flask_login
 import flask_socketio as fsio
 import sqlalchemy
 from . import socketio
@@ -32,7 +33,8 @@ def joined(message):
         fsio.emit('game_start', {}, room=game_id, namespace=NAMESPACE)
 
         if 'result' not in GLOBAL_DICT[game_id]:
-            result = play_game.delay(game_id, player_names, player_scripts).get()
+            result = play_game.delay(game_id, player_names, player_scripts)
+            result = result.get()
             GLOBAL_DICT[game_id]['result'] = result
         else:
             result = GLOBAL_DICT[game_id]['result']
@@ -49,6 +51,8 @@ def left(message):
 def submit_code(message):
     game_id = flask.session.get('game_id')
     name = flask.session.get('name', None)
+    flask_login.current_user.script = message
+    db.session.commit()
 
     # TODO global dict needs to go
     if game_id not in GLOBAL_DICT:

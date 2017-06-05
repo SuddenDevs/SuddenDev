@@ -6,10 +6,16 @@
   <div class="container">
     {{ suddendev_header() }}
 
+    <h3><img src="{{user.picture}}" style="border-radius:50%; width:10%; display:inline-block">
+        {{ user.name }}<br>{{ user.email }}
+    </h3>
+    Your script is 
+    <pre>{{ user.script }}</pre>
     <h3>Lobby</h3>
     <p>Join an open game, or create a new one. At the moment anyone can join your game
     and we won't keep track of your scripts and statistics.
     Don't worry though; <b>it's all coming soon!</b></p>
+    <a class="btn btn-lg btn-success" href="{{url_for('main.logout')}}">Log out</a>
 
     <br>
 

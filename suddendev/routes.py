@@ -1,14 +1,20 @@
 import flask
+import os
 import random
 import string
 import sqlalchemy
 import datetime
 import flask_socketio as fsio
+import flask_login
+import json
 from threading import Thread
 from . import main
 from . import socketio
-from .models import db, GameSetup
+from . import login_manager
+from .config import Config
+from .models import db, GameSetup, User
 from .game_instance import GameInstance
+from requests_oauthlib import OAuth2Session
 
 # TODO: get rid of and use databases
 GLOBAL_DICT = dict()
@@ -17,9 +23,45 @@ REQUIRED_PLAYER_COUNT = 4
 @main.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page."""
-    return flask.render_template('index.html')
+    if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
+        auth_url = flask.url_for('.lobby')
+    else:
+        google = get_google_auth()
+        auth_url, state = google.authorization_url(Config.AUTH_URI, access_type='offline')
+        flask.session['oauth_state'] = state
+    return flask.render_template('index.html', auth_url=auth_url)
+
+@main.route('/gcallback', methods=['GET', 'POST'])
+def g_callback():
+    if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
+        return flask.redirect(flask.url_for('.lobby'))
+    if 'code' not in flask.request.args and 'state' not in flask.request.args:
+        return flask.redirect(flask.url_for('.index'))
+    else:
+        google = get_google_auth(state=flask.session['oauth_state'])
+        token = google.fetch_token(Config.TOKEN_URI, client_secret=Config.CLIENT_SECRET,
+                authorization_response=flask.request.url)
+        google = get_google_auth(token=token)
+        response = google.get(Config.USER_INFO)
+        if response.status_code == 200:
+            user_data = response.json()
+            user = User.query.filter_by(email=user_data['email']).first()
+
+            if user is None:
+                user = User()
+                user.email = user_data['email']
+                user.name = user_data['name']
+                user.picture = user_data['picture']
+
+            user.tokens = json.dumps(token)
+            db.session.add(user)
+            db.session.commit()
+            flask_login.login_user(user)
+            return flask.redirect(flask.url_for('.lobby'))
+
 
 @main.route('/game', methods=['GET', 'POST'])
+@flask_login.login_required
 def game_page():
     game_id = flask.session.get('game_id', None)
     name = flask.session.get('name', None)
@@ -61,7 +103,14 @@ def game_page():
 
     return flask.render_template('game.html')
 
+@main.route('/logout', methods=['GET', 'POST'])
+@flask_login.login_required
+def logout():
+    flask_login.logout_user()
+    return flask.redirect(flask.url_for('.index'))
+
 @main.route('/lobby', methods=['GET', 'POST'])
+@flask_login.login_required
 def lobby():
     """
     Contains all currently open rooms, along with a button to instantly connect
@@ -92,7 +141,7 @@ def lobby():
 
         return flask.redirect(flask.url_for('.game_page'))
 
-    return flask.render_template('lobby.html', rooms=rooms)
+    return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
 
 def create_room():
     """Creates a new chat room and returns the key."""
@@ -123,3 +172,15 @@ def check_room_key(game_id):
         return "Sorry, that key appears to be invalid. Are you sure it's correct?"
 
     return None
+
+def get_google_auth(state=None, token=None):
+    redirect_uri = flask.url_for('.g_callback', _external=True)
+    if token:
+        return OAuth2Session(Config.CLIENT_ID, token=token)
+    if state:
+        return OAuth2Session(Config.CLIENT_ID, state=state, redirect_uri=redirect_uri)
+    return OAuth2Session(Config.CLIENT_ID, redirect_uri=redirect_uri, scope=Config.SCOPE)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
