@@ -19,5 +19,7 @@ def create_app():
 
     from suddendev import login_manager
     login_manager.init_app(app)
+    login_manager.login_view = "main.index"
+    login_manager.login_message = "Please log in before playing!"
     
     return app
