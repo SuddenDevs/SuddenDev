@@ -14,10 +14,10 @@ def create_app():
     from suddendev import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    from suddendev import socketio
-    socketio.init_app(app)
-
     from suddendev import celery
     celery.conf.update(app.config)
+
+    from suddendev import socketio
+    socketio.init_app(app, message_queue=Config.REDIS_URL)
 
     return app

@@ -32,7 +32,8 @@ def joined(message):
         fsio.emit('game_start', {}, room=game_id, namespace=NAMESPACE)
 
         if 'result' not in GLOBAL_DICT[game_id]:
-            result = play_game.delay(game_id, player_names, player_scripts).get()
+            result = play_game.delay(game_id, player_names, player_scripts)
+            result = result.get()
             GLOBAL_DICT[game_id]['result'] = result
         else:
             result = GLOBAL_DICT[game_id]['result']

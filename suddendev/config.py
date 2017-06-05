@@ -11,6 +11,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     CELERY_BROKER_URL = os.environ['REDIS_URL']
     CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
+    REDIS_URL = os.environ['REDIS_URL']
 
 class ProductionConfig(Config):
     DEBUG = False
