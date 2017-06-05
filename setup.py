@@ -11,6 +11,8 @@ setup(
         'gunicorn==19.7.1',
         'eventlet==0.21.0',
         'psycopg2==2.7.1',
+        'requests-oauthlib==0.8.0',
+        'Flask-Login==0.4.0',
     ],
     setup_requires=[
         'pytest-runner',

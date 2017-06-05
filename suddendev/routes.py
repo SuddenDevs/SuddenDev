@@ -4,20 +4,77 @@ import string
 import sqlalchemy
 import datetime
 import flask_socketio as fsio
+import flask_login
+import json
 from threading import Thread
 from . import main
 from . import socketio
-from .models import db, GameSetup
+from . import login_manager
+from .models import db, GameSetup, User
 from .game_instance import GameInstance
+from requests_oauthlib import OAuth2Session
 
 # TODO: get rid of and use databases
 GLOBAL_DICT = dict()
 REQUIRED_PLAYER_COUNT = 4
 
+CLIENT_ID = '690133088753-kk72josco183eb8smpq4dgkrqmd0eovm.apps.googleusercontent.com'
+CLIENT_SECRET = '7he9FnNvgC7C68FQZ0uAytr9'
+REDIRECT_URI = 'http://localhost:5000/gcallback'
+AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
+TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
+USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
+SCOPE = ['https://www.googleapis.com/auth/userinfo.email',
+             'https://www.googleapis.com/auth/userinfo.profile']
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page."""
     return flask.render_template('index.html')
+
+@main.route('/logintest', methods=['GET', 'POST'])
+@flask_login.login_required
+def login_test():
+    return flask.render_template('index.html')
+
+@main.route('/login', methods=['GET', 'POST'])
+def login():
+    if flask_login.current_user.is_authenticated:
+        return flask.redirect(flask.url_for('.login_test'))
+    google = get_google_auth()
+    auth_url, state = google.authorization_url(AUTH_URI, access_type='offline')
+    flask.session['oauth_state'] = state
+    return flask.render_template('login.html', auth_url=auth_url)
+
+@main.route('/gcallback', methods=['GET', 'POST'])
+def g_callback():
+    if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
+        return flask.redirect(flask.url_for('.login_test'))
+    if 'error' in flask.request.args:
+        return 'Error encountered.'
+    if 'code' not in flask.request.args and 'state' not in flask.request.args:
+        return flask.redirect(flask.url_for('.login'))
+    else:
+        google = get_google_auth(state=flask.session['oauth_state'])
+        token = google.fetch_token(TOKEN_URI, client_secret=CLIENT_SECRET,
+                authorization_response=flask.request.url)
+        google = get_google_auth(token=token)
+        resp = google.get(USER_INFO)
+        if resp.status_code == 200:
+            user_data = resp.json()
+            email = user_data['email']
+            user = User.query.filter_by(email=email).first()
+
+            if user is None:
+                user = User()
+                user.email = email
+
+            user.tokens = json.dumps(token)
+            db.session.add(user)
+            db.session.commit()
+            flask_login.login_user(user)
+            return flask.redirect(flask.url_for('.login_test'))
+
 
 @main.route('/game', methods=['GET', 'POST'])
 def game_page():
@@ -123,3 +180,14 @@ def check_room_key(game_id):
         return "Sorry, that key appears to be invalid. Are you sure it's correct?"
 
     return None
+
+def get_google_auth(state=None, token=None):
+    if token:
+        return OAuth2Session(CLIENT_ID, token=token)
+    if state:
+        return OAuth2Session(CLIENT_ID, state=state, redirect_uri=REDIRECT_URI)
+    return OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI, scope=SCOPE)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))

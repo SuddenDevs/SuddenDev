@@ -17,4 +17,7 @@ def create_app():
     from suddendev import socketio
     socketio.init_app(app)
 
+    from suddendev import login_manager
+    login_manager.init_app(app)
+    
     return app

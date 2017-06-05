@@ -15,4 +15,7 @@ socketio = SocketIO()
 from flask import Blueprint
 main = Blueprint('main', __name__)
 
+from flask_login import LoginManager
+login_manager = LoginManager()
+
 from . import routes, events
