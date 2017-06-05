@@ -21,5 +21,6 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = "main.index"
     login_manager.login_message = "Please log in before playing!"
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     
     return app
