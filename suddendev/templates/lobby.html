@@ -30,8 +30,8 @@
 
           <center>
             {% for r in rooms %}
-                <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r.game_id }}">
-            	Join {{ r.game_id }}</button>
+                <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r }}">
+            	Join {{ r }}</button>
             {% endfor %}
 
             <br>
