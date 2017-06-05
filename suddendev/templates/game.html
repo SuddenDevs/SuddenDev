@@ -9,6 +9,17 @@
       var PICKUPC = "#edd95c";
       var COREC = "#47d7f7";
       var FRAMERATE = 60;
+      var INITSCRIPT = 
+      "# INSTRUCTIONS" +
+      "\n\t# Write code in this editor" +
+      "\n\t# Submit code before game begins" +
+      "\n\t# Watch your AI fight to survive" +
+      "\n\t# Write your code in the update(self, delta) function" + 
+      "\n\t# Access your character through the object 'self'(e.g. 'self.vel = Vector(1,1)')" +
+      "\n\t# 'Delta' contains time passed since the last update" +
+      "\n\t# Have fun!" +
+      "\n\ndef update(self, delta):\n\t"
+
       var editor = null;
       var socket = null;
       var gameReady = false;
@@ -20,8 +31,8 @@
       var fpsText = null;
       var waitingText = new createjs.Text("Waiting for " + playersLeft +
                                     " more players!", "20px Arial", "x000000");
-      waitingText.x = 600;
-      waitingText.y = 300;
+      waitingText.x = 400;
+      waitingText.y = 200;
       waitingText.textAlign = "center";
       var playerNames = [];
 
@@ -34,7 +45,7 @@
       var statei = 0;
 
       //Initialise gameCanvas - initialise stage, add shape drawer
-      function init() {
+      function initCanvas() {
         stage = new createjs.Stage("gameCanvas");
         stage.addChild(shape);
         createjs.Ticker.framerate = FRAMERATE;
@@ -42,18 +53,17 @@
       }
 
       //Initialise the editor
-      function editorInit() {
+      function initEditor() {
         editor = ace.edit("editor");
         editor.getSession().setMode("ace/mode/python");
         editor.getSession().setUseWrapMode(true);
-        editor.setValue("def update(self, delta):\n\t", 1);
-        var e = document.getElementById("editor");  
-        e.style.height = "0%";
+        editor.setFontSize(20);
+        editor.setValue(INITSCRIPT, 1);
         editor.resize();
       }
 
       //Initialise connection to server
-      function socketInit() {
+      function initSocket() {
         $(document).ready(function(){
           socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
           socket.on('connect', function() {
@@ -189,25 +199,6 @@
         b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
       }
 
-      //Display editor over game canvas
-      function toggleEditor() {
-        var e = document.getElementById("editor");
-        var editorOn = e.style.height == "0%";
-        if (editorOn) {
-          editor.focus();
-          editor.setFontSize(20);
-          e.style.height = "100%";
-          e.style.pointerEvents = "auto";
-          e.style.borderStyle = "solid";
-          e.style.borderWidth = "thin";
-        } else {
-          e.style.height = "0%";
-          e.style.pointerEvents = "none";
-          e.style.borderStyle = "hidden";
-        }
-        editor.resize();
-      }
-
       //Display the next state
       function displayNextState() {
         shape.graphics.clear();
@@ -232,39 +223,33 @@
     </script>
 {% endblock %}
 {% block body %}
+
     <div id="title" class="title">
-      <img src="{{ url_for('static', filename='favicon_64.png')}}">
+      <img src="{{ url_for('static', filename='logo_64.png')}}">
       <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
     </div>
-    <div class="outer">
-      <div id="instructionDiv" class="instructionDiv">
-        <h1 class="instructionHeading">Instructions</h1>
-        <ul id="instructionList" class="instructionList">
-          <li>Write code in the editor</li>
-          <li>Submit code before game begins</li>
-          <li>Watch your AI fight to survive</li>
-          <li>Write your code in an update(self, delta) function</li>
-          <li>Access your character through the object "self" <br>(e.g. self.vel = Vector(1,1))</li>
-          <li>"Delta" contains time passed since the last update</li>
-        </ul>
-      </div>
-      <div id="editorContainer" class="editorContainer">
-        <div id="editor"></div>
-      </div>
-      <script>socketInit()</script>
-      <script>editorInit();</script>
-      <div id="gameDiv" class="gameDiv">
-        <canvas id="gameCanvas" class="gameCanvas" width="1200px"
-                height="800px"></canvas>
-        <div class="controls">
-          <button onclick="toggleEditor()">Toggle Editor</button>
-          <button id="pauseBtn" onclick="togglePause()">Pause</button>
-          <button id="nextStateBtn" onclick="displayNextState()">Next State
-            </button>
-          <button id="submitBtn" onclick="submitCode()">Submit Code</button>
-          <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
+    <div class="container-fluid">
+      <div class="row mainRow">
+        <div class="col mainCol gameCol">
+          <div id="gameDiv" class="gameDiv">
+            <canvas id="gameCanvas" class="gameCanvas" width="800px"
+                    height="600px"></canvas>
+            <div class="controls">
+              <button id="pauseBtn" onclick="togglePause()">Pause</button>
+              <button id="nextStateBtn" onclick="displayNextState()">Next State
+                </button>
+              <button id="submitBtn" onclick="submitCode()">Submit Code</button>
+              <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
+            </div>
+          </div>
+        </div>
+        <div class="col mainCol editCol">
+          <div class="editorContainer">
+            <div id="editor"></div>
+          </div>
         </div>
       </div>
     </div>
-    <script>init();</script>
+    <script>initCanvas();initSocket();initEditor();</script>
 {% endblock %}
+  
