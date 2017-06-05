@@ -29,8 +29,13 @@ def joined(message):
 
     # If there are enough players, start the game
     if player_count == REQUIRED_PLAYER_COUNT:
-        result = play_game.delay(game_id, player_names, player_scripts).get()
-        fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
+        fsio.emit('game_start', {}, room=game_id, namespace=NAMESPACE)
+
+        if 'result' not in GLOBAL_DICT[game_id]:
+            result = play_game.delay(game_id, player_names, player_scripts).get()
+            GLOBAL_DICT[game_id]['result'] = result
+        else:
+            result = GLOBAL_DICT[game_id]['result']
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
