@@ -1,10 +1,11 @@
 from .entity import Entity
 from .vector import Vector
+from .sandbox import builtins
+
 import math
 import random
-import inspect
 import sys
-import imp
+import inspect
 
 DEFAULT_SCRIPT = """
 timer = 0
@@ -23,7 +24,6 @@ def update(player, delta):
             target = e
 
     if target is not None:
-        print(player.pos)
         diff = player.pos - target.pos
         mag = min(player.speed, min_dist)
         player.vel = Vector.Normalize(diff) * mag
@@ -66,16 +66,18 @@ class Player(Entity):
             return False
 
         self.scope = {
-                'math' : math,
-                'Vector' : Vector,
-                'core' : game.core,
-                'random' : random,
-                'sys' : sys
-            }
+            'math' : math,
+            'Vector' : Vector,
+            'core' : game.core,
+            'random' : random,
+            'sys' : sys,
+            '__builtins__' : builtins
+        }
 
         exec(script, self.scope)
+        print(self.scope)
 
-        #Find class, check update method existence and signature
+        # Check update method existence and signature of update function
         update = self.scope['update']
         if update is not None and callable(update):
             if len(inspect.signature(update).parameters) == 2:

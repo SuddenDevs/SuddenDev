@@ -24,6 +24,9 @@ class Game:
         #Map
         self.map = Map(800, 600)
 
+        #Events
+        self.events = []
+
         #Core
         self.core = Core()
         self.core.pos = Vector(self.map.width/2, self.map.height/2)
