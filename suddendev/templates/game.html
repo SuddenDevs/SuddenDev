@@ -31,6 +31,7 @@
       var socket = null;
       var gameReady = false;
       var playersLeft = 3;
+      var scripts = [INITSCRIPT,"","",""];
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var shape = null;
@@ -168,13 +169,6 @@
         stage.update();
       }
 
-      //Pause game, update pause button
-      function togglePause() {
-        createjs.Ticker.paused = !createjs.Ticker.paused;
-        var b = document.getElementById("pauseBtn");
-        b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
-      }
-
       //Draws a triangle facing the direction of vector vel
       function drawTriangle(pos, vel, radius, color) {
         var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
@@ -196,15 +190,42 @@
           playerNames[i].y = list[i].pos.y + NAMEOFFS;
           drawTriangle(list[i].pos, list[i].vel, list[i].size, list[i].color);
         }
+      } 
+
+      //Pause game, update pause button
+      function togglePause() {
+        createjs.Ticker.paused = !createjs.Ticker.paused;
+        var b = document.getElementById("pauseBtn");
+        b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
+        b.classList.toggle("active");
+      }
+
+      function setEditorTab(tabi) {
+        var tabs = document.getElementsByClassName("tabBtn");
+        var previ = -1;
+        for (i = 0; i < tabs.length; i++) {
+          if (i == tabi) {
+            tabs[i].classList.add("active");
+          } else {
+            if (tabs[i].classList.contains("active")) {
+              previ = i;
+              tabs[i].classList.remove("active");
+            }
+          }
+        }
+        scripts[previ] = editor.getValue();
+        editor.setValue(scripts[tabi]);
+        editor.focus();
       }
 
       //Initialise the editor
       function initEditor() {
         editor = ace.edit("editor");
+        editor.$blockScrolling = Infinity;
         editor.getSession().setMode("ace/mode/python");
         editor.getSession().setUseWrapMode(true);
         editor.setFontSize(20);
-        editor.setValue(INITSCRIPT, 1);
+        editor.setValue(scripts[0], 1);
       }
 
     </script>
@@ -218,21 +239,31 @@
     <div class="container-fluid">
       <div class="row mainRow">
         <div class="col mainCol gameCol">
-          <div id="gameDiv" class="gameDiv">
-            <canvas id="gameCanvas" class="gameCanvas" width="800px"
+          <div id="gameDiv" class="game">
+            <canvas id="gameCanvas" class="game" width="800px"
                     height="600px"></canvas>
             <div class="controls">
-              <button id="pauseBtn" onclick="togglePause()">Pause</button>
-              <button id="nextStateBtn" onclick="displayNextState()">Next State
+              <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
+              <button class="controls" onclick="displayNextState()">Next State
                 </button>
-              <button id="submitBtn" onclick="submitCode()">Submit Code</button>
-              <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
+              <button class="controls" onclick="submitCode()">Submit Code</button>
+              <button class="controls" onclick="leaveGame()">Leave Game</button>
             </div>
           </div>
         </div>
         <div class="col mainCol editCol">
           <div class="editorContainer">
             <div id="editor"></div>
+          </div>
+          <div class="controls">
+            <button id="tab0" class="controls tabBtn active" 
+                    onclick="setEditorTab(0)">Player1</button>
+            <button id="tab1" class="controls tabBtn" onclick="setEditorTab(1)">
+                    Player2</button>
+            <button id="tab2" class="controls tabBtn" onclick="setEditorTab(2)">
+                    Player3</button>
+            <button id="tab3" class="controls tabBtn" onclick="setEditorTab(3)">
+                    Player4</button>
           </div>
         </div>
       </div>

@@ -25,26 +25,52 @@
   box-sizing:border-box;
 }
 
-.gameDiv {
-  height: 600px;
-  width: 800px;
+div.game {
+  display: inline-block;
   margin: 0 auto;
 }
 
-.gameCanvas{
+canvas.game{
   border-style: solid;
   border-width: thin;
+  border-color: #ccc;
   float: right;
-  margin-bottom: 10px;
 }
 
-.controls{
-  float: right;
+div.controls{
+  overflow: hidden;
+  border-style: solid;
+  border-width: thin;
+  border-color: #ccc;
+  border-top:none;
+  background-color: #f1f1f1;
+}
+
+button.controls:hover{
+  background-color: #ddd;
+}
+
+button.controls.active{
+  background-color: #ccc;
+}
+
+button.controls:active{
+  background-color: #bbb;
+}
+
+button.controls{
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
 }
 
 .editorContainer{
   border-style: solid;
   border-width: thin;
+  border-color: #ccc;
 }
 
 @media screen {
