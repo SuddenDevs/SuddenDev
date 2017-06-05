@@ -22,7 +22,7 @@ class Game:
 
     def __init__(self, player_names, scripts):
         #Map
-        self.map = Map(600, 600)
+        self.map = Map(800, 600)
 
         #Core
         self.core = Core()
