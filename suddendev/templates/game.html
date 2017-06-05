@@ -8,52 +8,43 @@
       var ENEMYC = "#000000";
       var PICKUPC = "#edd95c";
       var COREC = "#47d7f7";
+      var NAMEOFFS = 10;
       var FRAMERATE = 60;
+      var INITSCRIPT = 
+      "# INSTRUCTIONS" +
+      "\n\t# Write code in this editor" +
+      "\n\t# Submit code before game begins" +
+      "\n\t# Watch your AI fight to survive" +
+      "\n\t# Access variables through the 'self' object" +
+      "\n\t# Access your character through the 'player' object" +
+      "\n\t# The time passed since the last update is equal to 'delta'" +
+      "\n\t# Have fun!" +
+      "\n\nclass Controller:" +  
+      "\n\t# Initialise variables in this function" +
+      "\n\tdef __init__(self):" + 
+      "\n\t\tpass" +
+      "\n\n\t# Write your update code in this function" +
+      "\n\tdef update(self, player, delta):" + 
+      "\n\t\tplayer.vel = Vector(0, 0)"
+
       var editor = null;
       var socket = null;
       var gameReady = false;
       var playersLeft = 3;
 
       //Stage/shape drawer initialised, can be used in multiple functions
-      var shape = new createjs.Shape();
+      var shape = null;
       var stage = null;
       var fpsText = null;
-      var waitingText = new createjs.Text("Waiting for " + playersLeft +
-                                    " more players!", "20px Arial", "x000000");
-      waitingText.x = 600;
-      waitingText.y = 300;
-      waitingText.textAlign = "center";
+      var waitingText = null;
       var playerNames = [];
 
       //Game state
-      var playerList = [];
-      var enemyList = [];
-      var powerupList = [];
-      var core = null;
       var states = [];
       var statei = 0;
 
-      //Initialise gameCanvas - initialise stage, add shape drawer
-      function init() {
-        stage = new createjs.Stage("gameCanvas");
-        stage.addChild(shape);
-        createjs.Ticker.framerate = FRAMERATE;
-        createjs.Ticker.addEventListener("tick", handleTick);
-      }
-
-      //Initialise the editor
-      function editorInit() {
-        editor = ace.edit("editor");
-        editor.getSession().setMode("ace/mode/python");
-        editor.getSession().setUseWrapMode(true);
-        editor.setValue("def update(self, delta):\n\t", 1);
-        var e = document.getElementById("editor");  
-        e.style.height = "0%";
-        editor.resize();
-      }
-
       //Initialise connection to server
-      function socketInit() {
+      function initSocket() {
         $(document).ready(function(){
           socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
           socket.on('connect', function() {
@@ -81,10 +72,11 @@
         socket.emit('joined', {});
       }
 
-      //Get list of states from server reply
+      //Get list of states from server reply, init playerNames
       function processStates(data) {
         states = JSON.parse(data).result;
-        setState(states[0]);
+
+        var playerList = states[0].players;
         for (i = 0; i < playerList.length; i++) {
           var name = new createjs.Text(playerList[i].name, "12px Arial", "x000000")
           playerNames.push(name);
@@ -106,9 +98,6 @@
         } else {
           waitingText.text = "Ready to start!";
         }
-        if (!stage.contains(waitingText)) {
-          stage.addChild(waitingText);
-        }
         stage.update();
       }
 
@@ -116,107 +105,6 @@
       function exitGame(e) {
         socket.emit('left', {});
         socket.disconnect();
-      }
-
-      //Tick handler, clears graphics, draws FPS, updates canvas
-      function handleTick(event) {
-        if (!event.paused && gameReady) {
-          drawFPS();
-          displayNextState();
-        }
-      }
-
-      //Function to draw the ticker's FPS to the screen
-      function drawFPS() {
-        var fps = createjs.Ticker.getMeasuredFPS();
-        if (fpsText == null) {
-          fpsText = new createjs.Text(fps, "20px Arial", "x000000");
-          fpsText.x = 10;
-          fpsText.y = 10;
-          stage.addChild(fpsText);
-        } else {
-          fpsText.text = fps;
-        }
-      }
-
-      //Clear shape drawer, then draw game state to gameCanvas
-      function updateCanvas() {
-        drawList(playerList, null);
-        drawList(enemyList, ENEMYC);
-        drawList(powerupList, PICKUPC);
-        if (core != null) {
-          shape.graphics.beginFill(COREC).drawCircle(core.pos.x, core.pos.y, core.size);
-        }
-        stage.update();
-      }
-
-      //Draws a triangle facing the direction from vector vel
-      function drawTriangle(pos, vel, radius, color) {
-        var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
-        shape.graphics.beginFill(color).drawPolyStar(pos.x, pos.y, radius, 3, 0,
-                                                      angle);
-      }
-
-      /* Draw every object in a list - if color not provided then color is
-       * obtained from the list objects */
-      function drawList(list, color) {
-        var isPlayer = false;
-        if (color == null)
-          isPlayer = true;
-
-        for (i = 0; i < list.length; i++) {
-          if (isPlayer) {
-            color = list[i].color;
-            playerNames[i].x = list[i].pos.x + 10;
-            playerNames[i].y = list[i].pos.y - 10;
-          }
-          drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
-        }
-      }
-
-      //Convert JSON string json to object, set game state accordingly
-      function setState(state) {
-        playerList = state.players;
-        enemyList = state.enemies;
-        powerupList = state.powerups;
-        core = state.core;
-      }
-
-      //Pause game, update pause button
-      function togglePause() {
-        createjs.Ticker.paused = !createjs.Ticker.paused;
-        var b = document.getElementById("pauseBtn");
-        b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
-      }
-
-      //Display editor over game canvas
-      function toggleEditor() {
-        var e = document.getElementById("editor");
-        var editorOn = e.style.height == "0%";
-        if (editorOn) {
-          editor.focus();
-          editor.setFontSize(20);
-          e.style.height = "100%";
-          e.style.pointerEvents = "auto";
-          e.style.borderStyle = "solid";
-          e.style.borderWidth = "thin";
-        } else {
-          e.style.height = "0%";
-          e.style.pointerEvents = "none";
-          e.style.borderStyle = "hidden";
-        }
-        editor.resize();
-      }
-
-      //Display the next state
-      function displayNextState() {
-        shape.graphics.clear();
-        setState(states[statei]);
-        statei++;
-        if (statei >= states.length) {
-          statei = 0;
-        }
-        updateCanvas();
       }
 
       function submitCode() {
@@ -229,42 +117,126 @@
         window.location.href = "{{ url_for('main.lobby') }}";
       }
 
+      //Initialise gameCanvas - initialise stage, add shape drawer
+      function initCanvas() {
+        stage = new createjs.Stage("gameCanvas");
+        createjs.Ticker.framerate = FRAMERATE;
+        createjs.Ticker.addEventListener("tick", handleTick);
+
+        shape = new createjs.Shape();
+        stage.addChild(shape);
+
+        waitingText = new createjs.Text("Waiting for " + playersLeft +
+                                    " more players!", "20px Arial", "x000000");
+        waitingText.x = 400;
+        waitingText.y = 200;
+        waitingText.textAlign = "center";
+        stage.addChild(waitingText);
+
+        fpsText = new createjs.Text("", "20px Arial", "x000000");
+        fpsText.x = 10;
+        fpsText.y = 10;
+        stage.addChild(fpsText);
+      }
+
+      //Tick handler, clears graphics, draws FPS, updates canvas
+      function handleTick(event) {
+        if (!event.paused && gameReady) {
+          fpsText.text = createjs.Ticker.getMeasuredFPS();
+          displayNextState();
+        }
+      }
+
+      //Display the next state
+      function displayNextState() {
+        shape.graphics.clear();
+        statei++;
+        if (statei >= states.length) {
+          statei = 0;
+        }
+        updateCanvas();
+      }
+
+      //Clear shape drawer, then draw game state to gameCanvas
+      function updateCanvas() {
+        var state = states[statei];
+        drawPlayerList(state.players);
+        drawList(state.enemies, ENEMYC);
+        drawList(state.powerups, PICKUPC);
+        shape.graphics.beginFill(COREC)
+              .drawCircle(state.core.pos.x, state.core.pos.y, state.core.size);
+        stage.update();
+      }
+
+      //Pause game, update pause button
+      function togglePause() {
+        createjs.Ticker.paused = !createjs.Ticker.paused;
+        var b = document.getElementById("pauseBtn");
+        b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
+      }
+
+      //Draws a triangle facing the direction of vector vel
+      function drawTriangle(pos, vel, radius, color) {
+        var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
+        shape.graphics.beginFill(color).drawPolyStar(pos.x, pos.y, radius, 3, 0,
+                                                      angle);
+      }
+
+      // Draw every object in a list the same color
+      function drawList(list, color) {
+        for (i = 0; i < list.length; i++) {
+          drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
+        }
+      }
+
+      // Draw every player and update name locations
+      function drawPlayerList(list) {
+        for (i = 0; i < list.length; i++) {
+          playerNames[i].x = list[i].pos.x + NAMEOFFS;
+          playerNames[i].y = list[i].pos.y + NAMEOFFS;
+          drawTriangle(list[i].pos, list[i].vel, list[i].size, list[i].color);
+        }
+      }
+
+      //Initialise the editor
+      function initEditor() {
+        editor = ace.edit("editor");
+        editor.getSession().setMode("ace/mode/python");
+        editor.getSession().setUseWrapMode(true);
+        editor.setFontSize(20);
+        editor.setValue(INITSCRIPT, 1);
+      }
+
     </script>
 {% endblock %}
 {% block body %}
+
     <div id="title" class="title">
-      <img src="{{ url_for('static', filename='favicon_64.png')}}">
+      <img src="{{ url_for('static', filename='logo_64.png')}}">
       <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
     </div>
-    <div class="outer">
-      <div id="instructionDiv" class="instructionDiv">
-        <h1 class="instructionHeading">Instructions</h1>
-        <ul id="instructionList" class="instructionList">
-          <li>Write code in the editor</li>
-          <li>Submit code before game begins</li>
-          <li>Watch your AI fight to survive</li>
-          <li>Write your code in an update(self, delta) function</li>
-          <li>Access your character through the object "self" <br>(e.g. self.vel = Vector(1,1))</li>
-          <li>"Delta" contains time passed since the last update</li>
-        </ul>
-      </div>
-      <div id="editorContainer" class="editorContainer">
-        <div id="editor"></div>
-      </div>
-      <script>socketInit()</script>
-      <script>editorInit();</script>
-      <div id="gameDiv" class="gameDiv">
-        <canvas id="gameCanvas" class="gameCanvas" width="1200px"
-                height="800px"></canvas>
-        <div class="controls">
-          <button onclick="toggleEditor()">Toggle Editor</button>
-          <button id="pauseBtn" onclick="togglePause()">Pause</button>
-          <button id="nextStateBtn" onclick="displayNextState()">Next State
-            </button>
-          <button id="submitBtn" onclick="submitCode()">Submit Code</button>
-          <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
+    <div class="container-fluid">
+      <div class="row mainRow">
+        <div class="col mainCol gameCol">
+          <div id="gameDiv" class="gameDiv">
+            <canvas id="gameCanvas" class="gameCanvas" width="800px"
+                    height="600px"></canvas>
+            <div class="controls">
+              <button id="pauseBtn" onclick="togglePause()">Pause</button>
+              <button id="nextStateBtn" onclick="displayNextState()">Next State
+                </button>
+              <button id="submitBtn" onclick="submitCode()">Submit Code</button>
+              <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
+            </div>
+          </div>
+        </div>
+        <div class="col mainCol editCol">
+          <div class="editorContainer">
+            <div id="editor"></div>
+          </div>
         </div>
       </div>
     </div>
-    <script>init();</script>
+    <script>initCanvas();initSocket();initEditor();</script>
 {% endblock %}
+  
