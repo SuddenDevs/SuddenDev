@@ -1,10 +1,9 @@
 .title{
-  width: 450px;
+  width: 500px;
   margin: 0 auto;
 }
 
 .mainHeading{
-  text-align: right;
   display: inline-block;
   white-space: pre;
 }
@@ -19,8 +18,8 @@
 }
 
 .editCol{
-  margin-left: 825px;
   min-width: 500px;
+  margin-left: 825px;
   -webkit-box-sizing:border-box;
   -moz-box-sizing:border-box;
   box-sizing:border-box;
