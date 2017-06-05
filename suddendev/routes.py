@@ -1,4 +1,5 @@
 import flask
+import os
 import random
 import string
 import sqlalchemy
@@ -19,7 +20,7 @@ GLOBAL_DICT = dict()
 REQUIRED_PLAYER_COUNT = 4
 
 CLIENT_ID = '690133088753-kk72josco183eb8smpq4dgkrqmd0eovm.apps.googleusercontent.com'
-CLIENT_SECRET = '7he9FnNvgC7C68FQZ0uAytr9'
+CLIENT_SECRET = os.environ['CLIENT_SECRET']
 REDIRECT_URI = 'http://localhost:5000/gcallback'
 AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
 TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
@@ -30,30 +31,20 @@ SCOPE = ['https://www.googleapis.com/auth/userinfo.email',
 @main.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page."""
-    return flask.render_template('index.html')
-
-@main.route('/logintest', methods=['GET', 'POST'])
-@flask_login.login_required
-def login_test():
-    return flask.render_template('index.html')
-
-@main.route('/login', methods=['GET', 'POST'])
-def login():
-    if flask_login.current_user.is_authenticated:
-        return flask.redirect(flask.url_for('.login_test'))
-    google = get_google_auth()
-    auth_url, state = google.authorization_url(AUTH_URI, access_type='offline')
-    flask.session['oauth_state'] = state
-    return flask.render_template('login.html', auth_url=auth_url)
+    if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
+        auth_url = flask.url_for('.lobby')
+    else:
+        google = get_google_auth()
+        auth_url, state = google.authorization_url(AUTH_URI, access_type='offline')
+        flask.session['oauth_state'] = state
+    return flask.render_template('index.html', auth_url=auth_url)
 
 @main.route('/gcallback', methods=['GET', 'POST'])
 def g_callback():
     if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
-        return flask.redirect(flask.url_for('.login_test'))
-    if 'error' in flask.request.args:
-        return 'Error encountered.'
+        return flask.redirect(flask.url_for('.lobby'))
     if 'code' not in flask.request.args and 'state' not in flask.request.args:
-        return flask.redirect(flask.url_for('.login'))
+        return flask.redirect(flask.url_for('.index'))
     else:
         google = get_google_auth(state=flask.session['oauth_state'])
         token = google.fetch_token(TOKEN_URI, client_secret=CLIENT_SECRET,
@@ -62,21 +53,23 @@ def g_callback():
         resp = google.get(USER_INFO)
         if resp.status_code == 200:
             user_data = resp.json()
-            email = user_data['email']
-            user = User.query.filter_by(email=email).first()
+            user = User.query.filter_by(email=user_data['email']).first()
 
             if user is None:
                 user = User()
-                user.email = email
+                user.email = user_data['email']
+                user.name = user_data['name']
+                user.picture = user_data['picture']
 
             user.tokens = json.dumps(token)
             db.session.add(user)
             db.session.commit()
             flask_login.login_user(user)
-            return flask.redirect(flask.url_for('.login_test'))
+            return flask.redirect(flask.url_for('.lobby'))
 
 
 @main.route('/game', methods=['GET', 'POST'])
+@flask_login.login_required
 def game_page():
     game_id = flask.session.get('game_id', None)
     name = flask.session.get('name', None)
@@ -119,6 +112,7 @@ def game_page():
     return flask.render_template('game.html')
 
 @main.route('/lobby', methods=['GET', 'POST'])
+@flask_login.login_required
 def lobby():
     """
     Contains all currently open rooms, along with a button to instantly connect
@@ -149,7 +143,8 @@ def lobby():
 
         return flask.redirect(flask.url_for('.game_page'))
 
-    return flask.render_template('lobby.html', rooms=rooms)
+    user = flask_login.current_user
+    return flask.render_template('lobby.html', rooms=rooms, user=user)
 
 def create_room():
     """Creates a new chat room and returns the key."""

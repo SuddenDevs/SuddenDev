@@ -6,6 +6,9 @@
   <div class="container">
     {{ suddendev_header() }}
 
+    <h3><img src="{{user.picture}}" style="border-radius:50%; width:10%; display:inline-block">
+        {{ user.name }}<br>{{ user.email }}
+    </h3>
     <h3>Lobby</h3>
     <p>Join an open game, or create a new one. At the moment anyone can join your game
     and we won't keep track of your scripts and statistics.
