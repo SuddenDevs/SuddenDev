@@ -20,14 +20,19 @@ class GameConfig:
     MAP_HEIGHT = 600
 
     ENEMY_SPAWN_DELAY = 1
-    ENEMY_LIMIT = 5
+    ENEMY_LIMIT = 10
+
+    # Probability of an enemy spawning on each frame, if the enemy limit has
+    # not been reached. The expected number of frames between enemy spawn is
+    # given by 1/ENEMY_SPAWN_PROBABILITY, given by the Binomial distribution.
+    ENEMY_SPAWN_PROBABILITY = 0.1
 
     # Player
-    P_SPEED = 20
+    P_SPEED = 80
     P_RANGE_VISIBLE = 100
     P_RANGE_ATTACKABLE = 20
-    P_AMMO = 10
-    P_DAMAGE = 20
+    P_AMMO = 12
+    P_DAMAGE = 50
     P_DEFAULT_SCRIPT = """
 timer = 0
 

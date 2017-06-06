@@ -86,7 +86,8 @@ class Game:
 
         #Enemy Spawning
         if (self.enemy_spawn_timer > gc.ENEMY_SPAWN_DELAY
-            and len(self.enemies) < self.enemy_limit):
+            and len(self.enemies) < self.enemy_limit
+            and random.random() < gc.ENEMY_SPAWN_PROBABILITY):
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)

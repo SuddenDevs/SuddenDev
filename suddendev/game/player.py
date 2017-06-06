@@ -92,6 +92,9 @@ class Player(Entity):
         self.script_update(self.dummy, delta)
 
         #Check for sanity (restrict velocity)
+        if Vector.Length(self.dummy.vel) > self.speed:
+            self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed
+
         self.vel = self.dummy.vel
 
         #Reset dummy
@@ -102,8 +105,14 @@ class Player(Entity):
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
 
+# TODO: This should be restricted to the dummy and access the real player's
+# damage for verification, otherwise someone could do:
+# 
+# self.damage = 999999999
+# shoot(self, enemy)
 def shoot(player, enemy):
-    if Vector.Distance(enemy.pos, player.pos) <= player.range_attackable and player.ammo > 0 and not player.attacked:
+    if (Vector.Distance(enemy.pos, player.pos) <= player.range_attackable
+            and player.ammo > 0 and not player.attacked):
         # Point towards the target
         player.vel = enemy.pos - player.pos
         player.vel = Vector.Normalize(player.vel) * 0.01
