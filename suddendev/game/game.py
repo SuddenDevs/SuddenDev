@@ -1,13 +1,23 @@
 #!/usr/bin/python3.5
 
 from .vector import Vector
-from .color import Color3
+from .color import Color3, random_color3
 from .player import Player
 from .enemy import Enemy
+from .wall import Wall
 from .core import Core
 
 import time
 import random
+
+PLAYER_COUNT = 4
+
+MAP_WIDTH = 800
+MAP_HEIGHT = 600
+
+ENEMY_SPAWN_DELAY = 1
+ENEMY_LIMIT = 5
+ENEMY_SPAWN_TIMER = 0
 
 class Map:
     def __init__(self, width, height):
@@ -18,11 +28,11 @@ class Map:
 class Game:
     #### Config ####
     #Enemy Spawning
-    enemy_spawn_delay = 1
+    enemy_spawn_delay = ENEMY_SPAWN_DELAY
 
     def __init__(self, player_names, scripts):
         #Map
-        self.map = Map(800, 600)
+        self.map = Map(MAP_WIDTH, MAP_HEIGHT)
 
         #Events
         self.events = []
@@ -33,29 +43,35 @@ class Game:
 
         #Enemies
         self.enemies = []
-        self.enemy_limit = 5
-        self.enemy_spawn_timer = 0
+        self.enemy_limit = ENEMY_LIMIT
+        self.enemy_spawn_timer = ENEMY_SPAWN_TIMER
+
+        #Walls
+        self.walls = []
+        self.walls.append(Wall(pos=Vector(300,50), dim=Vector(10,150)))
+        self.walls.append(Wall(pos=Vector(100,90), dim=Vector(10,50)))
+        self.walls.append(Wall(pos=Vector(20,90), dim=Vector(90,10)))
+        self.walls.append(Wall(pos=Vector(500,90), dim=Vector(10,50)))
+        self.walls.append(Wall(pos=Vector(480,60), dim=Vector(90,10)))
 
         colors = [
-            Color3(255, 0, 0),
-            Color3(0, 255, 0),
-            Color3(0, 0, 255),
-            Color3(255, 0, 0)
+            random_color3(),
+            random_color3(),
+            random_color3(),
+            random_color3()
         ]
 
         #Players
         self.players = []
-        for i in range(4):
+        for i in range(PLAYER_COUNT):
             name = player_names[i]
             script = None
             if name in scripts:
                 script = scripts[name]
 
             player = Player(name, colors[i], self, script)
-            player.pos = Vector(random.random()*self.map.width,
-                                random.random()*self.map.height)
+            player.pos = self.get_random_spawn(player.size)
             self.players.append(player)
-
 
         #Powerups
         self.powerups = []
@@ -72,13 +88,15 @@ class Game:
 
         #Update Players
         for p in self.players:
-            p.update(delta)
-            p.pos = self.clamp_pos(p.pos)
+            pos = self.clamp_pos(p.update(delta))
+            if not self.collides_with_walls(pos, p.size):
+                p.pos = pos
 
         #Update Enemies
         for e in self.enemies:
-            e.update(delta)
-            e.pos = self.clamp_pos(e.pos)
+            pos = self.clamp_pos(e.update(delta))
+            if not self.collides_with_walls(pos, e.size):
+                e.pos = pos
 
         #Enemy Spawning
         if (self.enemy_spawn_timer > self.enemy_spawn_delay
@@ -102,5 +120,20 @@ class Game:
             pos.x = self.map.width
         if pos.y > self.map.height:
             pos.y = self.map.height
+        return pos
+
+    def collides_with_walls(self, center, size):
+        for w in self.walls:
+            if w.intersects(center, size):
+                return True
+        return False
+
+    def get_random_spawn(self, size):
+        """ Generates a random position that does not collide with any walls. """
+        cond = True
+        while cond:
+            pos = Vector(random.random()*self.map.width,
+                                random.random()*self.map.height)
+            cond = self.collides_with_walls(pos, size)
         return pos
 

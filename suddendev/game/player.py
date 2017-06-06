@@ -78,6 +78,9 @@ class Player(Entity):
         exec(script, self.scope)
 
         # Check update method existence and signature of update function
+        if 'update' not in self.scope:
+            return False
+
         update = self.scope['update']
         if update is not None and callable(update):
             if len(inspect.signature(update).parameters) == 2:
@@ -100,7 +103,7 @@ class Player(Entity):
         #Reset dummy
 
         #Apply Motion
-        super().update(delta)
+        return super().update(delta)
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)

@@ -8,6 +8,7 @@
       var ENEMYC = "#000000";
       var PICKUPC = "#edd95c";
       var COREC = "#47d7f7";
+      var WALLC = "#232323";
       var NAMEOFFS = 10;
       var FRAMERATE = 60;
       var INITSCRIPT = 
@@ -157,10 +158,15 @@
         drawPlayerList(state.players);
         drawList(state.enemies, ENEMYC);
         drawList(state.powerups, PICKUPC);
-        shape.graphics.beginFill(COREC)
-              .drawCircle(state.core.pos.x, state.core.pos.y, state.core.size);
+        drawWalls(state.walls, WALLC);
+        shape.graphics.beginFill(COREC).drawCircle(state.core.pos.x, state.core.pos.y, state.core.size);
         stage.update();
       }
+
+    function drawWalls(list, color) {
+        for (i = 0; i < list.length; i++) {
+        shape.graphics.beginFill(color).drawRect(list[i].pos.x, list[i].pos.y, list[i].dim.x, list[i].dim.y); }
+    }
 
       //Draws a triangle facing the direction of vector vel
       function drawTriangle(pos, vel, radius, color) {

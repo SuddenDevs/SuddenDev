@@ -26,4 +26,4 @@ class Enemy(Entity):
         mag = Vector.Length(to)
 
         self.vel = Vector.Normalize(to) * min(mag, self.speed)
-        super().update(delta)
+        return super().update(delta)

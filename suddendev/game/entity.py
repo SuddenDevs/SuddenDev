@@ -29,4 +29,4 @@ class Entity():
             self.health = max(0, self.health - damage)
 
     def update(self, delta):
-        self.pos = self.pos + self.vel * delta
+        return self.pos + self.vel * delta

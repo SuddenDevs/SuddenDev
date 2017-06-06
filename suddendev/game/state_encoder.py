@@ -14,9 +14,10 @@ class StateEncoder(json.JSONEncoder):
 
     def serializeState(self, state):
         return { 
-                'players': self.serializePlayers(state.players),
                 'enemies': self.serializeEnemies(state.enemies),
                 'powerups': self.serializePowerups(state.powerups),
+                'walls': self.serializeWalls(state.walls),
+                'players': self.serializePlayers(state.players),
                 'core': self.serializeCore(state.core)
         }
 
@@ -34,9 +35,17 @@ class StateEncoder(json.JSONEncoder):
         result = []
         for p in players:
             json = self.serializeEntity(p)
-            json['name'] = p.name;
-            #json['ammo'] = p.ammo;
-            json['color'] = self.serializeColor(p.color);
+            json['name'] = p.name
+            json['color'] = self.serializeColor(p.color)
+            result.append(json)
+        return result
+
+    def serializeWalls(self, walls):
+        result = []
+        for w in walls:
+            json = self.serializeEntity(w)
+            json['pos'] = self.serializeVector(w.pos)
+            json['dim'] = self.serializeVector(w.dim)
             result.append(json)
         return result
 
