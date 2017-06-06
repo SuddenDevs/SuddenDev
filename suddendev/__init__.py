@@ -25,4 +25,7 @@ main = Blueprint('main', __name__)
 from flask_login import LoginManager
 login_manager = LoginManager()
 
+from redis import StrictRedis
+redis = StrictRedis.from_url(Config.REDIS_URL, decode_responses=True, charset="utf-8")
+
 from . import routes, events

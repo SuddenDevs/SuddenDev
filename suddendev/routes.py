@@ -7,12 +7,11 @@ import datetime
 import flask_socketio as fsio
 import flask_login
 import json
+import redis
 from threading import Thread
-from . import main
-from . import socketio
-from . import login_manager
+from . import main, socketio, redis, login_manager
 from .config import Config
-from .models import db, GameSetup, User
+from .models import db, User
 from .game_instance import GameInstance
 from requests_oauthlib import OAuth2Session
 
@@ -63,7 +62,10 @@ def g_callback():
 @main.route('/game', methods=['GET', 'POST'])
 @flask_login.login_required
 def game_page():
-    game_id = flask.session.get('game_id', None)
+    player_id = flask_login.current_user.id
+    player_state = redis.hgetall(player_id)
+    game_id = player_state['game_id']
+
     name = flask.session.get('name', None)
 
     if game_id is None:
@@ -73,33 +75,6 @@ def game_page():
     if name is None:
         flask.flash('You must have a name!')
         return flask.redirect(flask.url_for('.lobby'))
-
-    error = check_room_key(game_id)
-    if error:
-        flask.flash(error)
-        return flask.redirect(flask.url_for('.lobby'))
-
-    joined_game = flask.session.get('joined_game', False)
-    if not joined_game:
-
-        # TODO: move to db
-        if game_id in GLOBAL_DICT:
-            if GLOBAL_DICT[game_id]['player_count'] >= REQUIRED_PLAYER_COUNT:
-                flask.flash('Sorry, game room is full. Try a different room.')
-                return flask.redirect(flask.url_for('.lobby'))
-
-            GLOBAL_DICT[game_id]['player_count'] += 1
-            GLOBAL_DICT[game_id]['players'].append(name)
-
-        else:
-            GLOBAL_DICT[game_id] = dict()
-            GLOBAL_DICT[game_id]['scripts'] = dict()
-            GLOBAL_DICT[game_id]['player_count'] = 1
-            GLOBAL_DICT[game_id]['players'] = [name]
-
-        flask.session['joined_game'] = True
-
-    # keep track of names
 
     return flask.render_template('game.html')
 
@@ -116,28 +91,26 @@ def lobby():
     Contains all currently open rooms, along with a button to instantly connect
     to them.
     """
-    if flask.request.method == 'GET':
-        # TODO: how to do this better?
-        if 'game_id' in flask.session:
-            flask.session.pop('game_id')
-        if 'joined_game' in flask.session:
-            flask.session.pop('joined_game')
-
-    # TODO: filter the database, since it also contains old rooms
-    rooms = GameSetup.query.all()
+    result = redis.smembers('rooms')
+    rooms = result if result is not None else []
 
     if flask.request.method == 'POST':
 
         if flask.request.form['name'] != "":
-            flask.session['name'] = flask.request.form['name']
+            name = flask.request.form['name']
         else:
-            flask.session['name'] = 'anon'
+            name = 'anon'
 
+        player_id = flask_login.current_user.id
         if flask.request.form['submit'] == 'create':
-            flask.session['game_id'] = create_room()
-
+            game_id = create_room()
         else:
-            flask.session['game_id'] = flask.request.form['submit']
+            game_id = flask.request.form['submit']
+
+        added = add_player(game_id, player_id, name)
+        if added is not None:
+            flask.flash(added + '\nError joining game. game_id: ' + str(game_id) + ', player_id: ' + str(player_id))
+            return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
 
         return flask.redirect(flask.url_for('.game_page'))
 
@@ -151,27 +124,78 @@ def create_room():
         return ''.join(random.choice(
             string.ascii_uppercase + string.digits) for _ in range(n))
 
-    while True:
-        game_id=gen_random_string(5)
-        game = GameSetup(game_id)
-        db.session.add(game)
-        try:
-            db.session.commit()
-        except sqlalchemy.exc.IntegrityError:
-           continue
-        break
+    game_id = gen_random_string(10)
+    while redis.sismember('rooms', game_id):
+        game_id = gen_random_string(10)
+
+    redis.sadd('rooms', game_id)
+
+    # Player id's, have to be set one by one because redis does not suppport
+    # nested data structures
+    DEFAULT_GAME_STATE = {
+            'wave' : 1,
+            'player_count' : 0,
+            'p1' : -1,
+            'p2' : -1,
+            'p3' : -1,
+            'p4' : -1,
+            'result' : ''
+            }
+
+    redis.hmset(game_id, DEFAULT_GAME_STATE)
 
     return game_id
 
-def check_room_key(game_id):
-    """Check the given room key exists and hasn't expired.
-    Returns an error string, or None if the key is ok."""
-    game = GameSetup.query.filter_by(game_id=game_id).one_or_none()
+def add_player(game_id, player_id, name):
+    """
+    Adds a player to the given room entry in Redis. Creates a player hash map
+    to store the player's state and game_id. Returns True if adding the player
+    was successful.
+    """
 
-    if game is None:
-        return "Sorry, that key appears to be invalid. Are you sure it's correct?"
+    if not redis.sismember('rooms', game_id):
+        return 'This game does not exist'
 
-    return None
+    ps = ['p0', 'p1','p2', 'p3']
+    DEFAULT_PLAYER_STATE = {
+            'state' : 'not_ready',
+            'username' : '',
+            'game_id' : ''
+            }
+
+    player_hm = DEFAULT_PLAYER_STATE
+    player_hm['game_id'] = game_id
+    player_hm['username'] = name
+
+    # lock = redis.lock(game_id)
+
+    game_state = redis.hgetall(game_id)
+
+    if int(game_state['player_count']) < REQUIRED_PLAYER_COUNT:
+        redis.hset(game_id, ps[int(game_state['player_count'])], player_id)
+        redis.hmset(player_id, player_hm)
+        redis.hset(game_id, 'player_count', int(game_state['player_count']) + 1)
+        # lock.release()
+        return None
+    else:
+        return 'Game is full.'
+
+    # lock.release()
+    return 'Something went wrong.'
+
+def get_players_in_room(game_id):
+    if not redis.sismember('rooms', game_id):
+        return None
+    else:
+        result = []
+        ps = ['p0', 'p1', 'p2', 'p3']
+        game_state = redis.hgetall(game_id)
+        for p in ps:
+            if game_state[p] != str(-1):
+                result.append(game_state[p])
+            else:
+                break
+        return result
 
 def get_google_auth(state=None, token=None):
     redirect_uri = flask.url_for('.g_callback', _external=True)
