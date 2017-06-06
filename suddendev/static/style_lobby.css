@@ -38,7 +38,11 @@ img.loginDetails{
 }
 
 h3.loginDetails{
-	display:inline-block;
+	font-size: 15px;
+}
+
+.buttonCell{
+	padding: 14px 16px;
 }
 
 .mainGrid{
@@ -52,21 +56,85 @@ h3.loginDetails{
 	min-width: 600px;
 	height: 100%;
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-content: stretch;
+}
+
+.flexForm{
+	flex:1 1 auto;
+	display:flex;
+	flex-direction:column;
+	align-content: stretch;
+}
+
+.nameBtnCol {
+	float: left;
+	display: inline-block;
+}
+
+.nameInputCol {
+	position: relative;
+	height: 100%;
+}
+
+.nameInput {
+	margin-bottom: 5px;
+}
+
+div.roomTable {
+	overflow-x:auto;
+	border-style:solid;
+	border-color:#ccc;
+	border-width: thin;
+	border-top:none;
+	width: 100%;
+	padding-left: 0;
+	flex: 1 1 auto;
+	min-width: 450px;
+}
+
+.roomCol {
+	margin-top: 10px;
+}	
+
+.roomControl{
+    background-color: #eee	;
+    outline: none;
+    border-style: : solid;
+    border-color: #ccc;
+    border-width: thin;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    cursor: pointer;
+    padding: 10px 16px;
+    transition: 0.3s;
+    width: 100%;
+    flex: 0 0 auto;
+}
+
+.roomControl:hover{
+  background-color: #ddd;
+}
+
+.roomControl:active{
+	background-color: #ccc;
 }
 
 .editorContainer{
-	position: relative;
 	border-style:solid;
 	border-width:thin;
   border-color: #ccc;
-  margin: 0 auto;
-  height: 90%;
+  top: 0;
   width: 100%;
+  display: flex;
+  flex: 1 1 auto;
 }
 
 @media screen {
   #editor {
-    height: 100%;
-    width: 100%;
+  display: flex;
+  flex: 1 1 auto;
   }
 }

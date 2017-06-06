@@ -8,13 +8,11 @@
 
     function initEditor(){
         editor = ace.edit("editor");
-        console.log(editor);
         editor.$blockScrolling = Infinity;
         editor.getSession().setMode("ace/mode/python");
         editor.getSession().setUseWrapMode(true);
         editor.setFontSize(20);
         editor.setValue(`{{user.script}}`, 1);
-        editor.resize();
     }
 
   </script>
@@ -37,8 +35,8 @@
         <div class="col-sm loginCell">
           <h3 class="loginDetails">{{ user.name }}<br>{{ user.email }}</h3>
         </div>
-        <div class="col-sm loginCell">
-          <a class="btn" href="{{url_for('main.logout')}}">Log out</a>
+        <div class="col-sm loginCell buttonCell">
+          <a href="{{url_for('main.logout')}}">Log out</a>
         </div>
       </div>
     </div>
@@ -47,34 +45,40 @@
   <div class="container-fluid mainGrid">
     <div class="row" style="height:100%">
       <div class="col-sm-6 lobbyCol">
-        <h3>Lobby</h3>
-        <p>Join an open game, or create a new one. At the moment anyone can join your game
-        and we won't keep track of your scripts and statistics.
-        Don't worry though; <b>it's all coming soon!</b></p>
-        <br>
-        <h1">Games</h1>
-        <div>
-          <form method="POST">
-            <label for="usr">Name (this is just what other people will see):</label>
-            <input type="text" class="form-control" name="name" value="anon">
-            
-            <br>
+        <div class="lobbyDescr">
+          <h3>Lobby</h3>
+          <p>Join an open game, or create a new one. At the moment anyone can join your game
+          and we won't keep track of your scripts and statistics.
+          Don't worry though; <b>it's all coming soon!</b></p>
 
-            <center>
-              {% for r in rooms %}
-                  <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r.game_id }}">
-              	Join {{ r.game_id }}</button>
-              {% endfor %}
-
-              <br>
-              <br>
-
-              <button type="submit" class="btn btn-lg btn-success" name="submit" value="create">
-              Create new game!
-              </button>
-            </center>
-          </form>
+          <br>
+          <h1">Games</h1>
         </div>
+          <form method="POST" class="flexForm">
+            <label for="usr">Name (this is just what other people will see):</label>
+            <input type="text" class="form-control nameInput align-bottom" name="name" value="anon">
+            <button type="submit" class="roomControl" name="submit" value="create">Create new game!</button>
+            <div class="container-fluid roomTable">
+              {% for r in rooms %}
+              <div class="row">
+                <div class="col-sm-3">
+                  <button type="submit" class="roomControl" name="submit" value="{{ r.game_id }}">
+                	Join Room</button>
+                </div>
+                <div class="col-sm-3 roomCol">
+                  <span>{{ r['lobby_name']}}</span>
+                </div>
+                <div class="col-sm-3 roomCol">
+                  <span>{{ r['created_by']}}</span>
+                </div>
+                <div class="col-sm-3 roomCol">
+                  <span>{{ r['player_count']}}/4 players</span>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+          </form>
       </div>
       <div class="col-sm-6 lobbyCol">
         <h4>Your script:</h4>
