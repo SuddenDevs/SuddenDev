@@ -1,3 +1,14 @@
+body{
+  height: 100%;
+  margin: 0;
+}
+
+.greyBorder{
+  border-style: solid;
+  border-width: thin;
+  border-color: #ccc;  
+}
+
 .title{
   width: 500px;
   margin: 0 auto;
@@ -8,21 +19,55 @@
   white-space: pre;
 }
 
-.mainCol{
-  padding: 12.5px;
+.mainGrid{
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
 }
 
+.mainRow{
+  display: flex;
+  flex-direction: row;
+  align-content: stretch;
+  order: 0;
+  flex: 0 0 auto;
+}
+
+.detailRow{
+  display: flex;
+  order: 1;
+  flex: 1 1 auto;
+  align-content: stretch;
+  height: 100%;
+}
+
+.detailGrid{
+  display: flex;
+  flex: 1 1 auto;
+  align-content: stretch;
+  margin: 12.5px;
+}
+
+.detailCol{
+  display: flex;
+  flex: 1 1 auto;
+  align-content: stretch;
+  text-align: center; 
+}
+
+.mainCol{
+  margin: 12.5px;
+}
 .gameCol{
   width: 800px;
-  float: left;
+  order: 1;
+  flex: 0 0 auto;
 }
 
 .editCol{
+  order: 2;
   min-width: 500px;
-  margin-left: 825px;
-  -webkit-box-sizing:border-box;
-  -moz-box-sizing:border-box;
-  box-sizing:border-box;
+  flex: 1 1 auto;
 }
 
 div.game {
@@ -31,17 +76,11 @@ div.game {
 }
 
 canvas.game{
-  border-style: solid;
-  border-width: thin;
-  border-color: #ccc;
   float: right;
 }
 
 div.controls{
   overflow: hidden;
-  border-style: solid;
-  border-width: thin;
-  border-color: #ccc;
   border-top:none;
   background-color: #f1f1f1;
 }
@@ -63,14 +102,12 @@ button.controls:hover{
   background-color: #ddd;
 }
 
-button.controls:active{
-  background-color: #bbb;
+button.controls.noEvents{
+  pointer-events: none;
 }
 
-.editorContainer{
-  border-style: solid;
-  border-width: thin;
-  border-color: #ccc;
+button.controls:active{
+  background-color: #bbb;
 }
 
 @media screen {

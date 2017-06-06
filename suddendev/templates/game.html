@@ -9,21 +9,16 @@
       var PICKUPC = "#edd95c";
       var COREC = "#47d7f7";
       var NAMEOFFS = 10;
+      var EDITFONTSIZE = 15;
       var FRAMERATE = 60;
-      var INITSCRIPT = 
-      "# INSTRUCTIONS" +
-      "\n\t# Write your program here" +
-      "\n\t# Submit when ready" +
-      "\n\t# Watch what happens!" +
-      "\n\t# Access state through the 'player' and 'game' objects" +
-      "\n\t# Have fun!" +
-      "\ndef update(player, delta):" + 
-      "\n\tplayer.vel = Vector(0, 0)"
+      var WAITTEXT = "Press ready to begin!";
+      var NUMCHARS = 4;
 
       var editor = null;
       var socket = null;
-      var gameReady = false;
+      var inGame = false;
       var playersLeft = 3;
+      var currentTab = 0;
       var scripts = [`{{user.script}}`,"","",""];
 
       //Stage/shape drawer initialised, can be used in multiple functions
@@ -31,7 +26,10 @@
       var stage = null;
       var fpsText = null;
       var waitingText = null;
-      var playerNames = [];
+      var charNames = [];
+      var players = [];
+      var charNameTexts = [];
+      var player = -1;
 
       //Game state
       var states = [];
@@ -48,11 +46,8 @@
             processStates(data);
             readyGame();
           });
-          socket.on('game_start', function() {
-            //May not need this signal
-          });
-          socket.on('player_count', function(data) {
-            updatePlayersLeft(data);
+          socket.on('room_update', function(data) {
+            updateRoom(data);
           });
         });
         window.onbeforeunload = function(e) {
@@ -81,34 +76,83 @@
       //Function to allow the game to start when enough players are waiting
       function readyGame(data) {
         stage.removeChild(waitingText);
-        gameReady = true;
+        inGame = true;
       }
 
-      //Function to update player count
-      function updatePlayersLeft(data) {
-        playersLeft = JSON.parse(data).count;
-        if (playersLeft > 0) {
-          waitingText.text = "Waiting for " + playersLeft + " more players!";
-        } else {
-          waitingText.text = "Ready to start!";
+      //Update player details/scripts
+      function updateRoom(data) {
+        var room = JSON.parse(data);
+        players = [];
+        for (i = 0; i < room.player_count; i++) {
+          var chars = [];
+          for (j = 0; j < room.characters.length; j++) {
+            if (room.characters[j].player == room.players[i].id){
+              chars.push(room.characters[j]);
+            }
+          }
+          players.push({"player":room.players[i],"character":chars})
         }
-        stage.update();
+        charNames = [];
+        for (i = 0; i < room.characters.length; i++) {
+          scripts[i] = room.characters[i].script;
+          charNames.push(room.characters[i].name);
+          updateChars();
+        }
+        player = room.current_player;
       }
 
-      //Function called when leaving the game
+      function updateChars() {
+        editor.setValue(scripts[currentTab]);
+        for (i = 0; i < NUMCHARS; i++) {
+          var t = document.getElementById("tab" + str(i));
+          t.innerHTML = charNames[i];
+        }
+      }
+
+      //Tell server that the client is leaving
       function exitGame(e) {
         socket.emit('left', {});
         socket.disconnect();
       }
 
+      //Save the editor value in scripts
+      function updateScripts() {
+        scripts[currentTab] = editor.getValue();
+      }
+
+      //Create a JSON object with characters/scripts
+      function getCode() {
+        updateScripts();
+        var charScripts = [];
+        for (i = 0; i < scripts.length; i++) {
+          var char = {"char":1,"script":scripts[i]};
+          charScripts.push(char);
+        }
+        return JSON.stringify({"charScripts":charScripts});
+      }
+
+      //Send code to server to be saved in DB
       function submitCode() {
-        console.log(editor.getValue());
-        socket.emit('submit_code', editor.getValue());
+        updateScripts(); 
+        socket.emit('submit_code', getCode());
+      }
+
+      //Send code to server to be run (not saved)
+      function testCode() {
+        updateScripts();
+        socket.emit('test', getCode());
       }
 
       //Function to leave the game
       function leaveGame() {
         window.location.href = "{{ url_for('main.lobby') }}";
+      }
+
+      //Ready up
+      function readyUp() {
+        var b = document.getElementById("readyBtn");
+        b.classList.add("active");
+        b.classList.add("noEvents");
       }
 
       //Initialise gameCanvas - initialise stage, add shape drawer
@@ -120,8 +164,7 @@
         shape = new createjs.Shape();
         stage.addChild(shape);
 
-        waitingText = new createjs.Text("Waiting for " + playersLeft +
-                                    " more players!", "20px Arial", "x000000");
+        waitingText = new createjs.Text(WAITTEXT, "20px Arial", "x000000");
         waitingText.x = 400;
         waitingText.y = 200;
         waitingText.textAlign = "center";
@@ -131,11 +174,12 @@
         fpsText.x = 10;
         fpsText.y = 10;
         stage.addChild(fpsText);
+        stage.update();
       }
 
       //Tick handler, clears graphics, draws FPS, updates canvas
       function handleTick(event) {
-        if (!event.paused && gameReady) {
+        if (!event.paused && inGame) {
           fpsText.text = createjs.Ticker.getMeasuredFPS();
           displayNextState();
         }
@@ -195,20 +239,10 @@
 
       function setEditorTab(tabi) {
         var tabs = document.getElementsByClassName("tabBtn");
-        var previ = -1;
-        for (i = 0; i < tabs.length; i++) {
-          if (i == tabi) {
-            tabs[i].classList.add("active");
-          } else {
-            if (tabs[i].classList.contains("active")) {
-              previ = i;
-              tabs[i].classList.remove("active");
-            }
-          }
-        }
-        scripts[previ] = editor.getValue();
+        updateScripts();
         editor.setValue(scripts[tabi]);
         editor.focus();
+        currentTab = tabi;
       }
 
       //Initialise the editor
@@ -217,46 +251,61 @@
         editor.$blockScrolling = Infinity;
         editor.getSession().setMode("ace/mode/python");
         editor.getSession().setUseWrapMode(true);
-        editor.setFontSize(20);
         editor.setValue(scripts[0], 1);
       }
 
     </script>
 {% endblock %}
 {% block body %}
-
+  
     <div id="title" class="title">
       <img src="{{ url_for('static', filename='logo_64.png')}}">
       <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
     </div>
-    <div class="container-fluid">
-      <div class="row">
+    <div class="container-fluid mainGrid">
+      <div class="row mainRow">
         <div class="col mainCol gameCol">
-          <div id="gameDiv" class="game">
+          <div id="gameDiv" class="game greyBorder">
             <canvas id="gameCanvas" class="game" width="800px"
                     height="600px"></canvas>
-            <div class="controls">
-              <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
-              <button class="controls" onclick="displayNextState()">Next State
-                </button>
-              <button class="controls" onclick="submitCode()">Submit Code</button>
+            <div class="controls greyBorder">
               <button class="controls" onclick="leaveGame()">Leave Game</button>
+              <button class="controls" onclick="displayNextState()">Next State
+              <button class="controls" onclick="submitCode()">Save Code</button>
+              <button id="readyBtn" class="controls" onclick="readyUp()">Ready</button>
+              <button class="controls" onclick="testCode()">Test Code</button>
+              <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
+                </button>
             </div>
           </div>
         </div>
         <div class="col mainCol editCol">
-          <div class="editorContainer">
+          <div class="greyBorder">
             <div id="editor"></div>
           </div>
           <div class="controls">
             <button id="tab0" class="controls tabBtn active" 
-                    onclick="setEditorTab(0)">Player1</button>
+                    onclick="setEditorTab(0)">Char1</button>
             <button id="tab1" class="controls tabBtn" onclick="setEditorTab(1)">
-                    Player2</button>
+                    Char2</button>
             <button id="tab2" class="controls tabBtn" onclick="setEditorTab(2)">
-                    Player3</button>
+                    Char3</button>
             <button id="tab3" class="controls tabBtn" onclick="setEditorTab(3)">
-                    Player4</button>
+                    Char4</button>
+          </div>
+        </div>
+      </div>
+      <div class="row detailRow">
+        <div class="container-fluid detailGrid greyBorder">
+          <div class="row detailRow">
+            <div class="col-sm-8 detailCol">
+            </div>
+            <div class="col-sm-4 detailCol">
+              <span style="width: 100%">Char1: Player1</span><br>
+              <span style="width: 100%">Char2: Player2</span><br>
+              <span style="width: 100%">Char3: Player3</span><br>
+              <span style="width: 100%">Char4: Player4</span>
+            </div>
           </div>
         </div>
       </div>
