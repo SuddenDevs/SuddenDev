@@ -100,14 +100,8 @@ def game_page():
     player_state = redis.hgetall(player_id)
     game_id = player_state['game_id']
 
-    name = flask.session.get('name', None)
-
     if game_id is None:
         flask.flash('Invalid game id!')
-        return flask.redirect(flask.url_for('.lobby'))
-
-    if name is None:
-        flask.flash('You must have a name!')
         return flask.redirect(flask.url_for('.lobby'))
 
     return flask.render_template('game.html', user=flask_login.current_user)
