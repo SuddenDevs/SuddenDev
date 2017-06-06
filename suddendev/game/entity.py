@@ -1,7 +1,16 @@
 from .vector import Vector
 
+tag = 0
+
+def next_tag():
+    global tag
+    t = tag
+    tag += 1
+    return t
+
 def entity_init(self):
-    self.tag = 0
+    global tag
+    self.tag = next_tag()
     self.pos = Vector(0, 0)
     self.vel = Vector(0, 0)
     self.speed = 10
