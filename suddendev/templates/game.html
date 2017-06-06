@@ -168,12 +168,10 @@
         //Create & delete entities
 
         //Update
-        draw_players(state.players);
         draw_entities(state.enemies, ENEMYC);
         draw_entities(state.powerups, PICKUPC);
+        draw_players(state.players);
         draw_core(state.core);
-        //shape.graphics.beginFill(COREC)
-              //.drawCircle(state.core.pos.x, state.core.pos.y, state.core.size);
       }
 
       function draw_core(core_state) {
@@ -183,38 +181,39 @@
 
       //Draws a triangle facing the direction of vector vel
       function drawTriangle(pos, vel, radius, color) {
-        var shape = new Graphics();
+        var shape = new PIXI.Graphics();
+       
+        var base = 2 * radius * Math.cos(Math.PI/6);
+        var height = radius * (1 +  Math.sin(Math.PI/6));
+        var v1x = 0
+        var v1y = 0
+        var v2x = base;
+        var v2y = 0;
+        var v3x = base/2; 
+        var v3y = height;
         
-        var angle = Math.atan2(vel.y, vel.x);
-        var cos = Math.cos(angle);
-        var sin = Math.sin(angle);
-        var v1x = radius * cos;
-        var v1y = radius * sin;
-        var v2x = radius * sin;
-        var v2y = - radius * cos;
-        var v3x = - radius * sin; 
-        var v3y = radius * cos;
-
         shape.beginFill(color);
         shape.drawPolygon([v1x, v1y, v2x, v2y, v3x, v3y]);
         shape.endFill();
+
+        shape.rotation = Math.atan2(vel.y, vel.x) + Math.PI/6;
         shape.x = pos.x;
         shape.y = pos.y;
+        shape.pivot.x = 0.5 * base;
+        shape.pivot.y = 1/3 * height;
         stage.addChild(shape);
       }
 
       // Draw every object in a list the same color
-      function drawList(list, color) {
+      function draw_entities(list, color) {
         for (i = 0; i < list.length; i++) {
           drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
         }
       }
 
       // Draw every player and update name locations
-      function drawPlayerList(list) {
+      function draw_players(list) {
         for (i = 0; i < list.length; i++) {
-          //playerNames[i].x = list[i].pos.x + NAMEOFFS;
-          //playerNames[i].y = list[i].pos.y + NAMEOFFS;
           drawTriangle(list[i].pos, list[i].vel, list[i].size, list[i].color);
         }
       } 

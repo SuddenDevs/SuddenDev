@@ -44,7 +44,7 @@ class StateEncoder(json.JSONEncoder):
         return {'x' : pos.x, 'y': pos.y}
 
     def serializeColor(self, color):
-        return "#{0:02x}{1:02x}{2:02x}".format(clamp(color.r), clamp(color.g), clamp(color.b))
+        return "0x{0:02x}{1:02x}{2:02x}".format(clamp(color.r), clamp(color.g), clamp(color.b))
 
     #TODO
     #Duplication, will extend if enemies or powerups start to differ
