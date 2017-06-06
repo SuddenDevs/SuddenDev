@@ -26,11 +26,12 @@ def joined(message):
     players = get_players_in_room(game_id)
 
     player_names = []
-    player_scripts = []
+    player_scripts = {}
 
     for p in players:
-        player_names.append(redis.hgetall(p)['username'])
-        player_scripts.append(User.query.get(p).script)
+        name = redis.hgetall(p)['username']
+        player_names.append(name)
+        player_scripts[name] = User.query.get(p).script
 
     # TODO: use json dumps and make less ugly
     fsio.emit('player_count', '{\"count\" : ' + str(REQUIRED_PLAYER_COUNT-int(player_count)) + '}', room=game_id, namespace=NAMESPACE)
