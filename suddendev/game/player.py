@@ -1,6 +1,7 @@
 from .entity import Entity
 from .vector import Vector
 from .sandbox import builtins
+from .color import Color3
 from .game_config import GameConfig as gc
 
 import math
@@ -22,8 +23,11 @@ class Player(Entity):
         self.ammo = gc.P_AMMO
         self.damage = gc.P_DAMAGE
 
+        # Flag to ensure we only attack once per frame
+        self.attacked = False
+
         if not self.try_apply_script(script, game):
-            self.try_apply_script(gc.DEFAULT_SCRIPT, game)
+            self.try_apply_script(gc.P_DEFAULT_SCRIPT, game)
 
     def enemies_visible(self):
         in_range = []
@@ -56,7 +60,14 @@ class Player(Entity):
             '__builtins__' : builtins
         }
 
-        exec(script, self.scope)
+        # If the script throws an error, just give up
+        # TODO: Inform user somehow
+        try:
+            exec(script, self.scope)
+        except:
+            # Set color to red to signify the bot is broken
+            self.color = Color3(255,0,0)
+            return False
 
         # Check update method existence and signature of update function
         if 'update' not in self.scope:
@@ -71,6 +82,8 @@ class Player(Entity):
         return False
 
     def update(self, delta):
+        self.attacked = False
+
         #Perform player-specific movement calculation
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
@@ -90,8 +103,7 @@ class Player(Entity):
         return str(self.name) + ":" + str(self.pos)
 
 def shoot(player, enemy):
-    if Vector.Distance(enemy.pos, player.pos) <= player.range_attackable and player.ammo > 0:
-
+    if Vector.Distance(enemy.pos, player.pos) <= player.range_attackable and player.ammo > 0 and not player.attacked:
         # Point towards the target
         player.vel = enemy.pos - player.pos
         player.vel = Vector.Normalize(player.vel) * 0.01
@@ -99,3 +111,5 @@ def shoot(player, enemy):
         # Deal damage
         player.ammo -= 1
         enemy.injure(player.damage)
+
+        player.attacked = True

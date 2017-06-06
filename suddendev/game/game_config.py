@@ -12,6 +12,8 @@ class GameConfig:
     BATCHSIZE = 500
 
     # Game
+    TIME_LIMIT = 15
+
     PLAYER_COUNT = 4
 
     MAP_WIDTH = 800
@@ -25,33 +27,34 @@ class GameConfig:
     P_RANGE_VISIBLE = 100
     P_RANGE_ATTACKABLE = 20
     P_AMMO = 10
-    P_DAMAGE = 100
+    P_DAMAGE = 20
     P_DEFAULT_SCRIPT = """
-    timer = 0
+timer = 0
 
-    def update(player, delta):
-        global timer
-        timer += delta
+def update(player, delta):
+    global timer
+    timer += delta
 
-        # Find Target
-        min_dist = sys.float_info.max
-        target = None
-        for e in enemies_visible:
-            mag = Vector.Length(e.pos - player.pos)
-            if mag < min_dist:
-                min_dist = mag
-                target = e
+    # Find Target
+    min_dist = sys.float_info.max
+    target = None
+    for e in enemies_visible:
+        mag = Vector.Length(e.pos - player.pos)
+        if mag < min_dist:
+            min_dist = mag
+            target = e
 
-        if target is not None:
-            diff = player.pos - target.pos
-            mag = min(player.speed, min_dist)
-            player.vel = Vector.Normalize(diff) * mag
-        else:
-            player.vel = Vector(0,0)
+    if target is not None:
+        diff = player.pos - target.pos
+        mag = min(player.speed, min_dist)
+        player.vel = Vector.Normalize(diff) * mag
+    else:
+        player.vel = Vector(0,0)
     """
 
     # Enemy
     ENEMY_SPEED = 30
+    ENEMY_RANGE_ATTACKABLE = 15
 
     # Entity
     E_POS = Vector(0,0)

@@ -94,7 +94,7 @@ class Game:
         #Powerup Spawning
 
         #Ending Conditions / Wave Conditions
-        if self.time >= 10:
+        if self.time >= gc.TIME_LIMIT:
             self.active = False
 
     def clamp_pos(self, pos):
