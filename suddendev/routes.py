@@ -15,13 +15,39 @@ from .models import db, User
 from .game_instance import GameInstance
 from requests_oauthlib import OAuth2Session
 
-# TODO: get rid of and use databases
-GLOBAL_DICT = dict()
 REQUIRED_PLAYER_COUNT = 4
+
+# Template for Redis entry of an ongoing game.
+# Player ids have to be set one by one because redis does not suppport
+# nested data structures
+DEFAULT_GAME_STATE = {
+        'game_id' : 0,
+        'lobby_name' : '',
+        'time_created': '',
+        'created_by': '',
+        'wave' : 1,
+        'player_count' : 0,
+        'p1' : -1,
+        'p2' : -1,
+        'p3' : -1,
+        'p4' : -1,
+        'result' : ''
+        }
+
+PLAYER_KEYS = ['p0', 'p1', 'p2', 'p3']
+
+# Template for Redis entry of a player.
+DEFAULT_PLAYER_STATE = {
+        'state' : 'not_ready',
+        'username' : '',
+        'game_id' : ''
+        }
+
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
     """Landing page."""
+    # If user is logged in, go straight to lobby, otherwise go to OAuth
     if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
         auth_url = flask.url_for('.lobby')
     else:
@@ -32,6 +58,9 @@ def index():
 
 @main.route('/gcallback', methods=['GET', 'POST'])
 def g_callback():
+    """
+    Callback route for Google's OAuth.
+    """
     if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
         return flask.redirect(flask.url_for('.lobby'))
     if 'code' not in flask.request.args and 'state' not in flask.request.args:
@@ -42,10 +71,13 @@ def g_callback():
                 authorization_response=flask.request.url)
         google = get_google_auth(token=token)
         response = google.get(Config.USER_INFO)
+
+        # Successful auth
         if response.status_code == 200:
             user_data = response.json()
             user = User.query.filter_by(email=user_data['email']).first()
 
+            # Create new user if he doesn't exist and add to db
             if user is None:
                 user = User()
                 user.email = user_data['email']
@@ -91,8 +123,11 @@ def lobby():
     Contains all currently open rooms, along with a button to instantly connect
     to them.
     """
+    rooms = []
     result = redis.smembers('rooms')
-    rooms = result if result is not None else []
+    if result is not None:
+        for r in result:
+            rooms.append(redis.hgetall(r))
 
     if flask.request.method == 'POST':
 
@@ -129,20 +164,13 @@ def create_room():
         game_id = gen_random_string(10)
 
     redis.sadd('rooms', game_id)
-
-    # Player id's, have to be set one by one because redis does not suppport
-    # nested data structures
-    DEFAULT_GAME_STATE = {
-            'wave' : 1,
-            'player_count' : 0,
-            'p1' : -1,
-            'p2' : -1,
-            'p3' : -1,
-            'p4' : -1,
-            'result' : ''
-            }
-
-    redis.hmset(game_id, DEFAULT_GAME_STATE)
+    game = dict(DEFAULT_GAME_STATE)
+    # TODO more meaningful name
+    game['game_id'] = str(game_id)
+    names = ['anaconda', 'python', 'cobra', 'snek', 'rattlesnek']
+    game['lobby_name'] = random.choice(names)
+    game['time_created'] = str(datetime.datetime.now())
+    redis.hmset(game_id, game)
 
     return game_id
 
@@ -156,13 +184,6 @@ def add_player(game_id, player_id, name):
     if not redis.sismember('rooms', game_id):
         return 'This game does not exist'
 
-    ps = ['p0', 'p1','p2', 'p3']
-    DEFAULT_PLAYER_STATE = {
-            'state' : 'not_ready',
-            'username' : '',
-            'game_id' : ''
-            }
-
     player_hm = DEFAULT_PLAYER_STATE
     player_hm['game_id'] = game_id
     player_hm['username'] = name
@@ -171,10 +192,15 @@ def add_player(game_id, player_id, name):
 
     game_state = redis.hgetall(game_id)
 
-    if int(game_state['player_count']) < REQUIRED_PLAYER_COUNT:
-        redis.hset(game_id, ps[int(game_state['player_count'])], player_id)
+    count = int(game_state['player_count'])
+    if count < REQUIRED_PLAYER_COUNT:
+        if count == 0:
+            redis.hset(game_id, 'created_by', name)
+
+        redis.hset(game_id, PLAYER_KEYS[count], player_id)
         redis.hmset(player_id, player_hm)
-        redis.hset(game_id, 'player_count', int(game_state['player_count']) + 1)
+        redis.hset(game_id, 'player_count', count + 1)
+
         # lock.release()
         return None
     else:
@@ -184,13 +210,15 @@ def add_player(game_id, player_id, name):
     return 'Something went wrong.'
 
 def get_players_in_room(game_id):
+    """
+    Get player ids of all players in a given game.
+    """
     if not redis.sismember('rooms', game_id):
         return None
     else:
         result = []
-        ps = ['p0', 'p1', 'p2', 'p3']
         game_state = redis.hgetall(game_id)
-        for p in ps:
+        for p in PLAYER_KEYS:
             if game_state[p] != str(-1):
                 result.append(game_state[p])
             else:
@@ -198,6 +226,9 @@ def get_players_in_room(game_id):
         return result
 
 def get_google_auth(state=None, token=None):
+    """
+    Helper factory function for OAuth requests.
+    """
     redirect_uri = flask.url_for('.g_callback', _external=True)
     if token:
         return OAuth2Session(Config.CLIENT_ID, token=token)
