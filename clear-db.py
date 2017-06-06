@@ -3,7 +3,6 @@ from suddendev import create_app
 from suddendev.models import db
 from flask_sqlalchemy import SQLAlchemy
 
-
 if __name__=='__main__':
     app = create_app()
 

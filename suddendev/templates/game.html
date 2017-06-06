@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block head %}
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_game.css')}}">
-  <script type="text/javascript" src="{{url_for('static', filename='createjs-2015.11.26.min.js')}}"></script>
   <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
   <script>
       //Colors and static variables
       var ENEMYC = "#000000";
@@ -27,13 +27,19 @@
       var scripts = [INITSCRIPT,"","",""];
 
       //Stage/shape drawer initialised, can be used in multiple functions
-      var shape = null;
       var stage = null;
+      var renderer = null
       var fpsText = null;
       var waitingText = null;
       var playerNames = [];
 
       //Game state
+      var ticker = null
+      var players = []
+      var enemies = []
+      var pickups = []
+      var core = null
+
       var states = [];
       var statei = 0;
 
@@ -66,22 +72,27 @@
         socket.emit('joined', {});
       }
 
-      //Get list of states from server reply, init playerNames
+      //Receive batch of game states
       function processStates(data) {
         states = JSON.parse(data).result;
 
-        var playerList = states[0].players;
-        for (i = 0; i < playerList.length; i++) {
-          var name = new createjs.Text(playerList[i].name, "12px Arial", "x000000")
-          playerNames.push(name);
-          stage.addChild(name);
-        }
+        //var playerList = states[0].players;
+        //for (i = 0; i < playerList.length; i++) {
+        //  //var name = new createjs.Text(playerList[i].name, "12px Arial", "x000000")
+        //  playerNames.push(name);
+        //  //stage.addChild(name);
+        //}
       }
 
       //Function to allow the game to start when enough players are waiting
       function readyGame(data) {
-        stage.removeChild(waitingText);
+        //stage.removeChild(waitingText);
         gameReady = true;
+        console.log("Game Ready!");
+      }
+
+      function draw() {
+        renderer.render(stage);
       }
 
       //Function to update player count
@@ -92,7 +103,7 @@
         } else {
           waitingText.text = "Ready to start!";
         }
-        stage.update();
+        draw();
       }
 
       //Function called when leaving the game
@@ -113,60 +124,83 @@
 
       //Initialise gameCanvas - initialise stage, add shape drawer
       function initCanvas() {
-        stage = new createjs.Stage("gameCanvas");
-        createjs.Ticker.framerate = FRAMERATE;
-        createjs.Ticker.addEventListener("tick", handleTick);
 
-        shape = new createjs.Shape();
-        stage.addChild(shape);
+        ticker = new PIXI.ticker.Ticker();
+        ticker.add(game_loop);
+        ticker.start();
 
-        waitingText = new createjs.Text("Waiting for " + playersLeft +
-                                    " more players!", "20px Arial", "x000000");
+
+        var canvas = document.getElementById("gameCanvas");
+        renderer = PIXI.autoDetectRenderer(800, 600, {view: canvas});
+        stage = new PIXI.Container();
+        renderer.backgroundColor = 0xffffff;
+        
+        waitingText = new PIXI.Text(
+            "Waiting for " + playersLeft + " more players...",
+              {fontFamily: "Arial",
+                fontSize: 20,
+                fill: "black",
+                align: "center"});
+
         waitingText.x = 400;
         waitingText.y = 200;
-        waitingText.textAlign = "center";
+        waitingText.anchor.x = 0.5;
         stage.addChild(waitingText);
 
-        fpsText = new createjs.Text("", "20px Arial", "x000000");
+        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
         fpsText.x = 10;
         fpsText.y = 10;
         stage.addChild(fpsText);
+        renderer.render(stage);
       }
 
-      //Tick handler, clears graphics, draws FPS, updates canvas
-      function handleTick(event) {
-        if (!event.paused && gameReady) {
-          fpsText.text = Math.round(createjs.Ticker.getMeasuredFPS() * 100) / 100;
-          displayNextState();
+      function game_loop(delta) {
+        fpsText.text = Math.round(ticker.FPS * 100) / 100;
+        if (gameReady && statei < states.length) {
+          process_state(states[statei]);
+          statei++;
         }
-      }
-
-      //Display the next state
-      function displayNextState() {
-        shape.graphics.clear();
-        statei++;
-        if (statei >= states.length) {
-          statei = 0;
-        }
-        updateCanvas();
+        draw();
       }
 
       //Clear shape drawer, then draw game state to gameCanvas
-      function updateCanvas() {
-        var state = states[statei];
-        drawPlayerList(state.players);
-        drawList(state.enemies, ENEMYC);
-        drawList(state.powerups, PICKUPC);
-        shape.graphics.beginFill(COREC)
-              .drawCircle(state.core.pos.x, state.core.pos.y, state.core.size);
-        stage.update();
+      function process_state(state) {
+        //Create & delete entities
+
+        //Update
+        draw_players(state.players);
+        draw_entities(state.enemies, ENEMYC);
+        draw_entities(state.powerups, PICKUPC);
+        draw_core(state.core);
+        //shape.graphics.beginFill(COREC)
+              //.drawCircle(state.core.pos.x, state.core.pos.y, state.core.size);
+      }
+
+      function draw_core(core_state) {
+        //core.x = core_state.pos.x
+        //core.y = core_state.pos.y
       }
 
       //Draws a triangle facing the direction of vector vel
       function drawTriangle(pos, vel, radius, color) {
-        var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
-        shape.graphics.beginFill(color).drawPolyStar(pos.x, pos.y, radius, 3, 0,
-                                                      angle);
+        var shape = new Graphics();
+        
+        var angle = Math.atan2(vel.y, vel.x);
+        var cos = Math.cos(angle);
+        var sin = Math.sin(angle);
+        var v1x = radius * cos;
+        var v1y = radius * sin;
+        var v2x = radius * sin;
+        var v2y = - radius * cos;
+        var v3x = - radius * sin; 
+        var v3y = radius * cos;
+
+        shape.beginFill(color);
+        shape.drawPolygon([v1x, v1y, v2x, v2y, v3x, v3y]);
+        shape.endFill();
+        shape.x = pos.x;
+        shape.y = pos.y;
+        stage.addChild(shape);
       }
 
       // Draw every object in a list the same color
@@ -179,17 +213,21 @@
       // Draw every player and update name locations
       function drawPlayerList(list) {
         for (i = 0; i < list.length; i++) {
-          playerNames[i].x = list[i].pos.x + NAMEOFFS;
-          playerNames[i].y = list[i].pos.y + NAMEOFFS;
+          //playerNames[i].x = list[i].pos.x + NAMEOFFS;
+          //playerNames[i].y = list[i].pos.y + NAMEOFFS;
           drawTriangle(list[i].pos, list[i].vel, list[i].size, list[i].color);
         }
       } 
 
       //Pause game, update pause button
       function togglePause() {
-        createjs.Ticker.paused = !createjs.Ticker.paused;
+        if (ticker.started) {
+          ticker.stop();
+        } else {
+          ticker.start();
+        }
         var b = document.getElementById("pauseBtn");
-        b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
+        b.innerHTML = (ticker.started) ? "Unpause" : "Pause";
         b.classList.toggle("active");
       }
 
@@ -237,8 +275,6 @@
                     height="600px"></canvas>
             <div class="controls">
               <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
-              <button class="controls" onclick="displayNextState()">Next State
-                </button>
               <button class="controls" onclick="submitCode()">Submit Code</button>
               <button class="controls" onclick="leaveGame()">Leave Game</button>
             </div>
