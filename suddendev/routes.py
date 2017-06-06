@@ -110,7 +110,7 @@ def game_page():
         flask.flash('You must have a name!')
         return flask.redirect(flask.url_for('.lobby'))
 
-    return flask.render_template('game.html')
+    return flask.render_template('game.html', user=flask_login.current_user)
 
 @main.route('/logout', methods=['GET', 'POST'])
 @flask_login.login_required
