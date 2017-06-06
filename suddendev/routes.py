@@ -43,6 +43,8 @@ DEFAULT_PLAYER_STATE = {
         'game_id' : ''
         }
 
+LOBBY_NAME1 = ['friendly', 'sad', 'brave', 'clever', 'slow', 'keen', 'scared', 'triangular', 'round', 'fiery', 'quiet', 'flaming']
+LOBBY_NAME2 = ['anaconda', 'python', 'cobra', 'snek', 'rattlesnek', 'boa', 'viper', 'rainbow boa', 'lizard', 'serpent']
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -127,7 +129,9 @@ def lobby():
     result = redis.smembers('rooms')
     if result is not None:
         for r in result:
-            rooms.append(redis.hgetall(r))
+            room = redis.hgetall(r)
+            if not int(room['player_count']) == REQUIRED_PLAYER_COUNT:
+                rooms.append(room)
 
     if flask.request.method == 'POST':
 
@@ -167,8 +171,7 @@ def create_room():
     game = dict(DEFAULT_GAME_STATE)
     # TODO more meaningful name
     game['game_id'] = str(game_id)
-    names = ['anaconda', 'python', 'cobra', 'snek', 'rattlesnek']
-    game['lobby_name'] = random.choice(names)
+    game['lobby_name'] = random.choice(LOBBY_NAME1) + " " + random.choice(LOBBY_NAME2)
     game['time_created'] = str(datetime.datetime.now())
     redis.hmset(game_id, game)
 
