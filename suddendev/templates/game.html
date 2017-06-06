@@ -12,19 +12,13 @@
       var FRAMERATE = 60;
       var INITSCRIPT = 
       "# INSTRUCTIONS" +
-      "\n\t# Write code in this editor" +
-      "\n\t# Submit code before game begins" +
-      "\n\t# Watch your AI fight to survive" +
-      "\n\t# Access variables through the 'self' object" +
-      "\n\t# Access your character through the 'player' object" +
-      "\n\t# The time passed since the last update is equal to 'delta'" +
+      "\n\t# Write your program here" +
+      "\n\t# Submit when ready" +
+      "\n\t# Watch what happens!" +
+      "\n\t# Access state through the 'player' and 'game' objects" +
       "\n\t# Have fun!" +
       "\n\nclass Controller:" +  
-      "\n\t# Initialise variables in this function" +
-      "\n\tdef __init__(self):" + 
-      "\n\t\tpass" +
-      "\n\n\t# Write your update code in this function" +
-      "\n\tdef update(self, player, delta):" + 
+      "\n\tdef update(player, delta):" + 
       "\n\t\tplayer.vel = Vector(0, 0)"
 
       var editor = null;
