@@ -15,7 +15,7 @@
       "\n\t# Write your program here" +
       "\n\t# Submit when ready" +
       "\n\t# Watch what happens!" +
-      "\n\t# Access state through the 'player' and 'game' objects" +
+      "\n\t# Access state through the \'player\' and \'game\' objects" +
       "\n\t# Have fun!" +
       "\ndef update(player, delta):" + 
       "\n\tplayer.vel = Vector(0, 0)"
@@ -136,7 +136,7 @@
       //Tick handler, clears graphics, draws FPS, updates canvas
       function handleTick(event) {
         if (!event.paused && gameReady) {
-          fpsText.text = createjs.Ticker.getMeasuredFPS();
+          fpsText.text = Math.round(createjs.Ticker.getMeasuredFPS() * 100) / 100;
           displayNextState();
         }
       }
