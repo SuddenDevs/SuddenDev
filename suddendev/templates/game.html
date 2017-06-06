@@ -103,8 +103,9 @@
       }
 
       function submitCode() {
-        console.log(editor.getValue());
-        socket.emit('submit_code', editor.getValue());
+        var text = editor.getValue().replace(/&lt;/g, '\<')
+        console.log(text);
+        socket.emit('submit_code', text);
       }
 
       //Function to leave the game
@@ -212,8 +213,8 @@
             }
           }
         }
-        scripts[previ] = editor.getValue();
-        editor.setValue(scripts[tabi]);
+        scripts[previ] = editor.getValue().replace(/&lt;/g, '\<');
+        editor.setValue(scripts[tabi]).replace(/&lt;/g, '\<');
         editor.focus();
       }
 

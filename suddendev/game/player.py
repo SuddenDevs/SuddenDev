@@ -1,35 +1,12 @@
 from .entity import Entity
 from .vector import Vector
 from .sandbox import builtins
+from .game_config import GameConfig as gc
 
 import math
 import random
 import sys
 import inspect
-
-DEFAULT_SCRIPT = """
-timer = 0
-
-def update(player, delta):
-    global timer
-    timer += delta
-
-    # Find Target
-    min_dist = sys.float_info.max
-    target = None
-    for e in enemies_visible:
-        mag = Vector.Length(e.pos - player.pos)
-        if mag < min_dist:
-            min_dist = mag
-            target = e
-
-    if target is not None:
-        diff = player.pos - target.pos
-        mag = min(player.speed, min_dist)
-        player.vel = Vector.Normalize(diff) * mag
-    else:
-        player.vel = Vector(0,0)
-"""
 
 class Player(Entity):
     def __init__(self, name, color, game, script):
@@ -38,12 +15,15 @@ class Player(Entity):
         self.color = color
         self.vel = Vector(random.random(), random.random())
         self.game = game
-        self.speed = 20
-        self.range_visible = 50
-        self.range_attackable = 30
+
+        self.speed = gc.P_SPEED
+        self.range_visible = gc.P_RANGE_VISIBLE
+        self.range_attackable = gc.P_RANGE_ATTACKABLE
+        self.ammo = gc.P_AMMO
+        self.damage = gc.P_DAMAGE
 
         if not self.try_apply_script(script, game):
-            self.try_apply_script(DEFAULT_SCRIPT, game)
+            self.try_apply_script(gc.DEFAULT_SCRIPT, game)
 
     def enemies_visible(self):
         in_range = []
@@ -72,6 +52,7 @@ class Player(Entity):
             'core' : game.core,
             'random' : random,
             'sys' : sys,
+            'shoot' : shoot,
             '__builtins__' : builtins
         }
 
@@ -107,3 +88,14 @@ class Player(Entity):
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
+
+def shoot(player, enemy):
+    if Vector.Distance(enemy.pos, player.pos) <= player.range_attackable and player.ammo > 0:
+
+        # Point towards the target
+        player.vel = enemy.pos - player.pos
+        player.vel = Vector.Normalize(player.vel) * 0.01
+
+        # Deal damage
+        player.ammo -= 1
+        enemy.injure(player.damage)

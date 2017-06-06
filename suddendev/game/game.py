@@ -6,18 +6,10 @@ from .player import Player
 from .enemy import Enemy
 from .wall import Wall
 from .core import Core
+from .game_config import GameConfig as gc
 
 import time
 import random
-
-PLAYER_COUNT = 4
-
-MAP_WIDTH = 800
-MAP_HEIGHT = 600
-
-ENEMY_SPAWN_DELAY = 1
-ENEMY_LIMIT = 5
-ENEMY_SPAWN_TIMER = 0
 
 class Map:
     def __init__(self, width, height):
@@ -26,13 +18,9 @@ class Map:
         self.height = height
 
 class Game:
-    #### Config ####
-    #Enemy Spawning
-    enemy_spawn_delay = ENEMY_SPAWN_DELAY
-
     def __init__(self, player_names, scripts):
         #Map
-        self.map = Map(MAP_WIDTH, MAP_HEIGHT)
+        self.map = Map(gc.MAP_WIDTH, gc.MAP_HEIGHT)
 
         #Events
         self.events = []
@@ -43,16 +31,11 @@ class Game:
 
         #Enemies
         self.enemies = []
-        self.enemy_limit = ENEMY_LIMIT
-        self.enemy_spawn_timer = ENEMY_SPAWN_TIMER
+        self.enemy_limit = gc.ENEMY_LIMIT
+        self.enemy_spawn_timer = 0
 
         #Walls
         self.walls = []
-        self.walls.append(Wall(pos=Vector(300,50), dim=Vector(10,150)))
-        self.walls.append(Wall(pos=Vector(100,90), dim=Vector(10,50)))
-        self.walls.append(Wall(pos=Vector(20,90), dim=Vector(90,10)))
-        self.walls.append(Wall(pos=Vector(500,90), dim=Vector(10,50)))
-        self.walls.append(Wall(pos=Vector(480,60), dim=Vector(90,10)))
 
         colors = [
             random_color3(),
@@ -63,7 +46,7 @@ class Game:
 
         #Players
         self.players = []
-        for i in range(PLAYER_COUNT):
+        for i in range(gc.PLAYER_COUNT):
             name = player_names[i]
             script = None
             if name in scripts:
@@ -94,19 +77,22 @@ class Game:
 
         #Update Enemies
         for e in self.enemies:
-            pos = self.clamp_pos(e.update(delta))
-            if not self.collides_with_walls(pos, e.size):
-                e.pos = pos
+            if e.health <= 0:
+                self.enemies.remove(e)
+            else:
+                pos = self.clamp_pos(e.update(delta))
+                if not self.collides_with_walls(pos, e.size):
+                    e.pos = pos
 
         #Enemy Spawning
-        if (self.enemy_spawn_timer > self.enemy_spawn_delay
+        if (self.enemy_spawn_timer > gc.ENEMY_SPAWN_DELAY
             and len(self.enemies) < self.enemy_limit):
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
 
         #Powerup Spawning
-        
+
         #Ending Conditions / Wave Conditions
         if self.time >= 10:
             self.active = False
