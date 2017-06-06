@@ -5,6 +5,7 @@ from .color import Color3
 from .player import Player
 from .enemy import Enemy
 from .core import Core
+from .event import Event
 
 import time
 import random
@@ -64,6 +65,12 @@ class Game:
         self.time = 0
         self.active = True
 
+    def events_add(self, event):
+        self.events.append(event)
+
+    def events_flush(self):
+        del self.events[:]
+
     #### Main Loop ####
     def tick(self, delta):
         #Timekeeping
@@ -92,6 +99,7 @@ class Game:
         #Ending Conditions / Wave Conditions
         if self.time >= 10:
             self.active = False
+            self.events_add(Event('Game_End'))
 
     def clamp_pos(self, pos):
         if pos.x < 0:
