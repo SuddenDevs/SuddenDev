@@ -30,8 +30,12 @@
 
           <center>
             {% for r in rooms %}
-                <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r }}">
-            	Join {{ r }}</button>
+                <button type="submit" class="btn btn-lg btn-primary" name="submit" value="{{ r['game_id'] }}">
+                    Created at: {{ r['time_created']}}<br>
+                    Lobby name: {{ r['lobby_name'] }}<br>
+                    Created by: {{ r['created_by']}}<br>
+                    Game id: {{ r['game_id']}}<br>
+                    Players: {{ r['player_count']}}/4</button>
             {% endfor %}
 
             <br>
