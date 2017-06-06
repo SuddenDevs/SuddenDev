@@ -62,6 +62,7 @@ class Player(Entity):
         return in_range                
 
     def try_apply_script(self, script, game):
+        print(script)
         if script is None:
             return False
 
