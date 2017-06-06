@@ -2,9 +2,9 @@ import flask
 import flask_login
 import flask_socketio as fsio
 import sqlalchemy
-from . import socketio
-from .models import db, GameSetup
-from .routes import GLOBAL_DICT, REQUIRED_PLAYER_COUNT # TODO: need to get rid of
+from . import socketio, redis
+from .models import db, User
+from .routes import REQUIRED_PLAYER_COUNT, get_players_in_room # TODO: need to get rid of
 from .game_instance import GameInstance
 from .tasks import play_game
 
@@ -13,50 +13,48 @@ NAMESPACE = '/game-session'
 @socketio.on('joined', namespace=NAMESPACE)
 def joined(message):
     """Sent by clients when they enter a room."""
-    game_id = flask.session.get('game_id')
+    player_id = flask_login.current_user.id
+    game_id = redis.hgetall(player_id)['game_id']
+    game_state = redis.hgetall(game_id)
     fsio.join_room(game_id)
 
-    # TODO global dict needs to go
-    if game_id not in GLOBAL_DICT:
+    if game_id == 0:
         flask.flash("sorry something isn't quite right... try joining another game")
         return flask.redirect(flask.url_for('.main.lobby'))
 
-    player_count = GLOBAL_DICT[game_id]['player_count']
-    player_names = GLOBAL_DICT[game_id]['players']
-    player_scripts = GLOBAL_DICT[game_id]['scripts']
+    player_count = game_state['player_count']
+    players = get_players_in_room(game_id)
+
+    player_names = []
+    player_scripts = []
+
+    for p in players:
+        player_names.append(redis.hgetall(p)['username'])
+        player_scripts.append(User.query.get(p).script)
 
     # TODO: use json dumps and make less ugly
-    fsio.emit('player_count', '{\"count\" : ' + str(REQUIRED_PLAYER_COUNT-player_count) + '}', room=game_id, namespace=NAMESPACE)
+    fsio.emit('player_count', '{\"count\" : ' + str(REQUIRED_PLAYER_COUNT-int(player_count)) + '}', room=game_id, namespace=NAMESPACE)
 
     # If there are enough players, start the game
-    if player_count == REQUIRED_PLAYER_COUNT:
+    if int(player_count) == REQUIRED_PLAYER_COUNT:
         fsio.emit('game_start', {}, room=game_id, namespace=NAMESPACE)
 
-        if 'result' not in GLOBAL_DICT[game_id]:
+        if game_state['result'] == '':
             result = play_game.delay(game_id, player_names, player_scripts)
             result = result.get()
-            GLOBAL_DICT[game_id]['result'] = result
+            redis.hset(game_id, 'result', result)
         else:
-            result = GLOBAL_DICT[game_id]['result']
+            result = game_state['result']
         fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
     """Sent by clients when they leave a room."""
-    room = flask.session.get('game_id')
-    fsio.leave_room(room)
-    flask.session['joined_game'] = False
+    player_id = flask_login.current_user.id
+    game_id = redis.hgetall(player_id)['game_id']
+    fsio.leave_room(game_id)
 
 @socketio.on('submit_code', namespace=NAMESPACE)
 def submit_code(message):
-    game_id = flask.session.get('game_id')
-    name = flask.session.get('name', None)
     flask_login.current_user.script = message
     db.session.commit()
-
-    # TODO global dict needs to go
-    if game_id not in GLOBAL_DICT:
-        flask.flash("sorry something isn't quite right... try joining another game")
-        return flask.redirect(flask.url_for('.main.lobby'))
-
-    GLOBAL_DICT[game_id]['scripts'][name] = message

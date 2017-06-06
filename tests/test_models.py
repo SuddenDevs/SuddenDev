@@ -1,7 +1,7 @@
 import pytest
-from suddendev.models import GameSetup
+from suddendev.models import User
 
 
-def test_create_game(session):
-    game_setup = GameSetup('ASDF')
-    assert game_setup.player_count == 0
+def test_create_user_has_empty_script(session):
+    user = User()
+    assert user.script == None
