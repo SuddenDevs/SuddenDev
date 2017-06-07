@@ -19,26 +19,31 @@ class Map:
         self.height = height
 
 class Game:
+    walls = []
+    events = []
+    enemies = []
+    powerups = []
+
+    enemy_spawn_timer = 0
+    powerup_spawn_timer = 0
+    powerup_count = 0
+
+    time = 0
+    active = True
+
     def __init__(self, gc, player_names, scripts):
         self.gc = gc
         #Map
         self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
 
-        #Events
-        self.events = []
-
         #Core
         self.core = Core()
         self.core.pos = Vector(self.map.width/2, self.map.height/2)
 
-        #Enemies
-        self.enemies = []
-        self.enemy_spawn_timer = 0
-
-        #Walls
-        self.walls = []
-
         #Players
+        self.init_players(player_names, scripts)
+
+    def init_players(self, player_names, scripts):
         player_count = len(player_names)
         self.players = []
         for i in range(player_count):
@@ -50,16 +55,6 @@ class Game:
             player = Player(name, random_color3(), self, script)
             player.pos = self.get_random_spawn(player.size)
             self.players.append(player)
-
-        #Powerups
-        self.powerups = []
-
-        self.powerup_spawn_timer = 0
-        self.powerup_count = 0
-
-        #Metadata
-        self.time = 0
-        self.active = True
 
     def events_add(self, event):
         self.events.append(event)
@@ -74,6 +69,19 @@ class Game:
         self.enemy_spawn_timer += delta
         self.powerup_spawn_timer += delta
 
+        # Update entities
+        self.update_players(delta)
+        self.update_enemies(delta)
+
+        self.spawn_powerups()
+        self.spawn_enemies()
+
+        #Ending Conditions / Wave Conditions
+        if self.time >= self.gc.TIME_LIMIT:
+            self.active = False
+            self.events_add(Event(EventType.GAME_END))
+
+    def update_players(self, delta):
         #Update Players
         for p in self.players:
             pos = self.clamp_pos(p.update(delta))
@@ -87,6 +95,7 @@ class Game:
                     pu.pickup(p)
                     self.powerups.remove(pu)
 
+    def update_enemies(self, delta):
         #Update Enemies
         for e in self.enemies:
             if e.health <= 0:
@@ -97,16 +106,10 @@ class Game:
                 if not self.collides_with_walls(pos, e.size):
                     e.pos = pos
 
-        #Enemy Spawning
-        if (self.enemy_spawn_timer > self.gc.ENEMY_SPAWN_DELAY
-            and len(self.enemies) < self.gc.ENEMY_LIMIT
-            and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
-            #Spawn Enemy
-            enemy = Enemy(self)
-            self.enemies.append(enemy)
-            self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
+    def spawn_powerups(self):
+        # powerupTypes = [PowerupType.AMMO_UP, PowerupType.HEALTH_UP]
+        powerupTypes = [powerup for _, powerup in PowerupType.__members__.items()]
 
-        powerupTypes = [PowerupType.AMMO_UP, PowerupType.HEALTH_UP]
         #Powerup Spawning
         if (self.powerup_spawn_timer > self.gc.POW_SPAWN_DELAY
             and self.powerup_count < self.gc.POW_LIMIT
@@ -115,12 +118,18 @@ class Game:
             pu = Powerup(self.get_random_spawn(self.gc.POW_SIZE), random.choice(powerupTypes))
             self.powerups.append(pu)
             self.powerup_count += 1
-            self.events_add(Event(EventType.POWERUP_SPAWN, e))
+            self.events_add(Event(EventType.POWERUP_SPAWN, pu))
 
-        #Ending Conditions / Wave Conditions
-        if self.time >= self.gc.TIME_LIMIT:
-            self.active = False
-            self.events_add(Event(EventType.GAME_END))
+    def spawn_enemies(self):
+        #Enemy Spawning
+        if (self.enemy_spawn_timer > self.gc.ENEMY_SPAWN_DELAY
+            and len(self.enemies) < self.gc.ENEMY_LIMIT
+            and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
+
+            #Spawn Enemy
+            enemy = Enemy(self)
+            self.enemies.append(enemy)
+            self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
 
     def clamp_pos(self, pos):
         if pos.x < 0:

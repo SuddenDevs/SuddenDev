@@ -28,6 +28,18 @@ class Player(Entity):
         if not self.try_apply_script(script, game):
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, game)
 
+    def reset_dummy(self):
+        self.dummy.name = self.name 
+        self.dummy.color = self.color 
+        self.dummy.vel = self.vel 
+        self.dummy.game = self.game 
+        self.dummy.speed = self.speed
+        self.dummy.range_visible = self.range_visible
+        self.dummy.range_attackable = self.range_attackable
+        self.dummy.ammo = self.ammo 
+        self.dummy.damage = self.damage 
+        self.dummy.attacked = self.attacked
+
     def powerups_visible(self):
         in_range = []
         for p in self.game.powerups:
@@ -104,6 +116,7 @@ class Player(Entity):
         self.vel = self.dummy.vel
 
         #Reset dummy
+        self.reset_dummy()
 
         #Apply Motion
         return super().update(delta)
