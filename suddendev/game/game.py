@@ -8,6 +8,7 @@ from .powerup import Powerup, PowerupType
 from .wall import Wall
 from .core import Core
 from .event import Event, EventType
+from .game_config import GameConfig
 
 import time
 import random
@@ -31,8 +32,9 @@ class Game:
     time = 0
     active = True
 
-    def __init__(self, gc, player_names, scripts):
-        self.gc = gc
+    def __init__(self, wave, player_names, scripts):
+        self.wave = wave
+        self.gc = GameConfig(wave)
         #Map
         self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
 
