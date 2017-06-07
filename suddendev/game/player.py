@@ -1,5 +1,6 @@
 from .entity import Entity
 from .vector import Vector
+from .powerup import PowerupType
 from .sandbox import builtins
 from .color import Color3
 
@@ -28,6 +29,14 @@ class Player(Entity):
         if not self.try_apply_script(script, game):
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, game)
 
+    def powerups_visible(self):
+        in_range = []
+        for p in self.game.powerups:
+            d = Vector.Length(p.pos - self.pos)
+            if d <= self.range_visible:
+                in_range.append(p)
+        return in_range                
+
     def enemies_visible(self):
         in_range = []
         for e in self.game.enemies:
@@ -52,6 +61,7 @@ class Player(Entity):
         self.scope = {
             'math' : math,
             'Vector' : Vector,
+            'PowerupType' : PowerupType,
             'core' : game.core,
             'random' : random,
             'sys' : sys,
@@ -86,6 +96,7 @@ class Player(Entity):
         #Perform player-specific movement calculation
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
+        self.scope['powerups_visible'] = self.powerups_visible()
 
         #Execute on Dummy Entity
         self.script_update(self.dummy, delta)

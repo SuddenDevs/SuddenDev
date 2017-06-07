@@ -4,6 +4,7 @@ from .vector import Vector
 from .color import Color3, random_color3
 from .player import Player
 from .enemy import Enemy
+from .powerup import Powerup, PowerupType
 from .wall import Wall
 from .core import Core
 
@@ -31,7 +32,6 @@ class Game:
 
         #Enemies
         self.enemies = []
-        self.enemy_limit = self.gc.ENEMY_LIMIT
         self.enemy_spawn_timer = 0
 
         #Walls
@@ -59,6 +59,9 @@ class Game:
         #Powerups
         self.powerups = []
 
+        self.powerup_spawn_timer = 0
+        self.powerup_count = 0
+
         #Metadata
         self.time = 0
         self.active = True
@@ -68,12 +71,19 @@ class Game:
         #Timekeeping
         self.time += delta
         self.enemy_spawn_timer += delta
+        self.powerup_spawn_timer += delta
 
         #Update Players
         for p in self.players:
             pos = self.clamp_pos(p.update(delta))
             if not self.collides_with_walls(pos, p.size):
                 p.pos = pos
+
+            # Pickup powerups
+            for pu in self.powerups:
+                if pu.intersects(p):
+                    pu.pickup(p)
+                    self.powerups.remove(pu)
 
         #Update Enemies
         for e in self.enemies:
@@ -86,13 +96,21 @@ class Game:
 
         #Enemy Spawning
         if (self.enemy_spawn_timer > self.gc.ENEMY_SPAWN_DELAY
-            and len(self.enemies) < self.enemy_limit
+            and len(self.enemies) < self.gc.ENEMY_LIMIT
             and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
 
+        powerupTypes = [PowerupType.AMMO_UP, PowerupType.HEALTH_UP]
         #Powerup Spawning
+        if (self.powerup_spawn_timer > self.gc.POW_SPAWN_DELAY
+            and self.powerup_count < self.gc.POW_LIMIT
+            and random.random() < self.gc.POW_SPAWN_PROBABILITY):
+
+            pu = Powerup(self.get_random_spawn(self.gc.POW_SIZE), random.choice(powerupTypes))
+            self.powerups.append(pu)
+            self.powerup_count += 1
 
         #Ending Conditions / Wave Conditions
         if self.time >= self.gc.TIME_LIMIT:

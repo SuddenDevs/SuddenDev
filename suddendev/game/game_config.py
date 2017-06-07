@@ -40,10 +40,10 @@ class GameConfig:
 
     # Player
     P_SPEED = 80
-    P_RANGE_VISIBLE = 100
+    P_RANGE_VISIBLE = 400
     P_RANGE_ATTACKABLE = 20
-    P_AMMO = 12
-    P_DAMAGE = 50
+    P_AMMO = 6
+    P_DAMAGE = 80
     P_DEFAULT_SCRIPT = """
 timer = 0
 
@@ -74,6 +74,16 @@ def update(player, delta):
     E_SPEED = 10
     E_SIZE = 10
     E_HEALTHMAX = 100
+
+    # Powerups
+    POW_SIZE = 50
+    POW_AMMO_UP_VALUE = 10
+    POW_HEALTH_UP_VALUE = 50 
+
+    # Limit of powerups spawned per wave
+    POW_LIMIT = 15
+    POW_SPAWN_DELAY = 3
+    POW_SPAWN_PROBABILITY = 0.02
 
     def __init__(self, wave):
         if wave <= 0:

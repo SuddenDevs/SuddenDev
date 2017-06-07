@@ -36,6 +36,7 @@ class StateEncoder(json.JSONEncoder):
         for p in players:
             json = self.serializeEntity(p)
             json['name'] = p.name
+            json['ammo'] = p.ammo
             json['color'] = self.serializeColor(p.color)
             result.append(json)
         return result
@@ -69,6 +70,7 @@ class StateEncoder(json.JSONEncoder):
         result = []
         for p in powerups:
             json = self.serializeEntity(p)
+            json['powerup_type'] = p.powerup_type
             result.append(json)
         return result
 

@@ -4,8 +4,6 @@ from .game.state_encoder import StateEncoder, encodeState
 from . import socketio
 from .game.game_config import GameConfig
 import time
-import flask
-import flask_socketio as fsio
 import datetime
 import time
 
