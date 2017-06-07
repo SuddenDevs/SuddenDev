@@ -77,9 +77,9 @@ class Player(Entity):
         exec(script, self.scope)
 
         # Check update method existence and signature of update function
-        update = self.scope['update']
-        if update is not None and callable(update):
-            if len(inspect.signature(update).parameters) == 2:
+        if 'update' in self.scope:
+            update = self.scope['update']
+            if callable(update) and len(inspect.signature(update).parameters) == 2:
                 #Create dummy function in special scope
                 self.script_update = type(update)(update.__code__, self.scope)
                 return True
