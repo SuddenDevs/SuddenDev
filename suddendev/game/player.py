@@ -7,6 +7,8 @@ from .util import (
         distance_to,
         move_to,
         move_from,
+        move_to_pos,
+        move_from_pos,
         get_nearest,
         get_farthest
         )
@@ -87,6 +89,8 @@ class Player(Entity):
 
             'move_to' : move_to,
             'move_from' : move_from,
+            'move_to_pos' : move_to_pos,
+            'move_from_pos' : move_from_pos,
             'get_nearest' : get_nearest,
             'get_farthest' : get_farthest,
             'distance_to' : distance_to,

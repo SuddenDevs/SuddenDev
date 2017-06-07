@@ -7,23 +7,28 @@ def distance_to(self, target):
 
 # Returns a velocity vector, scaled to the given speed, pointing to the target.
 # If speed is not given, defaults to self.speed.
+
+def move_to_pos(self, pos, speed=None):
+    if speed is None:
+        speed = self.speed
+
+    return Vector.Normalize(pos - self.pos) * speed
+
+def move_from_pos(self, pos, speed=None):
+    if speed is None:
+        speed = self.speed
+
+    return Vector.Normalize(self.pos - pos) * speed
+
 def move_to(self, target, speed=None):
-    if speed is None:
-        speed = self.speed
+    return move_to_pos(self, target.pos)
 
-    return Vector.Normalize(target - self.pos) * speed
-
-# Returns a velocity vector, scaled to the given speed, pointing away from the target.
-# If speed is not given, defaults to self.speed.
 def move_from(self, target, speed=None):
-    if speed is None:
-        speed = self.speed
-
-    return Vector.Normalize(self.pos - target) * speed
+    return move_from_pos(self, target.pos)
 
 # Given self and a list of entities, returns the nearest entity and the 
 # distance to that entity
-def get_nearest(self, entities):
+def get_nearest(self, entities, with_distance=False):
     nearest_distance = sys.maxsize
     nearest = None
 
@@ -33,11 +38,14 @@ def get_nearest(self, entities):
             nearest = e
             nearest_distance = distance
 
-    return nearest, nearest_distance
+    if with_distance:
+        return nearest, nearest_distance
+    else:
+        return nearest
 
 # Given self and a list of entities, returns the farthest entity and the 
 # distance to that entity
-def get_farthest(self, entities):
+def get_farthest(self, entities, with_distance=False):
     farthest_distance = -1
     farthest = None
 
@@ -47,4 +55,7 @@ def get_farthest(self, entities):
             farthest = e
             farthest_distance = distance
 
-    return farthest, farthest_distance
+    if with_distance:
+        return farthest, farthest_distance
+    else:
+        return farthest
