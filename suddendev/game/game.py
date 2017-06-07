@@ -6,7 +6,6 @@ from .player import Player
 from .enemy import Enemy
 from .wall import Wall
 from .core import Core
-from .game_config import GameConfig as gc
 
 import time
 import random
@@ -18,9 +17,10 @@ class Map:
         self.height = height
 
 class Game:
-    def __init__(self, player_names, scripts):
+    def __init__(self, gc, player_names, scripts):
+        self.gc = gc
         #Map
-        self.map = Map(gc.MAP_WIDTH, gc.MAP_HEIGHT)
+        self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
 
         #Events
         self.events = []
@@ -31,7 +31,7 @@ class Game:
 
         #Enemies
         self.enemies = []
-        self.enemy_limit = gc.ENEMY_LIMIT
+        self.enemy_limit = self.gc.ENEMY_LIMIT
         self.enemy_spawn_timer = 0
 
         #Walls
@@ -46,7 +46,7 @@ class Game:
 
         #Players
         self.players = []
-        for i in range(gc.PLAYER_COUNT):
+        for i in range(self.gc.PLAYER_COUNT):
             name = player_names[i]
             script = None
             if name in scripts:
@@ -85,9 +85,9 @@ class Game:
                     e.pos = pos
 
         #Enemy Spawning
-        if (self.enemy_spawn_timer > gc.ENEMY_SPAWN_DELAY
+        if (self.enemy_spawn_timer > self.gc.ENEMY_SPAWN_DELAY
             and len(self.enemies) < self.enemy_limit
-            and random.random() < gc.ENEMY_SPAWN_PROBABILITY):
+            and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
@@ -95,7 +95,7 @@ class Game:
         #Powerup Spawning
 
         #Ending Conditions / Wave Conditions
-        if self.time >= gc.TIME_LIMIT:
+        if self.time >= self.gc.TIME_LIMIT:
             self.active = False
 
     def clamp_pos(self, pos):

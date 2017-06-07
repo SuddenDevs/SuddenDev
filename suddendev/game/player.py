@@ -2,7 +2,6 @@ from .entity import Entity
 from .vector import Vector
 from .sandbox import builtins
 from .color import Color3
-from .game_config import GameConfig as gc
 
 import math
 import random
@@ -17,17 +16,17 @@ class Player(Entity):
         self.vel = Vector(random.random(), random.random())
         self.game = game
 
-        self.speed = gc.P_SPEED
-        self.range_visible = gc.P_RANGE_VISIBLE
-        self.range_attackable = gc.P_RANGE_ATTACKABLE
-        self.ammo = gc.P_AMMO
-        self.damage = gc.P_DAMAGE
+        self.speed = self.game.gc.P_SPEED
+        self.range_visible = self.game.gc.P_RANGE_VISIBLE
+        self.range_attackable = self.game.gc.P_RANGE_ATTACKABLE
+        self.ammo = self.game.gc.P_AMMO
+        self.damage = self.game.gc.P_DAMAGE
 
         # Flag to ensure we only attack once per frame
         self.attacked = False
 
         if not self.try_apply_script(script, game):
-            self.try_apply_script(gc.P_DEFAULT_SCRIPT, game)
+            self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, game)
 
     def enemies_visible(self):
         in_range = []

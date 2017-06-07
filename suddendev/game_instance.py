@@ -2,7 +2,7 @@
 from .game.game import Game
 from .game.state_encoder import StateEncoder, encodeState
 from . import socketio
-from .game.game_config import GameConfig as gc
+from .game.game_config import GameConfig
 import time
 import flask
 import flask_socketio as fsio
@@ -15,7 +15,8 @@ class GameInstance:
     def __init__(self, game_id, player_names, scripts):
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
-        self.game = Game(player_names, scripts)
+        self.gc = GameConfig(wave=1)
+        self.game = Game(self.gc, player_names, scripts)
 
     #Generator
     def run(self):
@@ -32,12 +33,12 @@ class GameInstance:
             time_last = time_current
 
             #Gameplay Update
-            self.game.tick(gc.FRAME_INTERVAL_SIM)
+            self.game.tick(self.gc.FRAME_INTERVAL_SIM)
 
             # Display frame sampling
-            frame_timer += gc.FRAME_INTERVAL_SIM
-            if frame_timer >= gc.FRAME_INTERVAL_DISPLAY:
-                frame_timer -= gc.FRAME_INTERVAL_DISPLAY
+            frame_timer += self.gc.FRAME_INTERVAL_SIM
+            if frame_timer >= self.gc.FRAME_INTERVAL_DISPLAY:
+                frame_timer -= self.gc.FRAME_INTERVAL_DISPLAY
                 state_counter += 1
                 batch.append(encodeState(self.game))
 

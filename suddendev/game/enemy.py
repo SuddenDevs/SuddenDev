@@ -1,6 +1,5 @@
 from .entity import Entity
 from .vector import Vector
-from .game_config import GameConfig as gc
 
 import random
 
@@ -10,7 +9,7 @@ class Enemy(Entity):
         self.game = game
         self.pos = Vector(random.random() * self.game.map.width,
                             random.random() * self.game.map.height)
-        self.speed = gc.ENEMY_SPEED
+        self.speed = self.game.gc.ENEMY_SPEED
     
     def update(self, delta):
         #Find Nearest Player
