@@ -13,5 +13,93 @@
       <code>self.vel = Vector(10,0)</code> will make the bot move to the right with speed <code>10</code>, whereas
       <code>self.vel = Vector(-1,-1)</code> will make the bot move down and left with speed <code>√2
       </code>, i.e. the magnitude of the vector.
+      <br><br><br>
+
+      <b>Must define:</b><br>
+      <code>update(self, delta)</code><br><br>
+
+      <b>Can define:</b><br>
+      <code>respond(self, message)</code><br><br>
+
+      <b>Can access as libraries</b><br>
+      <code>math</code><br>
+      <code>random</code><br>
+      <code>sys</code><br>
+      <code>__builtins__</code> (which is a super long list of built in keywords)<br><br>
+
+      <b>Can access as lists:</b><br>
+      <code>enemies_visible</code><br>
+      <code>enemies_attackable</code><br>
+      <code>powerups_visible</code><br><br>
+
+      <b>Can access</b><br>
+      <code>core</code><br><br>
+
+      <b>Can access as attributes (prepend with <code>self.</code>):</b><br>
+      (can also access most of these things for enemies and stuff)<br>
+      stuff in <b>bold</b> can be modified.<br>
+      <code>tag</code><br>
+      <code>pos</code><br>
+      <b><code>vel</code></b><br>
+      <code>speed</code><br>
+      <code>size</code><br>
+      <code>healthMax</code><br>
+      <code>health</code><br><br>
+
+      <code>ammo</code><br>
+      <code>name</code><br>
+      <code>color</code><br>
+      <code>speed</code><br>
+      <code>range_visible</code><br>
+      <code>range_attackable</code><br>
+      <code>damage</code><br>
+      <code>attack_delay</code><br>
+      <code>has_message</code><br>
+      <code>message</code><br><br>
+
+      <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
+      <b><code>shoot(self, enemy)</code></b><br>
+      <b><code>say(self, mtype=None, string=None, entity=None, vector=None, to_self=False)</code></b><br> 
+      <code>distance_to(self, target)</code><br>
+      <code>move_to_pos(self, pos, speed=None)</code><br>
+      <code>move_from_pos(self, pos, speed=None)</code><br>
+      <b><code>move_to(self, target, speed=None)</code></b><br>
+      <code>move_from(self, target, speed=None)</code><br>
+      <code>get_nearest(self, entities, with_distance=False)</code><br>
+      <code>get_farthest(self, entities, with_distance=False)</code><br><br>
+
+      <b>Message:</b><br>
+      <b><code>source</code></b><br>
+      <code>to_self</code><br>
+      At least one of the following fields must be set:<br>
+      <code>mtype</code><br>
+      <code>string</code><br>
+      <code>entity</code><br>
+      <code>vector</code><br><br>
+
+      <b>Vectors:</b><br>
+      Initialise as:<br>
+      <code>Vector(x, y)</code><br><br>
+      Vector functions:<br>
+      <code>DistanceSqrd(point1, point2)</code><br>
+      <code>Distance(point1, point2)</code><br>
+      <code>LengthSqrd(vec)</code><br>
+      <code>Length(vec)</code><br>
+      <code>Normalize(vec)</code><br>
+      <code>Dot(a, b)</code><br>
+      <code>ProjectOnto(w, v)</code><br><br>
+
+      <b>Enums:</b><br>
+      MessageType<br>
+      <code>HELP = 'help'</code><br>
+      <code>OK = 'ok'</code><br>
+      <code>KILL = 'kill'</code><br>
+      <code>NEED_AMMO = 'need ammo'</code><br>
+      <code>LOW_HEALTH = 'low health'</code><br><br>
+
+      PowerupType<br>
+      <code>AMMO_UP</code><br>
+      <code>HEALTH_UP</code><br>
+      <br><br>
   </div>
 {% endblock %}

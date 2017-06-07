@@ -50,6 +50,7 @@ class Player(Entity):
         self.dummy.speed = self.speed
         self.dummy.range_visible = self.range_visible
         self.dummy.range_attackable = self.range_attackable
+
         self.dummy.damage = self.damage 
         self.dummy.attack_delay = self.attack_delay
 
@@ -154,7 +155,7 @@ class Player(Entity):
         self.attack_timer = self.dummy.attack_timer
         self.ammo = self.dummy.ammo
 
-        if self.dummy.has_message:
+        if self.dummy.has_message and self.dummy.message is not None:
             for p in self.game.players:
                 if p.script_respond is None:
                     continue
