@@ -12,6 +12,9 @@ from .rooms import (
     remove_player_from_room,
     get_room_state_json_string,
     set_script,
+    set_player_ready,
+    all_players_are_ready,
+    reset_all_players,
 )
 
 NAMESPACE = '/game-session'
@@ -96,33 +99,28 @@ def test(message):
     handle = play_game.delay(game_id, player_names, player_scripts)
     result = handle.get()
     fsio.emit('result', result, namespace=NAMESPACE)
-    pass
 
 @socketio.on('play', namespace=NAMESPACE)
 def play(message):
     """Sent by clients to indicate they are ready to play."""
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
+    set_player_ready(game_id, player_id)
     run_game_if_everyone_ready(game_id)
 
-
 def run_game_if_everyone_ready(game_id):
-    player_jsons = get_players_in_room(game_id)
-    for player in player_jsons:
-        if player['status'] != 'ready':
-            update_players(game_id)
-            return
+    if all_players_are_ready(game_id):
+        player_jsons = get_players_in_room(game_id)
+        player_names = []
+        player_scripts = []
+        for player in player_jsons:
+            player_names.append(player['name'])
+            player_scripts.append(player['script'])
 
-    player_names = []
-    player_scripts = []
-    for player in player_jsons:
-        player_names.append(player['name'])
-        player_scripts.append(player['scripts'])
-
-    handle = play_game.delay(game_id, player_names, player_scripts)
-    result = handle.get()
-
-    fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
+        handle = play_game.delay(game_id, player_names, player_scripts)
+        result = handle.get()
+        reset_all_players(game_id)
+        fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
 
 def update_players(game_id):
     game_json_string = get_room_state_json_string(game_id)
