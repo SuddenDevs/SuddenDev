@@ -81,6 +81,7 @@ class StateEncoder(json.JSONEncoder):
     def serializePowerup(self, powerup):
         json = self.serializeEntity(p)
         json['powerup_type'] = p.powerup_type.value
+        json['value'] = p.value
         return json
 
     def serializeEvents(self, events):
