@@ -4,6 +4,8 @@ from .powerup import PowerupType
 from .sandbox import builtins
 from .color import Color3
 from .util import (
+        shoot,
+        say,
         distance_to,
         move_to,
         move_from,
@@ -12,6 +14,7 @@ from .util import (
         get_nearest,
         get_farthest
         )
+from .message import Message, MessageType
 
 import math
 import random
@@ -34,6 +37,9 @@ class Player(Entity):
         self.attack_delay = self.game.gc.P_ATTACK_DELAY
         self.attack_timer = 0
 
+        self.has_message = False
+        self.message = None
+
         if not self.try_apply_script(script, game):
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, game)
 
@@ -41,13 +47,14 @@ class Player(Entity):
         self.dummy.name = self.name 
         self.dummy.color = self.color 
         self.dummy.vel = self.vel 
-        self.dummy.game = self.game 
         self.dummy.speed = self.speed
         self.dummy.range_visible = self.range_visible
         self.dummy.range_attackable = self.range_attackable
         self.dummy.damage = self.damage 
-        self.dummy.attack_timer = self.attack_timer
         self.dummy.attack_delay = self.attack_delay
+
+        self.has_message = False
+        self.message = None
 
     def powerups_visible(self):
         in_range = []
@@ -82,11 +89,13 @@ class Player(Entity):
             'math' : math,
             'Vector' : Vector,
             'PowerupType' : PowerupType,
+            'MessageType' : MessageType,
             'core' : game.core,
             'random' : random,
             'sys' : sys,
-            'shoot' : shoot,
 
+            'say' : say,
+            'shoot' : shoot,
             'move_to' : move_to,
             'move_from' : move_from,
             'move_to_pos' : move_to_pos,
@@ -108,6 +117,13 @@ class Player(Entity):
             return False
 
         # Check update method existence and signature of update function
+        if 'respond' in self.scope:
+            respond = self.scope['respond']
+            if callable(respond) and len(inspect.signature(respond).parameters) == 2:
+                #Create dummy function in special scope
+                self.script_respond = type(respond)(respond.__code__, self.scope)
+            else:
+                self.script_respond = self.respond_default
         if 'update' in self.scope:
             update = self.scope['update']
             if callable(update) and len(inspect.signature(update).parameters) == 2:
@@ -133,9 +149,15 @@ class Player(Entity):
             self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed
 
         self.vel = self.dummy.vel
+
         # Have to update this because shoot() runs on the dummy
         self.attack_timer = self.dummy.attack_timer
         self.ammo = self.dummy.ammo
+
+        if self.dummy.has_message:
+            for p in self.game.players:
+                if self.dummy.message.to_self or p is not self:
+                    p.script_respond(p.dummy, self.dummy.message)
 
         #Reset dummy
         self.reset_dummy()
@@ -143,23 +165,9 @@ class Player(Entity):
         #Apply Motion
         return super().update(delta)
 
+    # Default handler for responding to messages.
+    def respond_default(self, message):
+        pass
+
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
-
-# TODO: This should be restricted to the dummy and access the real player's
-# damage for verification, otherwise someone could do:
-# 
-# self.damage = 999999999
-# shoot(self, enemy)
-def shoot(player, enemy):
-    if (Vector.Distance(enemy.pos, player.pos) <= player.range_attackable
-            and player.ammo > 0 and player.attack_timer == 0):
-        # Point towards the target
-        player.vel = enemy.pos - player.pos
-        player.vel = Vector.Normalize(player.vel) * 0.01
-
-        # Deal damage
-        player.ammo -= 1
-        enemy.injure(player.damage)
-
-        player.attack_timer = player.attack_delay

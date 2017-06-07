@@ -1,30 +1,67 @@
 from .vector import Vector
+from .message import Message
 import sys
+
+# TODO: This should be restricted to the dummy and access the real player's
+# damage for verification, otherwise someone could do:
+# 
+# self.damage = 999999999
+# shoot(self, enemy)
+def shoot(self, enemy):
+    if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable
+            and self.ammo > 0 and self.attack_timer == 0):
+        # Point towards the target
+        self.vel = enemy.pos - self.pos
+        self.vel = Vector.Normalize(self.vel) * 0.01
+
+        # Deal damage
+        self.ammo -= 1
+        enemy.injure(self.damage)
+
+        self.attack_timer = self.attack_delay
+
+# Broadcasts a message to all players. Only one of the args have to be set in
+# order for the message to be sent. If to_self is set, the message is also
+# sent to the sender himself.
+def say(self, mtype=None, string=None, entity=None, vector=None, to_self=False):
+    if (mtype is not None or
+        string is not None or
+        entity is not None or
+        vector is not None):
+
+        self.has_message = True
+        self.message = Message(source=self, mtype=mtype, 
+                entity=entity, string=string, vector=vector, to_self=to_self)
 
 # Returns distance from self to the target's position.
 def distance_to(self, target):
     return Vector.Distance(self.pos, target.pos)
 
-# Returns a velocity vector, scaled to the given speed, pointing to the target.
+# Sets the velocity vector, scaled to the given speed, pointing to the target.
 # If speed is not given, defaults to self.speed.
-
 def move_to_pos(self, pos, speed=None):
     if speed is None:
         speed = self.speed
 
-    return Vector.Normalize(pos - self.pos) * speed
+    self.vel = Vector.Normalize(pos - self.pos) * speed
 
 def move_from_pos(self, pos, speed=None):
     if speed is None:
         speed = self.speed
 
-    return Vector.Normalize(self.pos - pos) * speed
+    self.vel = Vector.Normalize(self.pos - pos) * speed
 
 def move_to(self, target, speed=None):
-    return move_to_pos(self, target.pos)
+    if speed is None:
+        speed = self.speed
+
+    self.vel = Vector.Normalize(target.pos - self.pos) * speed
 
 def move_from(self, target, speed=None):
-    return move_from_pos(self, target.pos)
+    if speed is None:
+        speed = self.speed
+
+    self.vel = Vector.Normalize(self.pos - target.pos) * speed
 
 # Given self and a list of entities, returns the nearest entity and the 
 # distance to that entity
