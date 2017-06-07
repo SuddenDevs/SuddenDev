@@ -84,16 +84,84 @@
         inGame = true;
       }
 
+      function create_health_bar() {
+        var red = new PIXI.Graphics();
+        var green = new PIXI.Graphics();
+        var width = 24;
+        var height = 4;
+        var radius = 2;
+        red.beginFill(0xff0000);
+        red.lineStyle(2, 0x0, 0);
+        green.beginFill(0x00ff00);
+        red.drawRoundedRect(0, 0, width, height, radius);
+        green.drawRoundedRect(0, 0, width, height, radius);
+
+        var health = new PIXI.Container();
+        health.addChildAt(red, 0);
+        health.addChildAt(green, 1);
+        return health;
+      }
+
+      function create_entity_triangle(data) {
+        var container = new PIXI.Container();
+        var sprite = create_triangle({x:0, y:0}, data.vel, data.size, data.color);
+        container.addChild(sprite);
+
+        var health = create_health_bar();
+        health.y = data.size + 2;
+        health.x = -health.width/2;
+        container.addChild(health);
+
+        container.position = data.pos;
+        stage.addChild(container);
+        return {
+          container: container,
+          sprite: sprite,
+          health: health
+        };
+      }
+
       function create_player(data) {
-        var p = create_triangle(data.pos, data.vel, data.size, data.color);
-        stage.addChild(p);
-        playerDict[data.tag] = p;
+        playerDict[data.tag] = create_entity_triangle(data);
       }
 
       function create_enemy(data) {
-        var e = create_triangle(data.pos, data.vel, data.size, ENEMYC);
-        stage.addChild(e);
-        enemies[data.tag] = e;
+        data.color = ENEMYC;
+        enemies[data.tag] = create_entity_triangle(data);
+      }
+
+      function create_powerup(data) {
+        var container = new PIXI.Container();
+        var sprite = new PIXI.Graphics();
+        var size = 10;
+        sprite.beginFill(0x0f0f00);
+        sprite.drawRect(0, 0, size, size);
+        sprite.x = -size/2;
+        sprite.y = -size/2;
+        container.addChild(sprite);
+
+        var label = new PIXI.Text(data.value,
+                                              { fontFamily:"Arial",
+                                                fontSize:"8",
+                                                fill: "black",
+                                                align: "center" });
+        label.anchor.y = 1;
+        label.y = -size/2 - 2;
+        container.addChild(label);
+
+        container.position = data.pos;
+        stage.addChild(container);
+        pickups[data.tag] = container;
+      }
+
+      function clearup_player(tag) {
+        stage.removeChild(playerDict[tag].container);
+        delete playerDict[tag];
+      }
+
+      function clearup_enemy(tag) {
+        stage.removeChild(enemies[tag].container);
+        delete enemies[tag];
       }
 
       //Update player details/scripts
@@ -234,12 +302,15 @@
               break;
             case "Enemy_Death":
               console.log('RIP enemy ' + body.tag);
+              clearup_enemy(body.tag);
               break;
             case "Powerup_Spawn":
               console.log('Creating powerup' + body.tag);
+              create_powerup(body);
               break;
             case "Powerup_Used":
               console.log('RIP powerup' + body.tag);
+              clearup_powerup(body.tag);
               break;
             case "Game_End":
               console.log('RIP game');
@@ -251,7 +322,7 @@
 
         //Update
         draw_enemies(state.enemies);
-        //draw_entities(state.powerups, PICKUPC);
+        draw_pickups(state.powerups);
         draw_players(state.players);
         //draw_core(state.core);
       }
@@ -285,29 +356,33 @@
         return shape;
       }
 
+      function update_entity(entity, data) {
+        entity.container.position = data.pos;
+        if (data.vel.x != 0 || data.vel.y != 0) {
+          entity.sprite.rotation = vector_to_rotation(data.vel);
+          entity.health.getChildAt(1).scale.x = data.health/data.healthMax;
+        }
+      }
+
       // Draw every object in a list the same color
       function draw_enemies(list) {
         for (i = 0; i < list.length; i++) {
-          var data = list[i];
-          var enemy = enemies[data.tag];
-          enemy.position = data.pos;
-          if (data.vel.x != 0 || data.vel.y != 0) {
-            enemy.rotation = vector_to_rotation(data.vel);
-          }
+          update_entity(enemies[list[i].tag], list[i]);
         }
       }
 
       // Draw every player and update name locations
       function draw_players(list) {
         for (i = 0; i < list.length; i++) {
-          var data = list[i];
-          var p = playerDict[data.tag];
-          p.position = data.pos;
-          if (data.vel.x != 0 || data.vel.y != 0) {
-            p.rotation = vector_to_rotation(data.vel);
-          }
+          update_entity(playerDict[list[i].tag], list[i]);
         }
       } 
+
+      function draw_pickups(list) {
+        for (i = 0; i < list.length; i++) {
+          //nothing! 
+        }
+      }
 
       //Pause game, update pause button
       function togglePause() {
