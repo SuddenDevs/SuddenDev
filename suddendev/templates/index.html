@@ -6,8 +6,8 @@
         
       {{ suddendev_header() }}
 
-      <h3>About</h3>
-      <p> SUDDEN_DEV is a co-op survival game with a twist - you aren't the player!
+      <p> <strong>SUDDEN_DEV is a co-op survival game with a twist - you aren't the player!</strong>
+      <br>
       Write scripts to manipulate a character and work together to slay violent geometric primitives.
       Prove your genius by defending the gloriously circular <i>core</i> from the pointy anatomy of your enemies.</p>
 
@@ -16,17 +16,33 @@
         <li>Scan the environment for enemies and powerups</li>
         <li>Control your character's movement</li>
         <li>Message other characters</li>
-        <li>Attack enemies</li>
+        <li>Attack enemies!</li>
       </ul>
 
       <p>Clearing stages will require not only smart scripts, but novel team strategies.
       You won't survive on your own.</p>
 
-      <p>Currently, SUDDEN_DEV is in very early development. You can check the code out
-      on GitHub <a href="https://github.com/SuddenDevs/SuddenDev">here</a></p>
+      <div class="alert alert-info">
+	<strong>Development in progress!</strong>
+	<p>It might be early days, but we have somehting playable and we would <i>love</i> for you to give it a spin and tell us how it goes.</p>
+	<ul>
+		<li>Documentation a bit confusing?</li>
+		<li>Ideas for gameplay?</li>
+		<li>Just want to tell us that we've made a horrible game?</li>
+	</ul>
+	Send it all our way on <b>suddendevcontact@gmail.com</b> - we are honestly greatful for it.
+      </div>
 
-      <br>
-      <a class="btn btn-lg btn-success" href="{{ auth_url }}">Sign in to play!</a>
+
+      <center>
+        <a class="btn btn-lg btn-success" href="{{ auth_url }}">Give it a go</a>
+        <br>
+        <br>
+
+        (By the way, <a href="https://github.com/SuddenDevs/SuddenDev">we're on Github</a>)
+      </center>
+
+
 
   </div>
 {% endblock %}

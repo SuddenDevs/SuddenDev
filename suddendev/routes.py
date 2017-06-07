@@ -23,7 +23,7 @@ def index():
 
     # if user is logged in, go straight to lobby, otherwise go to OAuth
     if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
-        auth_url = flask.url_for('.lobby')
+        auth_url = flask.url_for('.home')
     else:
         google = get_google_auth()
         auth_url, state = google.authorization_url(Config.AUTH_URI, access_type='offline')
@@ -55,7 +55,7 @@ def g_callback():
     """Callback route for Google's OAuth."""
 
     if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
-        return flask.redirect(flask.url_for('.lobby'))
+        return flask.redirect(flask.url_for('.home'))
     if 'code' not in flask.request.args and 'state' not in flask.request.args:
         return flask.redirect(flask.url_for('.index'))
     else:
@@ -81,7 +81,7 @@ def g_callback():
             db.session.add(user)
             db.session.commit()
             flask_login.login_user(user)
-            return flask.redirect(flask.url_for('.lobby'))
+            return flask.redirect(flask.url_for('.home'))
 
 
 @main.route('/game', methods=['GET', 'POST'])
@@ -99,6 +99,11 @@ def game_page():
 @main.route('/docs', methods=['GET'])
 def docs():
     return flask.render_template('docs.html')
+
+@flask_login.login_required
+@main.route('/scripts', methods=['GET'])
+def scripts():
+    return flask.render_template('scripts.html')
 
 @main.route('/lobby', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -137,3 +142,11 @@ def lobby():
         return flask.redirect(flask.url_for('.game_page'))
 
     return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
+
+
+@main.route('/home', methods=['GET'])
+@flask_login.login_required
+def home():
+    """Post-login page."""
+    # TODO: workout if noob or not - need DB field
+    return flask.render_template('home.html', user=flask_login.current_user, noob=True)
