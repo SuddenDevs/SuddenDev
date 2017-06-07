@@ -155,6 +155,11 @@
         pickups[data.tag] = container;
       }
 
+      function clearup_powerup(tag) {
+        stage.removeChild(pickups[tag]);
+        delete pickups[tag];
+      }
+
       function clearup_player(tag) {
         stage.removeChild(playerDict[tag].container);
         delete playerDict[tag];
