@@ -21,7 +21,6 @@
       var editor = null;
       var socket = null;
       var inGame = false;
-      var playersLeft = 3;
       var currentTab = 0;
       var scripts = [`{{user.script}}`,"","",""];
 
@@ -61,6 +60,7 @@
           socket.on(EVENTS.UPDATE, function(data) {
             updateRoom(data);
           });
+          socket.on
         });
         window.onbeforeunload = function(e) {
             socket.emit(EVENTS.LEFT, {});
@@ -76,7 +76,6 @@
       //Function to start the game
       function readyGame(data) {
         states = JSON.parse(data).result;
-        console.log(states);
         stage.removeChild(waitingText);
         for (i = 0; i < playerCount; i++) {
           stage.addChild(playerNames[i]);
@@ -149,9 +148,28 @@
         scripts[currentTab] = editor.getValue();
       }
 
-      function sendCode(event) {
+      function submitCode() {
         updateScripts();
-        socket.emit(event, scripts[0]);
+        socket.emit(EVENTS.SUBMIT, scripts[0]);
+      }
+
+      function testCode() {
+        updateScripts();
+        clearStates();
+        socket.emit(EVENTS.TEST, scripts[0]);
+      }
+
+      function clearStates() {
+        playerDict = {};
+        enemies = {};
+        pickups = {};
+        core = null;
+        states = [];
+        statei = 0;
+        inGame = false;
+        for (i = stage.children.length - 1; i >= 0; i--) {
+          stage.removeChild(stage.children[i]);
+        }
       }
 
       //Function to leave the game
@@ -206,11 +224,9 @@
         //Create & delete entities
 
         var events = state.events;
-        console.log(state);
         for (i = 0; i < events.length; i++) {
           var e = events[i];
           var body = e.body;
-          console.log(e.name);
           switch (e.name) {
             case "Enemy_Spawn":
               console.log('Creating enemy ' + body.tag);
@@ -285,8 +301,6 @@
       function draw_players(list) {
         for (i = 0; i < list.length; i++) {
           var data = list[i];
-          console.log(playerDict);
-          console.log(data);
           var p = playerDict[data.tag];
           p.position = data.pos;
           if (data.vel.x != 0 || data.vel.y != 0) {
@@ -342,9 +356,9 @@
                     height="600px"></canvas>
             <div class="controls greyBorder">
               <button class="controls" onclick="leaveGame()">Leave Game</button>
-              <button class="controls" onclick="sendCode(EVENTS.SUBMIT)">Save Code</button>
+              <button class="controls" onclick="submitCode()">Save Code</button>
               <button id="readyBtn" class="controls" onclick="readyUp()">Ready</button>
-              <button class="controls" onclick="sendCode(EVENTS.TEST)">Test Code</button>
+              <button class="controls" onclick="testCode()">Test Code</button>
               <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
                 </button>
             </div>
