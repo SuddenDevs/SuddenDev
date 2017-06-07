@@ -20,19 +20,19 @@ class Map:
         self.height = height
 
 class Game:
-    walls = []
-    events = []
-    enemies = []
-    powerups = []
-
-    enemy_spawn_timer = 0
-    powerup_spawn_timer = 0
-    powerup_count = 0
-
-    time = 0
-    active = True
-
     def __init__(self, wave, player_names, scripts):
+        self.walls = []
+        self.events = []
+        self.enemies = []
+        self.powerups = []
+
+        self.enemy_spawn_timer = 0
+        self.powerup_spawn_timer = 0
+        self.powerup_count = 0
+
+        self.time = 0
+        self.active = True
+
         self.wave = wave
         self.gc = GameConfig(wave)
         #Map
