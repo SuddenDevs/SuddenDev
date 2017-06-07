@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_game.css')}}">
   <script type="text/javascript" src="{{url_for('static', filename='createjs-2015.11.26.min.js')}}"></script>
   <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
   <script>
@@ -12,26 +12,19 @@
       var FRAMERATE = 60;
       var INITSCRIPT = 
       "# INSTRUCTIONS" +
-      "\n\t# Write code in this editor" +
-      "\n\t# Submit code before game begins" +
-      "\n\t# Watch your AI fight to survive" +
-      "\n\t# Access variables through the 'self' object" +
-      "\n\t# Access your character through the 'player' object" +
-      "\n\t# The time passed since the last update is equal to 'delta'" +
+      "\n\t# Write your program here" +
+      "\n\t# Submit when ready" +
+      "\n\t# Watch what happens!" +
+      "\n\t# Access state through the 'player' and 'game' objects" +
       "\n\t# Have fun!" +
-      "\n\nclass Controller:" +  
-      "\n\t# Initialise variables in this function" +
-      "\n\tdef __init__(self):" + 
-      "\n\t\tpass" +
-      "\n\n\t# Write your update code in this function" +
-      "\n\tdef update(self, player, delta):" + 
-      "\n\t\tplayer.vel = Vector(0, 0)"
+      "\ndef update(player, delta):" + 
+      "\n\tplayer.vel = Vector(0, 0)"
 
       var editor = null;
       var socket = null;
       var gameReady = false;
       var playersLeft = 3;
-      var scripts = [INITSCRIPT,"","",""];
+      var scripts = [`{{user.script}}`,"","",""];
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var shape = null;
@@ -237,7 +230,7 @@
       <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
     </div>
     <div class="container-fluid">
-      <div class="row mainRow">
+      <div class="row">
         <div class="col mainCol gameCol">
           <div id="gameDiv" class="game">
             <canvas id="gameCanvas" class="game" width="800px"

@@ -46,18 +46,6 @@ div.controls{
   background-color: #f1f1f1;
 }
 
-button.controls:hover{
-  background-color: #ddd;
-}
-
-button.controls.active{
-  background-color: #ccc;
-}
-
-button.controls:active{
-  background-color: #bbb;
-}
-
 button.controls{
     background-color: inherit;
     border: none;
@@ -65,6 +53,18 @@ button.controls{
     cursor: pointer;
     padding: 14px 16px;
     transition: 0.3s;
+}
+
+button.controls.active{
+  background-color: #ccc;
+}
+
+button.controls:hover{
+  background-color: #ddd;
+}
+
+button.controls:active{
+  background-color: #bbb;
 }
 
 .editorContainer{
