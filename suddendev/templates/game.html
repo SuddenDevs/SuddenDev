@@ -123,6 +123,17 @@
 
       function create_player(data) {
         playerDict[data.tag] = create_entity_triangle(data);
+
+        var ammo = new PIXI.Text(data.ammo.toString(),
+                                        { fontFamily: "Arial",
+                                          fontSize: 12,
+                                          fill: "black",
+                                          align: "center"});
+        ammo.anchor.x = 0.5;
+        ammo.anchor.y = 1;
+        ammo.y = -data.size/2 - 2;
+        playerDict[data.tag].container.addChild(ammo);
+        playerDict[data.tag].ammo = ammo;
       }
 
       function create_enemy(data) {
@@ -143,10 +154,11 @@
 
         var label = new PIXI.Text(data.value.toString(),
                                               { fontFamily:"Arial",
-                                                fontSize:"8",
+                                                fontSize:"12",
                                                 fill: "black",
                                                 align: "center" });
         label.anchor.y = 1;
+        label.anchor.x = 0.5;
         label.y = -size/2 - 2;
         container.addChild(label);
 
@@ -384,7 +396,10 @@
       // Draw every player and update name locations
       function draw_players(list) {
         for (i = 0; i < list.length; i++) {
-          update_entity(playerDict[list[i].tag], list[i]);
+          var data = list[i];
+          var player = playerDict[data.tag];
+          update_entity(player, data);
+          player.ammo.text = data.ammo.toString();
         }
       } 
 
