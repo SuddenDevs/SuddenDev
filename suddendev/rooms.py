@@ -39,6 +39,7 @@ def update(player, delta):
 # (and make updating the client easier) by using JSON strings.
 # These are associated with a game_id for each active (possibly full) room.
 GAME_JSON_TEMPLATE = {
+    'game_id' : None,           # the game_id of the room (included again for rendering)
     'lobby_name' : None,        # the human-readable name of the room
     'time_created': None,       # the time the room was created
     'created_by': None,         # the display name of the room creator
@@ -78,6 +79,7 @@ def create_room(creator_display_name):
     # TODO: release lock for 'rooms'
 
     game_json = dict(GAME_JSON_TEMPLATE)
+    game_json['game_id'] = game_id
     game_json['lobby_name'] = random.choice(LOBBY_ADJECTIVES) + " " + random.choice(LOBBY_NOUNS) #TODO: ensure unique?
     game_json['time_created'] = str(datetime.datetime.now())
     game_json['created_by'] = creator_display_name
@@ -127,7 +129,7 @@ def get_all_open_rooms():
             game_json = json.loads(game_json_string)
 
             if game_json['player_count'] < MAX_PLAYER_COUNT:
-                open_rooms.append(game_id)
+                open_rooms.append(game_json)
 
     return open_rooms
 
