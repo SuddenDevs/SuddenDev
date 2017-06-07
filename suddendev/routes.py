@@ -116,6 +116,8 @@ def lobby():
         else:
             game_id = flask.request.form['submit']
 
+        added, error_message = add_player_to_room(game_id, player_id, name)
+
         if not added:
             flask.flash(error_message)
             return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
