@@ -15,6 +15,7 @@ class StateEncoder(json.JSONEncoder):
 
     def serializeState(self, state):
         return { 
+                'wave': state.wave,
                 'enemies': self.serializeEnemies(state.enemies),
                 'powerups': self.serializePowerups(state.powerups),
                 'walls': self.serializeWalls(state.walls),
