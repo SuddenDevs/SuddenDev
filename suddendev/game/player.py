@@ -16,7 +16,6 @@ class Player(Entity):
         self.color = color
         self.vel = Vector(random.random(), random.random())
         self.game = game
-
         self.speed = self.game.gc.P_SPEED
         self.range_visible = self.game.gc.P_RANGE_VISIBLE
         self.range_attackable = self.game.gc.P_RANGE_ATTACKABLE
@@ -79,12 +78,9 @@ class Player(Entity):
             return False
 
         # Check update method existence and signature of update function
-        if 'update' not in self.scope:
-            return False
-
-        update = self.scope['update']
-        if update is not None and callable(update):
-            if len(inspect.signature(update).parameters) == 2:
+        if 'update' in self.scope:
+            update = self.scope['update']
+            if callable(update) and len(inspect.signature(update).parameters) == 2:
                 #Create dummy function in special scope
                 self.script_update = type(update)(update.__code__, self.scope)
                 return True

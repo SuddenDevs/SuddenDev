@@ -7,6 +7,7 @@ from .enemy import Enemy
 from .powerup import Powerup, PowerupType
 from .wall import Wall
 from .core import Core
+from .event import Event
 
 import time
 import random
@@ -66,6 +67,12 @@ class Game:
         self.time = 0
         self.active = True
 
+    def events_add(self, event):
+        self.events.append(event)
+
+    def events_flush(self):
+        del self.events[:]
+
     #### Main Loop ####
     def tick(self, delta):
         #Timekeeping
@@ -101,6 +108,7 @@ class Game:
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
+            self.events_add(Event('Enemy_Spawn', enemy))
 
         powerupTypes = [PowerupType.AMMO_UP, PowerupType.HEALTH_UP]
         #Powerup Spawning
@@ -115,6 +123,7 @@ class Game:
         #Ending Conditions / Wave Conditions
         if self.time >= self.gc.TIME_LIMIT:
             self.active = False
+            self.events_add(Event('Game_End'))
 
     def clamp_pos(self, pos):
         if pos.x < 0:

@@ -87,11 +87,16 @@ div.roomTable {
 	border-style:solid;
 	border-color:#ccc;
 	border-width: thin;
-	border-top:none;
 	width: 100%;
 	padding-left: 0;
 	flex: 1 1 auto;
 	min-width: 450px;
+}
+
+.roomRow {
+	border-bottom:solid;
+	border-color:#ccc;
+	border-width:thin;
 }
 
 .roomCol {
@@ -101,12 +106,7 @@ div.roomTable {
 .roomControl{
     background-color: #eee	;
     outline: none;
-    border-style: : solid;
-    border-color: #ccc;
-    border-width: thin;
-    border-left: none;
-    border-right: none;
-    border-top: none;
+    border-style: none;
     cursor: pointer;
     padding: 10px 16px;
     transition: 0.3s;

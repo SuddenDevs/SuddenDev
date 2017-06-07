@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 {% block head %}
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_game.css')}}">
-  <script type="text/javascript" src="{{url_for('static', filename='createjs-2015.11.26.min.js')}}"></script>
   <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
   <script>
       //Colors and static variables
       var ENEMYC = "#000000";
       var PICKUPC = "#edd95c";
       var COREC = "#47d7f7";
-      var WALLC = "#232323";
       var NAMEOFFS = 10;
       var FRAMERATE = 60;
       var INITSCRIPT = 
@@ -16,7 +15,7 @@
       "\n\t# Write your program here" +
       "\n\t# Submit when ready" +
       "\n\t# Watch what happens!" +
-      "\n\t# Access state through the 'player' and 'game' objects" +
+      "\n\t# Access state through the \'player\' and \'game\' objects" +
       "\n\t# Have fun!" +
       "\ndef update(player, delta):" + 
       "\n\tplayer.vel = Vector(0, 0)"
@@ -28,13 +27,19 @@
       var scripts = [`{{user.script}}`,"","",""];
 
       //Stage/shape drawer initialised, can be used in multiple functions
-      var shape = null;
       var stage = null;
+      var renderer = null
       var fpsText = null;
       var waitingText = null;
       var playerNames = [];
 
       //Game state
+      var ticker = null
+      var players = {}
+      var enemies = {}
+      var pickups = {}
+      var core = null
+
       var states = [];
       var statei = 0;
 
@@ -67,22 +72,39 @@
         socket.emit('joined', {});
       }
 
-      //Get list of states from server reply, init playerNames
+      function create_player(data) {
+        var p = create_triangle(data.pos, data.vel, data.size, data.color);
+        stage.addChild(p);
+        players[data.tag] = p;
+      }
+
+      function create_enemy(data) {
+        var e = create_triangle(data.pos, data.vel, data.size, ENEMYC);
+        stage.addChild(e);
+        enemies[data.tag] = e;
+      }
+
+      //Receive batch of game states
       function processStates(data) {
         states = JSON.parse(data).result;
 
-        var playerList = states[0].players;
-        for (i = 0; i < playerList.length; i++) {
-          var name = new createjs.Text(playerList[i].name, "12px Arial", "x000000")
-          playerNames.push(name);
-          stage.addChild(name);
+        // Find players from the first game state
+        var player_data = states[0].players;
+        for (i = 0; i < player_data.length; i++) {
+          var data = player_data[i];
+          console.log(data.tag);
+          create_player(data);
         }
       }
 
       //Function to allow the game to start when enough players are waiting
-      function readyGame(data) {
+      function readyGame() {
         stage.removeChild(waitingText);
         gameReady = true;
+      }
+
+      function draw() {
+        renderer.render(stage);
       }
 
       //Function to update player count
@@ -93,7 +115,7 @@
         } else {
           waitingText.text = "Ready to start!";
         }
-        stage.update();
+        draw();
       }
 
       //Function called when leaving the game
@@ -115,88 +137,133 @@
 
       //Initialise gameCanvas - initialise stage, add shape drawer
       function initCanvas() {
-        stage = new createjs.Stage("gameCanvas");
-        createjs.Ticker.framerate = FRAMERATE;
-        createjs.Ticker.addEventListener("tick", handleTick);
+        ticker = new PIXI.ticker.Ticker();
+        ticker.add(game_loop);
+        ticker.start();
 
-        shape = new createjs.Shape();
-        stage.addChild(shape);
+        var canvas = document.getElementById("gameCanvas");
+        renderer = PIXI.autoDetectRenderer(800, 600, {view: canvas, antialias: true});
+        stage = new PIXI.Container();
+        renderer.backgroundColor = 0xffffff;
+        
+        waitingText = new PIXI.Text(
+            "Waiting for " + playersLeft + " more players...",
+              {fontFamily: "Arial",
+                fontSize: 20,
+                fill: "black",
+                align: "center"});
 
-        waitingText = new createjs.Text("Waiting for " + playersLeft +
-                                    " more players!", "20px Arial", "x000000");
         waitingText.x = 400;
         waitingText.y = 200;
-        waitingText.textAlign = "center";
+        waitingText.anchor.x = 0.5;
         stage.addChild(waitingText);
 
-        fpsText = new createjs.Text("", "20px Arial", "x000000");
+        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
         fpsText.x = 10;
         fpsText.y = 10;
         stage.addChild(fpsText);
+        renderer.render(stage);
       }
 
-      //Tick handler, clears graphics, draws FPS, updates canvas
-      function handleTick(event) {
-        if (!event.paused && gameReady) {
-          fpsText.text = createjs.Ticker.getMeasuredFPS();
-          displayNextState();
+      function game_loop(delta) {
+        fpsText.text = Math.round(ticker.FPS * 100) / 100;
+        if (gameReady && statei < states.length) {
+          process_state(states[statei]);
+          statei++;
         }
-      }
-
-      //Display the next state
-      function displayNextState() {
-        shape.graphics.clear();
-        statei++;
-        if (statei >= states.length) {
-          statei = 0;
-        }
-        updateCanvas();
+        draw();
       }
 
       //Clear shape drawer, then draw game state to gameCanvas
-      function updateCanvas() {
-        var state = states[statei];
-        drawPlayerList(state.players);
-        drawList(state.enemies, ENEMYC);
-        drawList(state.powerups, PICKUPC);
-        drawWalls(state.walls, WALLC);
-        shape.graphics.beginFill(COREC).drawCircle(state.core.pos.x, state.core.pos.y, state.core.size);
-        stage.update();
+      function process_state(state) {
+        //Process events
+        //Create & delete entities
+
+        var events = state.events;
+        for (i = 0; i < events.length; i++) {
+          var e = events[i];
+          var body = e.body;
+          switch (e.name) {
+            case "Enemy_Spawn":
+              console.log('Creating enemy ' + body.tag);
+              create_enemy(body);
+              break;
+            case "Game_End":
+              break;
+            default:
+              console.log("Unknown event: " + e.name);
+          }
+        }
+
+        //Update
+        draw_enemies(state.enemies);
+        //draw_entities(state.powerups, PICKUPC);
+        draw_players(state.players);
+        //draw_core(state.core);
       }
 
-    function drawWalls(list, color) {
-        for (i = 0; i < list.length; i++) {
-        shape.graphics.beginFill(color).drawRect(list[i].pos.x, list[i].pos.y, list[i].dim.x, list[i].dim.y); }
-    }
+      function vector_to_rotation(dir) {
+        return Math.atan2(dir.y, dir.x) + Math.PI/6;
+      }
 
-      //Draws a triangle facing the direction of vector vel
-      function drawTriangle(pos, vel, radius, color) {
-        var angle = Math.atan2(vel.y, vel.x) * 180 / Math.PI;
-        shape.graphics.beginFill(color).drawPolyStar(pos.x, pos.y, radius, 3, 0,
-                                                      angle);
+      function draw_core(core_state) {
+        //core.x = core_state.pos.x
+        //core.y = core_state.pos.y
+      }
+
+      //Create equilateral triangle facing DIR
+      function create_triangle(pos, dir, radius, color) {
+        var shape = new PIXI.Graphics();
+       
+        var base = 2 * radius * Math.cos(Math.PI/6);
+        var height = radius * (1 +  Math.sin(Math.PI/6));
+        
+        shape.beginFill(color);
+        shape.drawPolygon([0, 0, base, 0, base/2, height]);
+        shape.endFill();
+
+        shape.rotation = vector_to_rotation(dir);
+        shape.x = pos.x;
+        shape.y = pos.y;
+        shape.pivot.x = 0.5 * base;
+        shape.pivot.y = 1/3 * height;
+
+        return shape;
       }
 
       // Draw every object in a list the same color
-      function drawList(list, color) {
+      function draw_enemies(list) {
         for (i = 0; i < list.length; i++) {
-          drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
+          var data = list[i];
+          var enemy = enemies[data.tag];
+          enemy.position = data.pos;
+          if (data.vel.x != 0 || data.vel.y != 0) {
+            enemy.rotation = vector_to_rotation(data.vel);
+          }
         }
       }
 
       // Draw every player and update name locations
-      function drawPlayerList(list) {
+      function draw_players(list) {
         for (i = 0; i < list.length; i++) {
-          playerNames[i].x = list[i].pos.x + NAMEOFFS;
-          playerNames[i].y = list[i].pos.y + NAMEOFFS;
-          drawTriangle(list[i].pos, list[i].vel, list[i].size, list[i].color);
+          var data = list[i];
+          var p = players[data.tag];
+          p.position = data.pos;
+          if (data.vel.x != 0 || data.vel.y != 0) {
+            p.rotation = vector_to_rotation(data.vel);
+          }
         }
       } 
 
       //Pause game, update pause button
       function togglePause() {
-        createjs.Ticker.paused = !createjs.Ticker.paused;
+        if (ticker.started) {
+          ticker.stop();
+        } else {
+          ticker.start();
+        }
         var b = document.getElementById("pauseBtn");
-        b.innerHTML = (createjs.Ticker.paused) ? "Unpause" : "Pause";
+        b.innerHTML = (ticker.started) ? "Unpause" : "Pause";
         b.classList.toggle("active");
       }
 
@@ -213,8 +280,8 @@
             }
           }
         }
-        scripts[previ] = editor.getValue().replace(/&lt;/g, '\<');
-        editor.setValue(scripts[tabi]).replace(/&lt;/g, '\<');
+        scripts[previ] = editor.getValue();
+        editor.setValue(scripts[tabi]);
         editor.focus();
       }
 
@@ -244,8 +311,6 @@
                     height="600px"></canvas>
             <div class="controls">
               <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
-              <button class="controls" onclick="displayNextState()">Next State
-                </button>
               <button class="controls" onclick="submitCode()">Submit Code</button>
               <button class="controls" onclick="leaveGame()">Leave Game</button>
             </div>

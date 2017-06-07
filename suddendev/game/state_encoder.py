@@ -18,7 +18,8 @@ class StateEncoder(json.JSONEncoder):
                 'powerups': self.serializePowerups(state.powerups),
                 'walls': self.serializeWalls(state.walls),
                 'players': self.serializePlayers(state.players),
-                'core': self.serializeCore(state.core)
+                'core': self.serializeCore(state.core),
+                'events': self.serializeEvents(state.events)
         }
 
     def serializeEntity(self, entity):
@@ -54,7 +55,7 @@ class StateEncoder(json.JSONEncoder):
         return {'x' : pos.x, 'y': pos.y}
 
     def serializeColor(self, color):
-        return "#{0:02x}{1:02x}{2:02x}".format(clamp(color.r), clamp(color.g), clamp(color.b))
+        return "0x{0:02x}{1:02x}{2:02x}".format(clamp(color.r), clamp(color.g), clamp(color.b))
 
     #TODO
     #Duplication, will extend if enemies or powerups start to differ
@@ -76,3 +77,17 @@ class StateEncoder(json.JSONEncoder):
 
     def serializeCore(self, core):
         return self.serializeEntity(core)
+
+    def serializeEvents(self, events):
+        result = []
+        for e in events:
+            json = {'name': e.name}
+            body = None
+
+            # Case Analysis to encode body
+            if e.name == 'Enemy_Spawn':
+                body = self.serializeEntity(e.body[0]);
+
+            json['body'] = body
+            result.append(json)
+        return result

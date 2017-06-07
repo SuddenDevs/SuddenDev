@@ -1,8 +1,16 @@
 from .vector import Vector
 from .game_config import GameConfig as gc
 
+tag = 0
+
+def next_tag():
+    global tag
+    t = tag
+    tag += 1
+    return t
+
 def entity_init(self):
-    self.tag = 0
+    self.tag = next_tag()
     self.pos = gc.E_POS
     self.vel = gc.E_VEL
     self.speed = gc.E_SPEED
