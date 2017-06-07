@@ -14,8 +14,6 @@ class GameConfig:
     # Game
     TIME_LIMIT = 15
 
-    PLAYER_COUNT = 4
-
     MAP_WIDTH = 800
     MAP_HEIGHT = 600
 

@@ -38,22 +38,16 @@ class Game:
         #Walls
         self.walls = []
 
-        colors = [
-            random_color3(),
-            random_color3(),
-            random_color3(),
-            random_color3()
-        ]
-
         #Players
+        player_count = len(player_names)
         self.players = []
-        for i in range(self.gc.PLAYER_COUNT):
+        for i in range(player_count):
             name = player_names[i]
             script = None
             if name in scripts:
                 script = scripts[name]
 
-            player = Player(name, colors[i], self, script)
+            player = Player(name, random_color3(), self, script)
             player.pos = self.get_random_spawn(player.size)
             self.players.append(player)
 
