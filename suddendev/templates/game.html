@@ -141,7 +141,7 @@
         ticker.start();
 
         var canvas = document.getElementById("gameCanvas");
-        renderer = PIXI.autoDetectRenderer(800, 600, {view: canvas});
+        renderer = PIXI.autoDetectRenderer(800, 600, {view: canvas, antialias: true});
         stage = new PIXI.Container();
         renderer.backgroundColor = 0xffffff;
         
@@ -184,6 +184,7 @@
           var body = e.body;
           switch (e.name) {
             case "Enemy_Spawn":
+              console.log('Creating enemy ' + body.tag);
               create_enemy(body);
               break;
             case "Game_End":
@@ -194,7 +195,7 @@
         }
 
         //Update
-        //draw_enemies(state.enemies);
+        draw_enemies(state.enemies);
         //draw_entities(state.powerups, PICKUPC);
         draw_players(state.players);
         //draw_core(state.core);

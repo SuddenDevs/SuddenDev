@@ -71,11 +71,11 @@ class StateEncoder(json.JSONEncoder):
         result = []
         for e in events:
             json = {'name': e.name}
-            body = null
+            body = None
 
             # Case Analysis to encode body
             if e.name == 'Enemy_Spawn':
-                json['body'] = serializeEntity(e.body[0]);
+                body = self.serializeEntity(e.body[0]);
 
             json['body'] = body
             result.append(json)

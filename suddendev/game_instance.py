@@ -54,6 +54,7 @@ class GameInstance:
                 frame_timer -= frame_interval_display
                 state_counter += 1
                 batch.append(encodeState(self.game))
+                self.game.events_flush()
 
             # if state_counter == batchSize or not self.game.active:
                 # #Client Update

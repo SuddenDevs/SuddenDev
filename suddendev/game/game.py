@@ -93,7 +93,7 @@ class Game:
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
-            #self.events_add(Event('Enemy_Spawn', enemy))
+            self.events_add(Event('Enemy_Spawn', enemy))
 
         #Powerup Spawning
         
