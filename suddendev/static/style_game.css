@@ -110,6 +110,10 @@ button.controls.noEvents{
   pointer-events: none;
 }
 
+button.controls.inactive{
+  background-color: #fff;
+}
+
 button.controls:active{
   background-color: #bbb;
 }
