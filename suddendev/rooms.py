@@ -160,6 +160,12 @@ def add_player_to_room(game_id, player_id, name):
         # TODO: release lock for game_id
         return False, "Sorry, the last space was *just* taken,  please try another room."
 
+    player_jsons = game_json['players']
+    for player_json in player_jsons:
+        if player_json['id'] == player_id:
+            # TODO: release lock for game_id
+            return False, "Sorry looks like you've already joined that game! Check your other tabs."
+
     player_json = dict(PLAYER_JSON_TEMPLATE)
     player_json['id'] = player_id
     player_json['name'] = name
@@ -189,6 +195,7 @@ def remove_player_from_room(game_id, player_id):
         for player_json in game_json['players']:
             if player_json['id'] == player_id:
                 game_json['players'].remove(player_json)
+                game_json['player_count'] -= 1
                 break
 
         redis.set(game_id, json.dumps(game_json))
