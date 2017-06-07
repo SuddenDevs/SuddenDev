@@ -19,9 +19,12 @@ class GameConfig:
 
     # Enemy
     ENEMY_SPEED = 30
-    ENEMY_RANGE_ATTACKABLE = 15
     ENEMY_SPAWN_DELAY = 1
     ENEMY_LIMIT = 10
+
+    ENEMY_RANGE_ATTACKABLE = 15
+    ENEMY_DAMAGE = 10
+    ENEMY_ATTACK_DELAY = 30
 
     # Probability of an enemy spawning on each frame, if the enemy limit has
     # not been reached. The expected number of frames between enemy spawn is
@@ -42,6 +45,7 @@ class GameConfig:
     P_RANGE_ATTACKABLE = 20
     P_AMMO = 6
     P_DAMAGE = 80
+    P_ATTACK_DELAY = 10
     P_DEFAULT_SCRIPT = """
 timer = 0
 
