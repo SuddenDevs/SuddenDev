@@ -35,9 +35,9 @@
 
       //Game state
       var ticker = null
-      var players = []
-      var enemies = []
-      var pickups = []
+      var players = {}
+      var enemies = {}
+      var pickups = {}
       var core = null
 
       var states = [];
@@ -72,23 +72,35 @@
         socket.emit('joined', {});
       }
 
+      function create_player(data) {
+        var p = create_triangle(data.pos, data.vel, data.size, data.color);
+        stage.addChild(p);
+        players[data.tag] = p;
+      }
+
+      function create_enemy(data) {
+        var e = create_triangle(data.pos, data.vel, data.size, ENEMYC);
+        stage.addChild(e);
+        enemies[data.tag] = e;
+      }
+
       //Receive batch of game states
       function processStates(data) {
         states = JSON.parse(data).result;
 
-        //var playerList = states[0].players;
-        //for (i = 0; i < playerList.length; i++) {
-        //  //var name = new createjs.Text(playerList[i].name, "12px Arial", "x000000")
-        //  playerNames.push(name);
-        //  //stage.addChild(name);
-        //}
+        // Find players from the first game state
+        var player_data = states[0].players;
+        for (i = 0; i < player_data.length; i++) {
+          var data = player_data[i];
+          console.log(data.tag);
+          create_player(data);
+        }
       }
 
       //Function to allow the game to start when enough players are waiting
-      function readyGame(data) {
-        //stage.removeChild(waitingText);
+      function readyGame() {
+        stage.removeChild(waitingText);
         gameReady = true;
-        console.log("Game Ready!");
       }
 
       function draw() {
@@ -124,11 +136,9 @@
 
       //Initialise gameCanvas - initialise stage, add shape drawer
       function initCanvas() {
-
         ticker = new PIXI.ticker.Ticker();
         ticker.add(game_loop);
         ticker.start();
-
 
         var canvas = document.getElementById("gameCanvas");
         renderer = PIXI.autoDetectRenderer(800, 600, {view: canvas});
@@ -165,7 +175,23 @@
 
       //Clear shape drawer, then draw game state to gameCanvas
       function process_state(state) {
+        //Process events
         //Create & delete entities
+
+        //var events = state.events;
+        //for (i = 0; i < events.length; i++) {
+        //  var e = events[i];
+        //  var body = e.body;
+        //  switch (e.name) {
+        //    case "Enemy_Spawn":
+        //      create_enemy(body);
+        //      break;
+        //    case "Game_End":
+        //      break;
+        //    default:
+        //      console.log("Unknown event: " + e.name);
+        //  }
+        //}
 
         //Update
         draw_entities(state.enemies, ENEMYC);
@@ -174,47 +200,52 @@
         draw_core(state.core);
       }
 
+      function vector_to_rotation(dir) {
+        return Math.atan2(dir.y, dir.x) + Math.PI/6;
+      }
+
       function draw_core(core_state) {
         //core.x = core_state.pos.x
         //core.y = core_state.pos.y
       }
 
-      //Draws a triangle facing the direction of vector vel
-      function drawTriangle(pos, vel, radius, color) {
+      //Create equilateral triangle facing DIR
+      function create_triangle(pos, dir, radius, color) {
         var shape = new PIXI.Graphics();
        
         var base = 2 * radius * Math.cos(Math.PI/6);
         var height = radius * (1 +  Math.sin(Math.PI/6));
-        var v1x = 0
-        var v1y = 0
-        var v2x = base;
-        var v2y = 0;
-        var v3x = base/2; 
-        var v3y = height;
         
         shape.beginFill(color);
-        shape.drawPolygon([v1x, v1y, v2x, v2y, v3x, v3y]);
+        shape.drawPolygon([0, 0, base, 0, base/2, height]);
         shape.endFill();
 
-        shape.rotation = Math.atan2(vel.y, vel.x) + Math.PI/6;
+        shape.rotation = vector_to_rotation(dir);
         shape.x = pos.x;
         shape.y = pos.y;
         shape.pivot.x = 0.5 * base;
         shape.pivot.y = 1/3 * height;
-        stage.addChild(shape);
+
+        return shape;
       }
 
       // Draw every object in a list the same color
       function draw_entities(list, color) {
         for (i = 0; i < list.length; i++) {
-          drawTriangle(list[i].pos, list[i].vel, list[i].size, color);
+          var t = create_triangle(list[i].pos, list[i].vel, list[i].size, color);
+          stage.addChild(t);
         }
       }
 
       // Draw every player and update name locations
       function draw_players(list) {
         for (i = 0; i < list.length; i++) {
-          drawTriangle(list[i].pos, list[i].vel, list[i].size, list[i].color);
+          var data = list[i];
+          var p = players[data.tag];
+          p.position = data.pos;
+          if (data.vel.x != 0 || data.vel.y != 0) {
+            p.rotation = vector_to_rotation(data.vel);
+          }
         }
       } 
 
@@ -243,6 +274,7 @@
             }
           }
         }
+
         scripts[previ] = editor.getValue();
         editor.setValue(scripts[tabi]);
         editor.focus();
