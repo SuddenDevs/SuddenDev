@@ -188,7 +188,17 @@
               console.log('Creating enemy ' + body.tag);
               create_enemy(body);
               break;
+            case "Enemy_Death":
+              console.log('RIP enemy ' + body.tag);
+              break;
+            case "Powerup_Spawn":
+              console.log('Creating powerup' + body.tag);
+              break;
+            case "Powerup_Used":
+              console.log('RIP powerup' + body.tag);
+              break;
             case "Game_End":
+              console.log('RIP game');
               break;
             default:
               console.log("Unknown event: " + e.name);

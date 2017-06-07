@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import json
+from .event import EventType
 
 def encodeState(game):
     return json.dumps(game, cls=StateEncoder)
@@ -71,7 +72,7 @@ class StateEncoder(json.JSONEncoder):
         result = []
         for p in powerups:
             json = self.serializeEntity(p)
-            json['powerup_type'] = p.powerup_type
+            json['powerup_type'] = p.powerup_type.value
             result.append(json)
         return result
 
@@ -81,11 +82,14 @@ class StateEncoder(json.JSONEncoder):
     def serializeEvents(self, events):
         result = []
         for e in events:
-            json = {'name': e.name}
+            json = {'name': e.event_type.value}
             body = None
 
             # Case Analysis to encode body
-            if e.name == 'Enemy_Spawn':
+            # TODO: make this less ugly
+            if e.event_type == EventType.ENEMY_SPAWN or e.event_type == EventType.ENEMY_DEATH:
+                body = self.serializeEntity(e.body[0]);
+            elif e.event_type == EventType.POWERUP_SPAWN or e.event_type == EventType.POWERUP_USED:
                 body = self.serializeEntity(e.body[0]);
 
             json['body'] = body

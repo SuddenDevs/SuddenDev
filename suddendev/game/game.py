@@ -7,7 +7,7 @@ from .enemy import Enemy
 from .powerup import Powerup, PowerupType
 from .wall import Wall
 from .core import Core
-from .event import Event
+from .event import Event, EventType
 
 import time
 import random
@@ -89,6 +89,7 @@ class Game:
             # Pickup powerups
             for pu in self.powerups:
                 if pu.intersects(p):
+                    self.events_add(Event(EventType.POWERUP_USED, pu))
                     pu.pickup(p)
                     self.powerups.remove(pu)
 
@@ -96,6 +97,7 @@ class Game:
         for e in self.enemies:
             if e.health <= 0:
                 self.enemies.remove(e)
+                self.events_add(Event(EventType.ENEMY_DEATH, e))
             else:
                 pos = self.clamp_pos(e.update(delta))
                 if not self.collides_with_walls(pos, e.size):
@@ -108,7 +110,7 @@ class Game:
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
-            self.events_add(Event('Enemy_Spawn', enemy))
+            self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
 
         powerupTypes = [PowerupType.AMMO_UP, PowerupType.HEALTH_UP]
         #Powerup Spawning
@@ -119,11 +121,12 @@ class Game:
             pu = Powerup(self.get_random_spawn(self.gc.POW_SIZE), random.choice(powerupTypes))
             self.powerups.append(pu)
             self.powerup_count += 1
+            self.events_add(Event(EventType.POWERUP_SPAWN, e))
 
         #Ending Conditions / Wave Conditions
         if self.time >= self.gc.TIME_LIMIT:
             self.active = False
-            self.events_add(Event('Game_End'))
+            self.events_add(Event(EventType.GAME_END))
 
     def clamp_pos(self, pos):
         if pos.x < 0:
