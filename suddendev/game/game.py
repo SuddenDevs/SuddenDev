@@ -35,6 +35,7 @@ class Game:
 
         self.wave = wave
         self.gc = GameConfig(wave)
+
         #Map
         self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
 

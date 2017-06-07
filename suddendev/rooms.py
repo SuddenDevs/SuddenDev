@@ -257,3 +257,60 @@ def set_script(game_id, player_id, script):
 
     redis.set(game_id, json.dumps(game_json))
     # TODO: release lock for game_id
+
+def all_players_are_ready(game_id):
+    """Returns true if the game exists and all players are ready."""
+    # TODO: acquire lock for game_id
+    game_json_string = redis.get(game_id)
+
+    if game_json_string is None:
+        # TODO: release lock for game_id
+        return
+
+    game_json = json.loads(game_json_string)
+    for player_json in game_json['players']:
+        if player_json['status'] != 'ready':
+            # TODO: release lock for game_id
+            return False
+    
+    # TODO: release lock for game_id
+    return True
+
+def set_player_ready(game_id, player_id):
+    """
+    If the game exists, and the player is a member
+    set the player to be ready.
+    """
+
+    # TODO: acquire lock for game_id
+    game_json_string = redis.get(game_id)
+
+    if game_json_string is None:
+        # TODO: release lock for game_id
+        return 
+
+    game_json = json.loads(game_json_string)
+
+    for player_json in game_json['players']:
+        if player_json['id'] == player_id:
+            player_json['status'] = 'ready'
+            break
+
+    redis.set(game_id, json.dumps(game_json))
+    # TODO: release lock for game_id
+
+def reset_all_players(game_id):
+    """Clear the ready state of all players."""
+    # TODO: acquire lock for game_id
+    game_json_string = redis.get(game_id)
+
+    if game_json_string is None:
+        # TODO: release lock for game_id
+        return 
+
+    game_json = json.loads(game_json_string)
+    for player_json in game_json['players']:
+        player_json['status'] = 'editing'
+
+    redis.set(game_id, json.dumps(game_json))
+    # TODO: release lock for game_id

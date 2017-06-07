@@ -211,20 +211,21 @@
         socket.disconnect();
       }
 
-      //Save the editor value in scripts
-      function updateScripts() {
-        scripts[currentTab] = editor.getValue();
-      }
-
       function submitCode() {
-        updateScripts();
-        socket.emit(EVENTS.SUBMIT, scripts[0]);
+        if (editor.getValue() !== scripts[0]) {
+          console.log("saved");
+          scripts[0] = editor.getValue();
+          socket.emit(EVENTS.SUBMIT, scripts[0]);
+        }
       }
 
       function testCode() {
-        updateScripts();
         clearStates();
-        socket.emit(EVENTS.TEST, scripts[0]);
+        socket.emit(EVENTS.TEST, editor.getValue());
+      }
+
+      function revertCode() {
+        editor.setValue(scripts[0]);
       }
 
       function clearStates() {
@@ -250,6 +251,9 @@
         var b = document.getElementById("readyBtn");
         b.classList.add("active");
         b.classList.add("noEvents");
+        var tb = document.getElementById("testBtn");
+        tb.classList.add("noEvents");
+        tb.classList.add("active");
         socket.emit(EVENTS.PLAY, {});
       }
 
@@ -433,7 +437,7 @@
               <button class="controls" onclick="leaveGame()">Leave Game</button>
               <button class="controls" onclick="submitCode()">Save Code</button>
               <button id="readyBtn" class="controls" onclick="readyUp()">Ready</button>
-              <button class="controls" onclick="testCode()">Test Code</button>
+              <button id="testBtn" class="controls" onclick="testCode()">Test Code</button>
               <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
                 </button>
             </div>
@@ -444,6 +448,7 @@
             <div id="editor"></div>
           </div>
           <div class="controls">
+            <button class="controls" onclick="revertCode()">Revert</button>
             <button id="tab0" class="controls tabBtn active" 
                     onclick="setEditorTab(0)">Player1</button>
             <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">

@@ -72,13 +72,17 @@ class StateEncoder(json.JSONEncoder):
     def serializePowerups(self, powerups):
         result = []
         for p in powerups:
-            json = self.serializeEntity(p)
-            json['powerup_type'] = p.powerup_type.value
-            result.append(json)
+            result.append(serializePowerup(p))
         return result
 
     def serializeCore(self, core):
         return self.serializeEntity(core)
+
+    def serializePowerup(self, powerup):
+        json = self.serializeEntity(p)
+        json['powerup_type'] = p.powerup_type.value
+        json['value'] = p.value
+        return json
 
     def serializeEvents(self, events):
         result = []
@@ -91,7 +95,7 @@ class StateEncoder(json.JSONEncoder):
             if e.event_type == EventType.ENEMY_SPAWN or e.event_type == EventType.ENEMY_DEATH:
                 body = self.serializeEntity(e.body[0]);
             elif e.event_type == EventType.POWERUP_SPAWN or e.event_type == EventType.POWERUP_USED:
-                body = self.serializeEntity(e.body[0]);
+                body = self.serializePowerup(e.body[0]);
 
             json['body'] = body
             result.append(json)

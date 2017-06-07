@@ -22,8 +22,8 @@ class Player(Entity):
         self.ammo = self.game.gc.P_AMMO
         self.damage = self.game.gc.P_DAMAGE
 
-        # Flag to ensure we only attack once per frame
-        self.attacked = False
+        self.attack_delay = self.game.gc.P_ATTACK_DELAY
+        self.attack_timer = 0
 
         if not self.try_apply_script(script, game):
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, game)
@@ -36,9 +36,9 @@ class Player(Entity):
         self.dummy.speed = self.speed
         self.dummy.range_visible = self.range_visible
         self.dummy.range_attackable = self.range_attackable
-        self.dummy.ammo = self.ammo 
         self.dummy.damage = self.damage 
-        self.dummy.attacked = self.attacked
+        self.dummy.attack_timer = self.attack_timer
+        self.dummy.attack_delay = self.attack_delay
 
     def powerups_visible(self):
         in_range = []
@@ -99,12 +99,13 @@ class Player(Entity):
         return False
 
     def update(self, delta):
-        self.attacked = False
-
         #Perform player-specific movement calculation
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
         self.scope['powerups_visible'] = self.powerups_visible()
+
+        if self.attack_timer > 0:
+            self.attack_timer -= 1
 
         #Execute on Dummy Entity
         self.script_update(self.dummy, delta)
@@ -114,6 +115,8 @@ class Player(Entity):
             self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed
 
         self.vel = self.dummy.vel
+        # Have to update this because shoot() runs on the dummy
+        self.attack_timer = self.dummy.attack_timer
 
         #Reset dummy
         self.reset_dummy()
@@ -131,7 +134,7 @@ class Player(Entity):
 # shoot(self, enemy)
 def shoot(player, enemy):
     if (Vector.Distance(enemy.pos, player.pos) <= player.range_attackable
-            and player.ammo > 0 and not player.attacked):
+            and player.ammo > 0 and player.attack_timer == 0):
         # Point towards the target
         player.vel = enemy.pos - player.pos
         player.vel = Vector.Normalize(player.vel) * 0.01
@@ -140,4 +143,4 @@ def shoot(player, enemy):
         player.ammo -= 1
         enemy.injure(player.damage)
 
-        player.attacked = True
+        player.attack_timer = player.attack_delay
