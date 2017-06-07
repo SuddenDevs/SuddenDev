@@ -60,7 +60,7 @@
             <button type="submit" class="roomControl" name="submit" value="create">Create new game!</button>
             <div class="container-fluid roomTable">
               {% for r in rooms %}
-              <div class="row">
+              <div class="row roomRow">
                 <div class="col-sm-3">
                   <button type="submit" class="roomControl" name="submit" value="{{ r['game_id'] }}">
                 	Join Room</button>

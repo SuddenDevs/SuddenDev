@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from 'macros.html' import suddendev_header %}
+{% block body %}
+
+  <div class="container">
+      {{ suddendev_header() }}
+      Your code should define an <code>update(self, delta)</code> function, where <code>delta</code> refers to the time between frames.<br>
+      You can access the following attributes of your bot:<br>
+      <code>self.vel</code> - velocity of the bot<br>
+      You will probably want to modify this in order to move your bot. The velocity should be assigned to a vector as follows:<br>
+      <code>self.vel = Vector(x, y)</code><br>
+      The coordinate system starts at <code>(0,0)</code> at the top left corner, so for example<br>
+      <code>self.vel = Vector(10,0)</code> will make the bot move to the right with speed <code>10</code>, whereas
+      <code>self.vel = Vector(-1,-1)</code> will make the bot move down and left with speed <code>√2
+      </code>, i.e. the magnitude of the vector.
+  </div>
+{% endblock %}

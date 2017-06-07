@@ -64,7 +64,7 @@ class Vector:
         return ( (point1[0]-point2[0])**2 + (point1[1]-point2[1])**2)
     def Distance( point1, point2 ):
         'Returns the distance between two points'
-        return math.sqrt( DistanceSqrd(point1,point2) )
+        return math.sqrt( Vector.DistanceSqrd(point1,point2) )
     def LengthSqrd( vec ):
         'Returns the length of a vector sqaured. Faster than Length(), but only marginally'
         return vec[0]**2 + vec[1]**2

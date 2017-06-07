@@ -1,10 +1,13 @@
 #!/usr/bin/python3.5
 
 from .vector import Vector
-from .color import Color3
+from .color import Color3, random_color3
 from .player import Player
 from .enemy import Enemy
+from .powerup import Powerup, PowerupType
+from .wall import Wall
 from .core import Core
+from .event import Event, EventType
 
 import time
 import random
@@ -16,82 +19,115 @@ class Map:
         self.height = height
 
 class Game:
-    #### Config ####
-    #Enemy Spawning
-    enemy_spawn_delay = 1
+    walls = []
+    events = []
+    enemies = []
+    powerups = []
 
-    def __init__(self, player_names, scripts):
+    enemy_spawn_timer = 0
+    powerup_spawn_timer = 0
+    powerup_count = 0
+
+    time = 0
+    active = True
+
+    def __init__(self, gc, player_names, scripts):
+        self.gc = gc
         #Map
-        self.map = Map(800, 600)
-
-        #Events
-        self.events = []
+        self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
 
         #Core
         self.core = Core()
         self.core.pos = Vector(self.map.width/2, self.map.height/2)
 
-        #Enemies
-        self.enemies = []
-        self.enemy_limit = 5
-        self.enemy_spawn_timer = 0
-
-        colors = [
-            Color3(255, 0, 0),
-            Color3(0, 255, 0),
-            Color3(0, 0, 255),
-            Color3(255, 0, 0)
-        ]
-
         #Players
-        self.players = []
-        for i in range(4):
-            name = player_names[i]
-            script = None
-            if name in scripts:
-                script = scripts[name]
+        self.init_players(player_names, scripts)
 
-            player = Player(name, colors[i], self, script)
-            player.pos = Vector(random.random()*self.map.width,
-                                random.random()*self.map.height)
+    def init_players(self, player_names, scripts):
+        player_count = len(player_names)
+        self.players = []
+        for i in range(player_count):
+            name = player_names[i]
+            script = scripts[i]
+
+            player = Player(name, random_color3(), self, script)
+            player.pos = self.get_random_spawn(player.size)
             self.players.append(player)
 
+    def events_add(self, event):
+        self.events.append(event)
 
-        #Powerups
-        self.powerups = []
-
-        #Metadata
-        self.time = 0
-        self.active = True
+    def events_flush(self):
+        del self.events[:]
 
     #### Main Loop ####
     def tick(self, delta):
         #Timekeeping
         self.time += delta
         self.enemy_spawn_timer += delta
+        self.powerup_spawn_timer += delta
 
+        # Update entities
+        self.update_players(delta)
+        self.update_enemies(delta)
+
+        self.spawn_powerups()
+        self.spawn_enemies()
+
+        #Ending Conditions / Wave Conditions
+        if self.time >= self.gc.TIME_LIMIT:
+            self.active = False
+            self.events_add(Event(EventType.GAME_END))
+
+    def update_players(self, delta):
         #Update Players
         for p in self.players:
-            p.update(delta)
-            p.pos = self.clamp_pos(p.pos)
+            pos = self.clamp_pos(p.update(delta))
+            if not self.collides_with_walls(pos, p.size):
+                p.pos = pos
 
+            # Pickup powerups
+            for pu in self.powerups:
+                if pu.intersects(p):
+                    self.events_add(Event(EventType.POWERUP_USED, pu))
+                    pu.pickup(p)
+                    self.powerups.remove(pu)
+
+    def update_enemies(self, delta):
         #Update Enemies
         for e in self.enemies:
-            e.update(delta)
-            e.pos = self.clamp_pos(e.pos)
+            if e.health <= 0:
+                self.enemies.remove(e)
+                self.events_add(Event(EventType.ENEMY_DEATH, e))
+            else:
+                pos = self.clamp_pos(e.update(delta))
+                if not self.collides_with_walls(pos, e.size):
+                    e.pos = pos
 
+    def spawn_powerups(self):
+        # powerupTypes = [PowerupType.AMMO_UP, PowerupType.HEALTH_UP]
+        powerupTypes = [powerup for _, powerup in PowerupType.__members__.items()]
+
+        #Powerup Spawning
+        if (self.powerup_spawn_timer > self.gc.POW_SPAWN_DELAY
+            and self.powerup_count < self.gc.POW_LIMIT
+            and random.random() < self.gc.POW_SPAWN_PROBABILITY):
+
+            pu = Powerup(self.get_random_spawn(self.gc.POW_SIZE), random.choice(powerupTypes))
+            self.powerups.append(pu)
+            self.powerup_count += 1
+            self.events_add(Event(EventType.POWERUP_SPAWN, pu))
+
+    def spawn_enemies(self):
         #Enemy Spawning
-        if (self.enemy_spawn_timer > self.enemy_spawn_delay
-            and len(self.enemies) < self.enemy_limit):
+        if (self.enemy_spawn_timer > self.gc.ENEMY_SPAWN_DELAY
+            and len(self.enemies) < self.gc.ENEMY_LIMIT
+            and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
+
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
-
-        #Powerup Spawning
-        
-        #Ending Conditions / Wave Conditions
-        if self.time >= 10:
-            self.active = False
+            self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
 
     def clamp_pos(self, pos):
         if pos.x < 0:
@@ -102,5 +138,20 @@ class Game:
             pos.x = self.map.width
         if pos.y > self.map.height:
             pos.y = self.map.height
+        return pos
+
+    def collides_with_walls(self, center, size):
+        for w in self.walls:
+            if w.intersects(center, size):
+                return True
+        return False
+
+    def get_random_spawn(self, size):
+        """ Generates a random position that does not collide with any walls. """
+        cond = True
+        while cond:
+            pos = Vector(random.random()*self.map.width,
+                                random.random()*self.map.height)
+            cond = self.collides_with_walls(pos, size)
         return pos
 

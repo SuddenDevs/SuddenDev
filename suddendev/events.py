@@ -29,9 +29,7 @@ def joined(message):
 
     # subscribe client to room broadcasts
     fsio.join_room(game_id)
-
-    # tell the client what the user's player id is
-    fsio.emit('player_id', str(player_id), namespace=NAMESPACE)
+    update_players(game_id)
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
@@ -92,7 +90,7 @@ def test(message):
         if player['id'] == player_id:
             player_scripts.append(message)
         else:
-            player_scripts.append(player['scripts'])
+            player_scripts.append(player['script'])
 
     # TODO: specify test run in call
     handle = play_game.delay(game_id, player_names, player_scripts)
@@ -128,5 +126,7 @@ def run_game_if_everyone_ready(game_id):
 
 def update_players(game_id):
     game_json_string = get_room_state_json_string(game_id)
+    print(game_json_string)
     if game_json_string is not None:
+        print('sending')
         fsio.emit('update', game_json_string, room=game_id, namespace=NAMESPACE)

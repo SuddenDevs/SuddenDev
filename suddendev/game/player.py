@@ -1,35 +1,13 @@
 from .entity import Entity
 from .vector import Vector
+from .powerup import PowerupType
 from .sandbox import builtins
+from .color import Color3
 
 import math
 import random
 import sys
 import inspect
-
-DEFAULT_SCRIPT = """
-timer = 0
-
-def update(player, delta):
-    global timer
-    timer += delta
-
-    # Find Target
-    min_dist = sys.float_info.max
-    target = None
-    for e in enemies_visible:
-        mag = Vector.Length(e.pos - player.pos)
-        if mag < min_dist:
-            min_dist = mag
-            target = e
-
-    if target is not None:
-        diff = player.pos - target.pos
-        mag = min(player.speed, min_dist)
-        player.vel = Vector.Normalize(diff) * mag
-    else:
-        player.vel = Vector(0,0)
-"""
 
 class Player(Entity):
     def __init__(self, name, color, game, script):
@@ -38,12 +16,37 @@ class Player(Entity):
         self.color = color
         self.vel = Vector(random.random(), random.random())
         self.game = game
-        self.speed = 20
-        self.range_visible = 50
-        self.range_attackable = 30
+        self.speed = self.game.gc.P_SPEED
+        self.range_visible = self.game.gc.P_RANGE_VISIBLE
+        self.range_attackable = self.game.gc.P_RANGE_ATTACKABLE
+        self.ammo = self.game.gc.P_AMMO
+        self.damage = self.game.gc.P_DAMAGE
+
+        # Flag to ensure we only attack once per frame
+        self.attacked = False
 
         if not self.try_apply_script(script, game):
-            self.try_apply_script(DEFAULT_SCRIPT, game)
+            self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, game)
+
+    def reset_dummy(self):
+        self.dummy.name = self.name 
+        self.dummy.color = self.color 
+        self.dummy.vel = self.vel 
+        self.dummy.game = self.game 
+        self.dummy.speed = self.speed
+        self.dummy.range_visible = self.range_visible
+        self.dummy.range_attackable = self.range_attackable
+        self.dummy.ammo = self.ammo 
+        self.dummy.damage = self.damage 
+        self.dummy.attacked = self.attacked
+
+    def powerups_visible(self):
+        in_range = []
+        for p in self.game.powerups:
+            d = Vector.Length(p.pos - self.pos)
+            if d <= self.range_visible:
+                in_range.append(p)
+        return in_range                
 
     def enemies_visible(self):
         in_range = []
@@ -69,38 +72,72 @@ class Player(Entity):
         self.scope = {
             'math' : math,
             'Vector' : Vector,
+            'PowerupType' : PowerupType,
             'core' : game.core,
             'random' : random,
             'sys' : sys,
+            'shoot' : shoot,
             '__builtins__' : builtins
         }
 
-        exec(script, self.scope)
+        # If the script throws an error, just give up
+        # TODO: Inform user somehow
+        try:
+            exec(script, self.scope)
+        except:
+            # Set color to red to signify the bot is broken
+            self.color = Color3(255,0,0)
+            return False
 
         # Check update method existence and signature of update function
-        update = self.scope['update']
-        if update is not None and callable(update):
-            if len(inspect.signature(update).parameters) == 2:
+        if 'update' in self.scope:
+            update = self.scope['update']
+            if callable(update) and len(inspect.signature(update).parameters) == 2:
                 #Create dummy function in special scope
                 self.script_update = type(update)(update.__code__, self.scope)
                 return True
         return False
 
     def update(self, delta):
+        self.attacked = False
+
         #Perform player-specific movement calculation
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
+        self.scope['powerups_visible'] = self.powerups_visible()
 
         #Execute on Dummy Entity
         self.script_update(self.dummy, delta)
 
         #Check for sanity (restrict velocity)
+        if Vector.Length(self.dummy.vel) > self.speed:
+            self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed
+
         self.vel = self.dummy.vel
 
         #Reset dummy
+        self.reset_dummy()
 
         #Apply Motion
-        super().update(delta)
+        return super().update(delta)
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
+
+# TODO: This should be restricted to the dummy and access the real player's
+# damage for verification, otherwise someone could do:
+# 
+# self.damage = 999999999
+# shoot(self, enemy)
+def shoot(player, enemy):
+    if (Vector.Distance(enemy.pos, player.pos) <= player.range_attackable
+            and player.ammo > 0 and not player.attacked):
+        # Point towards the target
+        player.vel = enemy.pos - player.pos
+        player.vel = Vector.Normalize(player.vel) * 0.01
+
+        # Deal damage
+        player.ammo -= 1
+        enemy.injure(player.damage)
+
+        player.attacked = True

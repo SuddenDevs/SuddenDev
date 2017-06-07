@@ -96,6 +96,10 @@ def game_page():
 
     return flask.render_template('game.html', user=flask_login.current_user)
 
+@main.route('/docs', methods=['GET'])
+def docs():
+    return flask.render_template('docs.html')
+
 @main.route('/lobby', methods=['GET', 'POST'])
 @flask_login.login_required
 def lobby():
