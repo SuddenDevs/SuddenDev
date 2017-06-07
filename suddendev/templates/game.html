@@ -178,26 +178,26 @@
         //Process events
         //Create & delete entities
 
-        //var events = state.events;
-        //for (i = 0; i < events.length; i++) {
-        //  var e = events[i];
-        //  var body = e.body;
-        //  switch (e.name) {
-        //    case "Enemy_Spawn":
-        //      create_enemy(body);
-        //      break;
-        //    case "Game_End":
-        //      break;
-        //    default:
-        //      console.log("Unknown event: " + e.name);
-        //  }
-        //}
+        var events = state.events;
+        for (i = 0; i < events.length; i++) {
+          var e = events[i];
+          var body = e.body;
+          switch (e.name) {
+            case "Enemy_Spawn":
+              create_enemy(body);
+              break;
+            case "Game_End":
+              break;
+            default:
+              console.log("Unknown event: " + e.name);
+          }
+        }
 
         //Update
-        draw_entities(state.enemies, ENEMYC);
-        draw_entities(state.powerups, PICKUPC);
+        //draw_enemies(state.enemies);
+        //draw_entities(state.powerups, PICKUPC);
         draw_players(state.players);
-        draw_core(state.core);
+        //draw_core(state.core);
       }
 
       function vector_to_rotation(dir) {
@@ -230,10 +230,14 @@
       }
 
       // Draw every object in a list the same color
-      function draw_entities(list, color) {
+      function draw_enemies(list) {
         for (i = 0; i < list.length; i++) {
-          var t = create_triangle(list[i].pos, list[i].vel, list[i].size, color);
-          stage.addChild(t);
+          var data = list[i];
+          var enemy = enemies[data.tag];
+          enemy.position = data.pos;
+          if (data.vel.x != 0 || data.vel.y != 0) {
+            enemy.rotation = vector_to_rotation(data.vel);
+          }
         }
       }
 

@@ -17,7 +17,8 @@ class StateEncoder(json.JSONEncoder):
                 'players': self.serializePlayers(state.players),
                 'enemies': self.serializeEnemies(state.enemies),
                 'powerups': self.serializePowerups(state.powerups),
-                'core': self.serializeCore(state.core)
+                'core': self.serializeCore(state.core),
+                'events': self.serializeEvents(state.events)
         }
 
     def serializeEntity(self, entity):
@@ -65,3 +66,17 @@ class StateEncoder(json.JSONEncoder):
 
     def serializeCore(self, core):
         return self.serializeEntity(core)
+
+    def serializeEvents(self, events):
+        result = []
+        for e in events:
+            json = {'name': e.name}
+            body = null
+
+            # Case Analysis to encode body
+            if e.name == 'Enemy_Spawn':
+                json['body'] = serializeEntity(e.body[0]);
+
+            json['body'] = body
+            result.append(json)
+        return result
