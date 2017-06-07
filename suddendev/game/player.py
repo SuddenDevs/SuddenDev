@@ -3,6 +3,7 @@ from .vector import Vector
 from .powerup import PowerupType
 from .sandbox import builtins
 from .color import Color3
+from .util import move_to, get_nearest, move_from
 
 import math
 import random
@@ -77,6 +78,9 @@ class Player(Entity):
             'random' : random,
             'sys' : sys,
             'shoot' : shoot,
+            'move_to' : move_to,
+            'move_from' : move_from,
+            'get_nearest' : get_nearest,
             '__builtins__' : builtins
         }
 
