@@ -61,11 +61,18 @@ PLAYER_JSON_TEMPLATE = {
 # To keep track of current rooms, we have a set of game_ids
 # with key 'rooms'.
 
-def create_room(creator_display_name):
+def create_room(player_id, creator_display_name):
     """
-    Creates a new game room and returns a game_id to use as a handle.
+    Creates a new game room and returns a game_id to use as a handle, and an error message
+    which is non-empty if the game_id is None.
     Takes the display name of the user who created the game.
+
+    Can fail if the user is part of a game already.
     """
+
+
+    if redis.get(player_id) is not None:
+        return None, "Sorry, you can't create a game whilst you're still in one."
 
     def gen_random_string(n):
         return ''.join(random.choice(
@@ -88,7 +95,7 @@ def create_room(creator_display_name):
     redis.set(game_id, json.dumps(game_json))
     # TODO: release lock for 'game_id'
 
-    return game_id
+    return game_id, ''
 
 def get_players_in_room(game_id):
     """
@@ -139,14 +146,19 @@ def add_player_to_room(game_id, player_id, name):
     Returns a flag to indicate success, and a user facing error message
     (which is empty if successful).
 
-    Failure occurs when a room with the 'game_id' does not exist or, when
-    the room in question is full.
+    Failure occurs when a room with the 'game_id' does not exist, when
+    the room in question is full or the player is already in a room.
     In either case, get_all_open_rooms() should be called and the view
     updated.
     """
 
     if not room_exists(game_id):
         return False, "Sorry, something seems to have gone wrong, please try another room."
+
+    # TODO: acquire player_id lock
+    if redis.get(player_id) is not None:
+        # TODO: release player_id lock
+        return False, "Sorry, looks like you've already joined another room. Play there, or leave before joining another."
 
     # TODO: acquire lock for game_id
     game_json_string = redis.get(game_id)
@@ -200,6 +212,9 @@ def remove_player_from_room(game_id, player_id):
 
         redis.set(game_id, json.dumps(game_json))
         # TODO: release lock for game_id
+
+        redis.delete(player_id)
+        # TODO: release lock for player_id
 
 def get_room_of_player(player_id):
     """

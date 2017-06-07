@@ -116,7 +116,12 @@ def lobby():
 
         game_id = ""
         if flask.request.form['submit'] == 'create':
-            game_id = create_room(name)
+            game_id, error_message = create_room(player_id, name)
+
+            if game_id is None:
+                flask.flash(error_message)
+                return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
+
         else:
             game_id = flask.request.form['submit']
 
