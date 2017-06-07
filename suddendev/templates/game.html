@@ -134,13 +134,14 @@
         var container = new PIXI.Container();
         var sprite = new PIXI.Graphics();
         var size = 10;
-        sprite.beginFill(0x0f0f00);
+
+        sprite.beginFill(PIXI.utils.rgb2hex([1, 0, 1]));
         sprite.drawRect(0, 0, size, size);
         sprite.x = -size/2;
         sprite.y = -size/2;
         container.addChild(sprite);
 
-        var label = new PIXI.Text(data.value,
+        var label = new PIXI.Text(data.value.toString(),
                                               { fontFamily:"Arial",
                                                 fontSize:"8",
                                                 fill: "black",
