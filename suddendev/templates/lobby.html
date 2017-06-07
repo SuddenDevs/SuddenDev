@@ -1,93 +1,63 @@
 {% extends "base.html" %}
+
 {% block head %}
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_lobby.css')}}">
-  <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
-
-  <script>
-    var editor = null;
-
-    function initEditor(){
-        editor = ace.edit("editor");
-        editor.$blockScrolling = Infinity;
-        editor.getSession().setMode("ace/mode/python");
-        editor.getSession().setUseWrapMode(true);
-        editor.setFontSize(20);
-        editor.setValue(`{{user.script}}`, 1);
-    }
-
-  </script>
-
 {% endblock %}
 
 {% block body %}
-  <div class="header">
-    <div id="title" class="title">
-      <img src="{{ url_for('static', filename='logo_64.png')}}">
-      <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
-    </div>
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <img src="{{ url_for('static', filename='logo_64.png')}}">
+        <h1 style="display:inline-block; white-space:pre">   S U D D E N _ D E V</h1>
+      </div>
   
-    <div class="container-fluid loginDetails">
-      <div class="row loginDetails">
-        <div class="col-sm loginCell displayPicCell">
-          <img class="loginDetails" src="{{user.picture}}">
-        </div>
-        <div class="col-sm loginCell">
-          <h3 class="loginDetails">{{ user.name }}<br>{{ user.email }}</h3>
-        </div>
-        <div class="col-sm loginCell buttonCell">
-          <a href="{{url_for('main.logout')}}">Log out</a>
+  
+      <div class="container-fluid loginDetails">
+        <div class="row loginDetails">
+          <div class="col-sm loginCell displayPicCell">
+            <img class="loginDetails" src="{{user.picture}}">
+          </div>
+          <div class="col-sm loginCell">
+            <h3 class="loginDetails">{{ user.name }}<br>{{ user.email }}</h3>
+          </div>
+          <div class="col-sm loginCell buttonCell">
+            <a href="{{url_for('main.logout')}}">Log out</a>
+          </div>
         </div>
       </div>
+
+    <p class="lead" style="white-space:pre">                 Strategize. Script. Survive.</p>
     </div>
-  </div>
 
-  <div class="container-fluid mainGrid">
-    <div class="row" style="height:100%">
-      <div class="col-sm-6 lobbyCol">
-        <div class="lobbyDescr">
-          <h3>Lobby</h3>
-          <p>Join an open game, or create a new one. At the moment anyone can join your game
-          and we won't keep track of your scripts and statistics.
-          Don't worry though; <b>it's all coming soon!</b></p>
+    <h3>Lobby</h3>
+    <p>Join an open game, or create a new one. At the moment anyone can join your game -
+    don't worry though - room keys are coming soon!</p>
+    <br>
 
-          <br>
-          <h1">Games</h1>
-        </div>
-          <form method="POST" class="flexForm">
-            <label for="usr">Name (this is just what other people will see):</label>
-            <input type="text" class="form-control nameInput align-bottom" name="name" placeholder="anon">
-            <button type="submit" class="roomControl" name="submit" value="create">Create new game!</button>
-            <div class="container-fluid roomTable">
-              {% for r in rooms %}
-              <div class="row roomRow">
-                <div class="col-sm-3">
-                  <button type="submit" class="roomControl" name="submit" value="{{ r['game_id'] }}">
-                	Join Room</button>
-                </div>
-                <div class="col-sm-3 roomCol">
-                  <span>{{ r['lobby_name']}}</span>
-                </div>
-                <div class="col-sm-3 roomCol">
-                  <span>{{ r['created_by']}}</span>
-                </div>
-                <div class="col-sm-3 roomCol">
-                  <span>{{ r['player_count']}}/4 players</span>
-                </div>
-              </div>
-              {% endfor %}
+    <form method="POST" class="flexForm">
+      <label for="usr">Display name (this is just what other people will see):</label>
+      <input type="text" class="form-control nameInput align-bottom" name="name" placeholder="anon">
+      <button type="submit" class="roomControl" name="submit" value="create">Create new game!</button>
+      <div class="container-fluid roomTable">
+        {% for r in rooms %}
+          <div class="row roomRow">
+            <div class="col-sm-3">
+              <button type="submit" class="roomControl" name="submit" value="{{ r['game_id'] }}">
+              Join Room</button>
             </div>
-
-          </form>
+            <div class="col-sm-3 roomCol">
+              <span>{{ r['lobby_name']}}</span>
+            </div>
+            <div class="col-sm-3 roomCol">
+              <span>{{ r['created_by']}}</span>
+            </div>
+            <div class="col-sm-3 roomCol">
+              <span>{{ r['player_count']}}/4 players</span>
+            </div>
+          </div>
+        {% endfor %}
       </div>
-      <div class="col-sm-6 lobbyCol">
-        <h4>Your script:</h4>
-        <div class="editorContainer">
-          <div id="editor"></div>
-          <script>initEditor()</script>
-        </div>
-      </div>
-    </div>
-
+    </form>
   </div>
-
 {% endblock %}
