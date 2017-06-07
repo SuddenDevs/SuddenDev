@@ -123,7 +123,7 @@ class Player(Entity):
                 #Create dummy function in special scope
                 self.script_respond = type(respond)(respond.__code__, self.scope)
             else:
-                self.script_respond = self.respond_default
+                self.script_respond = None
         if 'update' in self.scope:
             update = self.scope['update']
             if callable(update) and len(inspect.signature(update).parameters) == 2:
@@ -156,6 +156,8 @@ class Player(Entity):
 
         if self.dummy.has_message:
             for p in self.game.players:
+                if p.script_respond is None:
+                    continue
                 if self.dummy.message.to_self or p is not self:
                     p.script_respond(p.dummy, self.dummy.message)
 
@@ -164,10 +166,6 @@ class Player(Entity):
 
         #Apply Motion
         return super().update(delta)
-
-    # Default handler for responding to messages.
-    def respond_default(self, message):
-        pass
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
