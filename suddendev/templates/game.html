@@ -12,7 +12,11 @@
       var EDITFONTSIZE = 15;
       var FRAMERATE = 60;
       var WAITTEXT = "Press ready to begin!";
-      var NUMCHARS = 4;
+      var MAXPLAYERS = 4;
+      var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
+                    "RESULT":'result',"UPDATE":'room_update',"TEST":'test',
+                    "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
+                    "PLAY":'play'};
 
       var editor = null;
       var socket = null;
@@ -26,10 +30,10 @@
       var stage = null;
       var fpsText = null;
       var waitingText = null;
-      var charNames = [];
       var players = [];
-      var charNameTexts = [];
-      var player = -1;
+      var playerNames = [];
+      var playerID = -1;
+      var playerCount = 1;
 
       //Game state
       var states = [];
@@ -39,79 +43,80 @@
       function initSocket() {
         $(document).ready(function(){
           socket = io.connect('http://' + document.domain + ':' + location.port + '/game-session');
-          socket.on('connect', function() {
+          socket.on(EVENTS.CONNECT, function() {
             connectToGame();
           });
-          socket.on('result', function(data) {
-            processStates(data);
-            readyGame();
+          socket.on(EVENTS.PLAYERID, function(data) {
+            playerID = parseInt(data);
           });
-          socket.on('room_update', function(data) {
+          socket.on(EVENTS.RESULT, function(data) {
+            readyGame(data);
+          });
+          socket.on(EVENTS.UPDATE, function(data) {
             updateRoom(data);
           });
         });
         window.onbeforeunload = function(e) {
-            socket.emit('left', {});
+            socket.emit(EVENTS.LEFT, {});
             socket.disconnect();
         }
       }
 
       //Tell the server when the player has joined
       function connectToGame() {
-        socket.emit('joined', {});
+        socket.emit(EVENTS.JOINED, {});
       }
 
-      //Get list of states from server reply, init playerNames
-      function processStates(data) {
-        states = JSON.parse(data).result;
-
-        var playerList = states[0].players;
-        for (i = 0; i < playerList.length; i++) {
-          var name = new createjs.Text(playerList[i].name, "12px Arial", "x000000")
-          playerNames.push(name);
-          stage.addChild(name);
-        }
-      }
-
-      //Function to allow the game to start when enough players are waiting
+      //Function to start the game
       function readyGame(data) {
+        states = JSON.parse(data).result;
         stage.removeChild(waitingText);
+        for (i = 0; i < playerCount; i++) {
+          stage.addChild(playerNames[i])
+        }
         inGame = true;
       }
 
       //Update player details/scripts
       function updateRoom(data) {
         var room = JSON.parse(data);
-        players = [];
-        for (i = 0; i < room.player_count; i++) {
-          var chars = [];
-          for (j = 0; j < room.characters.length; j++) {
-            if (room.characters[j].player == room.players[i].id){
-              chars.push(room.characters[j]);
-            }
+        for (i = 0; i < playerNum; i++) {
+          tryAddPlayer(room.players[i]);
+          if (i != 0) {
+            scripts[i] = players[i].script;
           }
-          players.push({"player":room.players[i],"character":chars})
         }
-        charNames = [];
-        for (i = 0; i < room.characters.length; i++) {
-          scripts[i] = room.characters[i].script;
-          charNames.push(room.characters[i].name);
-          updateChars();
-        }
-        player = room.current_player;
       }
 
-      function updateChars() {
-        editor.setValue(scripts[currentTab]);
-        for (i = 0; i < NUMCHARS; i++) {
-          var t = document.getElementById("tab" + str(i));
-          t.innerHTML = charNames[i];
+      //If a player isn't already stored then store their details
+      function tryAddPlayer(player) {
+        if (havePlayer(player.id)) {
+          return false;
         }
+        players.push(player);
+        var t = document.getElementById("tab" + str(playerCount));
+        if (t.classList.contains("hidden")) {
+          t.classList.remove("hidden");
+        }
+        var name = createjs.Text(player.name, "12px Arial", "x000000");
+        playerNames.push(name);
+        playerCount++;
+        return true;
+      }
+
+      //Function to tell if a player id is already present in the room
+      function havePlayer(id) {
+        for (i = 0; i < players.length; i++) {
+          if (players[i].id == id) {
+            return true;
+          }
+        }
+        return false;
       }
 
       //Tell server that the client is leaving
       function exitGame(e) {
-        socket.emit('left', {});
+        socket.emit(EVENTS.LEFT, {});
         socket.disconnect();
       }
 
@@ -120,27 +125,9 @@
         scripts[currentTab] = editor.getValue();
       }
 
-      //Create a JSON object with characters/scripts
-      function getCode() {
+      function sendCode(event) {
         updateScripts();
-        var charScripts = [];
-        for (i = 0; i < scripts.length; i++) {
-          var char = {"char":1,"script":scripts[i]};
-          charScripts.push(char);
-        }
-        return JSON.stringify({"charScripts":charScripts});
-      }
-
-      //Send code to server to be saved in DB
-      function submitCode() {
-        updateScripts(); 
-        socket.emit('submit_code', getCode());
-      }
-
-      //Send code to server to be run (not saved)
-      function testCode() {
-        updateScripts();
-        socket.emit('test', getCode());
+        socket.emit(event, scripts[0]);
       }
 
       //Function to leave the game
@@ -153,6 +140,7 @@
         var b = document.getElementById("readyBtn");
         b.classList.add("active");
         b.classList.add("noEvents");
+        socket.emit(EVENTS.PLAY, {});
       }
 
       //Initialise gameCanvas - initialise stage, add shape drawer
@@ -239,6 +227,8 @@
 
       function setEditorTab(tabi) {
         var tabs = document.getElementsByClassName("tabBtn");
+        tabs[currentTab].classList.toggle("active");
+        tabs[tabi].classList.toggle("active");
         updateScripts();
         editor.setValue(scripts[tabi]);
         editor.focus();
@@ -271,9 +261,9 @@
             <div class="controls greyBorder">
               <button class="controls" onclick="leaveGame()">Leave Game</button>
               <button class="controls" onclick="displayNextState()">Next State
-              <button class="controls" onclick="submitCode()">Save Code</button>
+              <button class="controls" onclick="sendCode(SENDEVENTS.SUBMIT)">Save Code</button>
               <button id="readyBtn" class="controls" onclick="readyUp()">Ready</button>
-              <button class="controls" onclick="testCode()">Test Code</button>
+              <button class="controls" onclick="sendCode(SENDEVENTS.TEST)">Test Code</button>
               <button id="pauseBtn" class="controls" onclick="togglePause()">Pause</button>
                 </button>
             </div>
@@ -285,13 +275,13 @@
           </div>
           <div class="controls">
             <button id="tab0" class="controls tabBtn active" 
-                    onclick="setEditorTab(0)">Char1</button>
-            <button id="tab1" class="controls tabBtn" onclick="setEditorTab(1)">
-                    Char2</button>
-            <button id="tab2" class="controls tabBtn" onclick="setEditorTab(2)">
-                    Char3</button>
-            <button id="tab3" class="controls tabBtn" onclick="setEditorTab(3)">
-                    Char4</button>
+                    onclick="setEditorTab(0)">Player1</button>
+            <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">
+                    Player2</button>
+            <button id="tab2" class="controls tabBtn hidden" onclick="setEditorTab(2)">
+                    Player3</button>
+            <button id="tab3" class="controls tabBtn hidden" onclick="setEditorTab(3)">
+                    Player4</button>
           </div>
         </div>
       </div>
@@ -301,10 +291,10 @@
             <div class="col-sm-8 detailCol">
             </div>
             <div class="col-sm-4 detailCol">
-              <span style="width: 100%">Char1: Player1</span><br>
-              <span style="width: 100%">Char2: Player2</span><br>
-              <span style="width: 100%">Char3: Player3</span><br>
-              <span style="width: 100%">Char4: Player4</span>
+              <span style="width: 100%">Player1</span><br>
+              <span style="width: 100%">Player2</span><br>
+              <span style="width: 100%">Player3</span><br>
+              <span style="width: 100%">Player4</span>
             </div>
           </div>
         </div>

@@ -102,6 +102,10 @@ button.controls:hover{
   background-color: #ddd;
 }
 
+button.controls.hidden{
+  visibility: hidden;
+}
+
 button.controls.noEvents{
   pointer-events: none;
 }
