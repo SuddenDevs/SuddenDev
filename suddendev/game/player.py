@@ -25,8 +25,7 @@ def update(player, delta):
 
     if target is not None:
         diff = player.pos - target.pos
-        mag = min(player.speed, min_dist)
-        player.vel = Vector.Normalize(diff) * mag
+        player.vel = Vector.Normalize(diff) * player.speed
     else:
         player.vel = Vector(0,0)
 """
@@ -38,7 +37,7 @@ class Player(Entity):
         self.color = color
         self.vel = Vector(random.random(), random.random())
         self.game = game
-        self.speed = 20
+        self.speed = 30
         self.range_visible = 50
         self.range_attackable = 30
 

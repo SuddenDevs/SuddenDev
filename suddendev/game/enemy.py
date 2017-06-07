@@ -9,7 +9,7 @@ class Enemy(Entity):
         self.game = game
         self.pos = Vector(random.random() * self.game.map.width,
                             random.random() * self.game.map.height)
-        self.speed = 8
+        self.speed = 20
     
     def update(self, delta):
         #Find Nearest Player

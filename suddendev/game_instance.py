@@ -13,7 +13,7 @@ NAMESPACE = '/game-session'
 # Game steps per second
 # simulation rate >= display rate
 framerate_sim = 30
-framerate_display = 30
+framerate_display = 15
 
 frame_interval_sim = 1/framerate_sim
 frame_interval_display = 1/framerate_display
