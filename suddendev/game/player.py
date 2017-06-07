@@ -3,7 +3,13 @@ from .vector import Vector
 from .powerup import PowerupType
 from .sandbox import builtins
 from .color import Color3
-from .util import move_to, get_nearest, move_from
+from .util import (
+        distance_to,
+        move_to,
+        move_from,
+        get_nearest,
+        get_farthest
+        )
 
 import math
 import random
@@ -78,9 +84,13 @@ class Player(Entity):
             'random' : random,
             'sys' : sys,
             'shoot' : shoot,
+
             'move_to' : move_to,
             'move_from' : move_from,
             'get_nearest' : get_nearest,
+            'get_farthest' : get_farthest,
+            'distance_to' : distance_to,
+
             '__builtins__' : builtins
         }
 
@@ -121,6 +131,7 @@ class Player(Entity):
         self.vel = self.dummy.vel
         # Have to update this because shoot() runs on the dummy
         self.attack_timer = self.dummy.attack_timer
+        self.ammo = self.dummy.ammo
 
         #Reset dummy
         self.reset_dummy()
