@@ -224,40 +224,31 @@
         label.y = -size/2 - 2;
         container.addChild(label);
 
+        container.position = data.pos;
+        stage.addChild(container);
+
         var emitter = new PIXI.particles.Emitter(
                 container,
-                [sprite.generateCanvasTexture()],
+                [sprite.generateCanvasTexture(new PIXI.Point(1,1), 1)],
                 {
                         alpha: {
                                 start: 0.8,
                                 end: 0.1
                         },
                         scale: {
-                                start: 1,
+                                start: 2,
                                 end: 0.3
-                        },
-                        color: {
-                                start: "fb1010",
-                                end: "f5b830"
                         },
                         speed: {
                                 start: 200,
                                 end: 100
                         },
-                        startRotation: {
-                                min: 0,
-                                max: 360
-                        },
-                        rotationSpeed: {
-                                min: 0,
-                                max: 0
-                        },
                         lifetime: {
-                                min: 0.5,
-                                max: 0.5
+                                min: 2,
+                                max: 2
                         },
-                        frequency: 0.008,
-                        emitterLifetime: 0.31,
+                        frequency: 40,
+                        emitterLifetime: 10,
                         maxParticles: 1000,
                         pos: {
                                 x: 0,
@@ -273,8 +264,6 @@
                 }
         );
 
-        container.position = data.pos;
-        stage.addChild(container);
         pickups[data.tag] = {
           container: container,
           sprite: sprite,
@@ -472,23 +461,19 @@
           var body = e.body;
           switch (e.name) {
             case "Enemy_Spawn":
-              //console.log('Creating enemy ' + body.tag);
               create_enemy(body);
               break;
             case "Enemy_Death":
-              //console.log('RIP enemy ' + body.tag);
               clearup_enemy(body.tag);
               break;
             case "Powerup_Spawn":
-              //console.log('Creating powerup' + body.tag);
               create_powerup(body);
               break;
             case "Powerup_Used":
-              //console.log('RIP powerup' + body.tag);
               clearup_powerup(body.tag);
               break;
             case "Game_End":
-              //console.log('RIP game');
+              console.log('RIP game');
               break;
             case "Attack":
               create_attack(body[0].pos, body[1].pos);
