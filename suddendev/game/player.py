@@ -5,6 +5,7 @@ from .sandbox import builtins
 from .color import Color3
 from .event import Event, EventType
 from .util import (
+        user_print,
         shoot,
         say,
         say_also_to_self,
@@ -120,6 +121,7 @@ class Player(Entity):
             'get_nearest' : get_nearest,
             'get_farthest' : get_farthest,
             'distance_to' : distance_to,
+            'print' : user_print,
 
             '__builtins__' : builtins
         }
@@ -132,7 +134,7 @@ class Player(Entity):
             signal.alarm(0)
         except Exception:
             # Set color to red to signify the bot is broken
-            self.game.errors.append(traceback.format_exc())
+            self.game.add_error(traceback.format_exc())
             self.color = Color3(255,0,0)
             return False
 
@@ -168,7 +170,7 @@ class Player(Entity):
             # If script is broken, set color to red to signify the bot is broken
             # and reset to default script
             # TODO: Send an event and stack trace
-            self.game.errors.append(traceback.format_exc())
+            self.game.add_error(traceback.format_exc())
             self.color = Color3(255,0,0)
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, self.game)
 
@@ -211,7 +213,7 @@ class Player(Entity):
                         p.script_respond(p.dummy, self.dummy.message)
                         signal.alarm(0)
                     except Exception:
-                        self.game.errors.append(traceback.format_exc())
+                        self.game.add_error(traceback.format_exc())
                         p.script_respond = None
 
     def __str__(self):

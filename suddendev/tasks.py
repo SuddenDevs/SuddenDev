@@ -9,8 +9,11 @@ def play_game(game_id, player_names, scripts, namespace):
     game = GameInstance(game_id, player_names, scripts)
     socketio = fsio.SocketIO(message_queue=Config.REDIS_URL)
 
-    for batch, errors in game.run():
-        for e in errors:
-            socketio.emit('message', '[ERROR] ' + e, namespace=namespace)
+    for batch, log in game.run():
+        if log is not None:
+            for e in log['errors']:
+                socketio.emit('message', '[ERROR] ' + e, namespace=namespace)
+            for e in log['stdout']:
+                socketio.emit('message', '[OUT] ' + e, namespace=namespace)
 
         socketio.emit('result', '{\"result\": [ ' + ','.join(batch) + ']}', room=game_id, namespace=namespace)
