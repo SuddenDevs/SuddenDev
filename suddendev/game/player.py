@@ -3,6 +3,7 @@ from .vector import Vector
 from .powerup import PowerupType
 from .sandbox import builtins
 from .color import Color3
+from .event import Event, EventType
 from .util import (
         shoot,
         say,
@@ -118,13 +119,12 @@ class Player(Entity):
             return False
 
         # Check update method existence and signature of update function
+        self.script_respond = None
         if 'respond' in self.scope:
             respond = self.scope['respond']
             if callable(respond) and len(inspect.signature(respond).parameters) == 2:
                 #Create dummy function in special scope
                 self.script_respond = type(respond)(respond.__code__, self.scope)
-            else:
-                self.script_respond = None
         if 'update' in self.scope:
             update = self.scope['update']
             if callable(update) and len(inspect.signature(update).parameters) == 2:
@@ -156,6 +156,7 @@ class Player(Entity):
         self.ammo = self.dummy.ammo
 
         if self.dummy.has_message and self.dummy.message is not None:
+            self.game.events_add(Event(EventType.MESSAGE_SENT, self.dummy.message))
             for p in self.game.players:
                 if p.script_respond is None:
                     continue

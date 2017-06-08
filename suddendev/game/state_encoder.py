@@ -37,12 +37,15 @@ class StateEncoder(json.JSONEncoder):
     def serializePlayers(self, players):
         result = []
         for p in players:
-            json = self.serializeEntity(p)
-            json['name'] = p.name
-            json['ammo'] = p.ammo
-            json['color'] = self.serializeColor(p.color)
-            result.append(json)
+            result.append(self.serializePlayer(p))
         return result
+
+    def serializePlayer(self, p):
+        json = self.serializeEntity(p)
+        json['name'] = p.name
+        json['ammo'] = p.ammo
+        json['color'] = self.serializeColor(p.color)
+        return json
 
     def serializeWalls(self, walls):
         result = []
@@ -84,6 +87,17 @@ class StateEncoder(json.JSONEncoder):
         json['value'] = powerup.value
         return json
 
+    def serializeMessage(self, message):
+        json = {
+                'source' : self.serializePlayer(message.source),
+                'mtype' : message.mtype.value,
+                'string' : message.string,
+                'entity' : self.serializeEntity(message.entity),
+                'vector' : self.serializeVector(message.vector),
+                'to_self' : message.to_self,
+                'body' : body
+                }
+
     def serializeEvents(self, events):
         result = []
         for e in events:
@@ -92,10 +106,14 @@ class StateEncoder(json.JSONEncoder):
 
             # Case Analysis to encode body
             # TODO: make this less ugly
-            if e.event_type == EventType.ENEMY_SPAWN or e.event_type == EventType.ENEMY_DEATH:
+            if (e.event_type == EventType.ENEMY_SPAWN or e.event_type == EventType.ENEMY_DEATH):
                 body = self.serializeEntity(e.body[0]);
+            elif e.event_type == EventType.PLAYER_DEATH:
+                body = self.serializePlayer(e.body[0]);
             elif e.event_type == EventType.POWERUP_SPAWN or e.event_type == EventType.POWERUP_USED:
                 body = self.serializePowerup(e.body[0]);
+            elif e.event_type == EventType.GAME_END:
+                body = e.body[0]
 
             json['body'] = body
             result.append(json)

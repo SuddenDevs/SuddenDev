@@ -18,22 +18,23 @@ class GameConfig:
     MAP_HEIGHT = 600
 
     # Enemy
-    ENEMY_SPEED = 30
-    ENEMY_SPAWN_DELAY = 1
-    ENEMY_LIMIT = 10
-
-    ENEMY_RANGE_ATTACKABLE = 15
-    ENEMY_DAMAGE = 10
     ENEMY_ATTACK_DELAY = 30
+
+    BASE_ENEMY_SPEED = 30
+    BASE_ENEMY_SPAWN_DELAY = 1
+    BASE_ENEMY_LIMIT = 3
+    BASE_ENEMY_RANGE_ATTACKABLE = 15
+    BASE_ENEMY_DAMAGE = 10
 
     # Probability of an enemy spawning on each frame, if the enemy limit has
     # not been reached. The expected number of frames between enemy spawn is
     # given by 1/ENEMY_SPAWN_PROBABILITY, given by the Binomial distribution.
-    ENEMY_SPAWN_PROBABILITY = 0.1
+    BASE_ENEMY_SPAWN_PROBABILITY = 0.1
 
     # Difficulty scaling
     # Increased by x = x + wave_number * scale
     ENEMY_SPEED_SCALE = 1
+    ENEMY_DAMAGE_SCALE = 2
     ENEMY_RANGE_ATTACKABLE_SCALE = 1
     ENEMY_SPAWN_DELAY_SCALE = 0
     ENEMY_LIMIT_SCALE = 3
@@ -94,11 +95,12 @@ def update(player, delta):
         scale = wave - 1
 
         # Enemy
-        self.ENEMY_SPEED = self.ENEMY_SPEED + scale * self.ENEMY_SPEED_SCALE
-        self.ENEMY_RANGE_ATTACKABLE = self.ENEMY_RANGE_ATTACKABLE + scale * self.ENEMY_RANGE_ATTACKABLE_SCALE
-        self.ENEMY_SPAWN_DELAY = self.ENEMY_SPAWN_DELAY + scale * self.ENEMY_SPAWN_DELAY_SCALE
-        self.ENEMY_LIMIT = self.ENEMY_LIMIT + scale * self.ENEMY_LIMIT_SCALE
-        self.ENEMY_SPAWN_PROBABILITY = self.ENEMY_SPAWN_PROBABILITY + scale * self.ENEMY_SPAWN_PROBABILITY_SCALE
+        self.ENEMY_SPEED = self.BASE_ENEMY_SPEED + scale * self.ENEMY_SPEED_SCALE
+        self.ENEMY_RANGE_ATTACKABLE = self.BASE_ENEMY_RANGE_ATTACKABLE + scale * self.ENEMY_RANGE_ATTACKABLE_SCALE
+        self.ENEMY_DAMAGE = self.BASE_ENEMY_DAMAGE + scale * self.ENEMY_DAMAGE_SCALE
+        self.ENEMY_SPAWN_DELAY = self.BASE_ENEMY_SPAWN_DELAY + scale * self.ENEMY_SPAWN_DELAY_SCALE
+        self.ENEMY_LIMIT = self.BASE_ENEMY_LIMIT + scale * self.ENEMY_LIMIT_SCALE
+        self.ENEMY_SPAWN_PROBABILITY = self.BASE_ENEMY_SPAWN_PROBABILITY + scale * self.ENEMY_SPAWN_PROBABILITY_SCALE
 
         # Cap probability at 1
         if self.ENEMY_SPAWN_PROBABILITY >= 1:
