@@ -3,12 +3,14 @@ import datetime
 import string
 import json
 from . import redis
+from .models import User
 from .lobby_names import LOBBY_ADJECTIVES, LOBBY_NOUNS
 
 # max num of players in a game
 MAX_PLAYER_COUNT = 4
 
 # TODO: proper db setup for the default script, and general tracking of user scripts
+# TODO: get rid of this
 DEFAULT_SCRIPT = """
 # Attacking script
 timer = 0
@@ -186,6 +188,7 @@ def add_player_to_room(game_id, player_id, name):
     player_json = dict(PLAYER_JSON_TEMPLATE)
     player_json['id'] = player_id
     player_json['name'] = name
+    player_json['script'] = User.query.get(player_id).script
     game_json['players'].append(player_json)
     game_json['player_count'] += 1
     redis.set(game_id, json.dumps(game_json))
@@ -273,7 +276,6 @@ def set_script(game_id, player_id, script):
 
     game_json = json.loads(game_json_string)
     for player in game_json['players']:
-
         if player['id'] == player_id:
             player['script'] = script
             break
