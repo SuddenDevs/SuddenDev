@@ -11,5 +11,6 @@ class EventType(Enum):
     PLAYER_DEATH = 'Player_Death'
     POWERUP_SPAWN = 'Powerup_Spawn'
     POWERUP_USED = 'Powerup_Used'
+    GAME_START = 'Game_Start'
     GAME_END = 'Game_End'
     MESSAGE_SENT = 'Message_Sent'

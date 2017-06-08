@@ -50,6 +50,8 @@ class Game:
         #Players
         self.init_players(player_names, scripts)
 
+        self.events_add(Event(EventType.GAME_START))
+
     def init_players(self, player_names, scripts):
         player_count = len(player_names)
         self.players = []
