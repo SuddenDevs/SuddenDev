@@ -38,21 +38,30 @@ body, html{
   flex: 0 0 auto;
 }
 
+.detailGrid{
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  align-content: stretch;
+  min-height: 100px;
+  padding: 0;
+  max-width: 100%;
+}
+
 .detailRow{
   display: flex;
   order: 1;
   flex: 1 1 auto;
+  padding: 12.5px;
   align-content: stretch;
-  height: 100%;
 }
 
-.detailGrid{
+.inDetailRow{
   display: flex;
+  order: 0;
   flex: 1 1 auto;
   align-content: stretch;
-  margin: 12.5px;
-  min-height: 100px;
-  padding: 0;
+  margin: 0;
 }
 
 .detailCol{
@@ -60,6 +69,22 @@ body, html{
   flex: 1 1 auto;
   align-content: stretch;
   text-align: center; 
+}
+
+div.console{
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  padding: 10px;
+  text-align: left;
+}
+
+span.console{
+  word-wrap: break-word;
+  display: block;
+  width: inherit;
+  word-wrap: break-word;
 }
 
 .mainCol{
@@ -123,13 +148,6 @@ button.controls.inactive{
 
 button.controls:active{
   background-color: #bbb;
-}
-
-.console{
-  flex: 1 1 auto;
-  width: 100%;
-  height: 100%;
-  resize: none;
 }
 
 @media screen {
