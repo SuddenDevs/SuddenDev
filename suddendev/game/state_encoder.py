@@ -109,7 +109,7 @@ class StateEncoder(json.JSONEncoder):
                 body = self.serializePlayer(e.body[0]);
             elif e.event_type == EventType.POWERUP_SPAWN or e.event_type == EventType.POWERUP_USED:
                 body = self.serializePowerup(e.body[0]);
-            elif e.event_type == EventType.GAME_END:
+            elif e.event_type == EventType.GAME_END or e.event_type == EventType.PRINT or e.event_type == EventType.ERROR:
                 body = e.body[0]
             elif e.event_type == EventType.ATTACK:
                 body = [
