@@ -20,7 +20,7 @@ class Powerup(Entity):
         if self.powerup_type == PowerupType.AMMO_UP:
             player.ammo += self.value
         elif self.powerup_type == PowerupType.HEALTH_UP:
-            player.health += self.value
+            player.health = max(self.healthMax, player.health + self.value)
 
     def intersects(self, player):
         distance = Vector.Distance(self.pos, player.pos)
