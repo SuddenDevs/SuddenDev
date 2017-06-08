@@ -81,7 +81,7 @@ def update(player, delta):
     E_HEALTHMAX = 100
 
     # Powerups
-    POW_SIZE = 50
+    POW_SIZE = 10
     POW_AMMO_UP_VALUE = 10
     POW_HEALTH_UP_VALUE = 50 
 
