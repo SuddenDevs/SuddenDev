@@ -18,7 +18,9 @@
             </div>
           <div id="collapseZero" class="panel-collapse collapse in">
             <div class="panel-body">
-	    Your bones don't break, mine do. That's clear. Your cells react to bacteria and viruses differently than mine. You don't get sick, I do. That's also clear. But for some reason, you and I react the exact same way to water. We swallow it too fast, we choke. We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I. We're on the same curve, just on opposite ends.
+                Welcome to Sudden_Dev!
+
+                The objective of this game is to program a bot to survive against waves of enemies and work together with your teammates who will be trying to do the same. 
 	    </div>
           </div>
         </div>
@@ -46,7 +48,109 @@
           </div>
           <div id="collapseTwo" class="panel-collapse collapse">
             <div class="panel-body">
-	    Now that we know who you are, I know who I am. I'm not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain's going to be? He's the exact opposite of the hero. And most times they're friends, like you and me! I should've known way back when... You know why, David? Because of the kids. They called me Mr Glass.
+                In order to control your character, you will have to write a script - a series of instructions which will tell your bot where to go and what to do. This script will have to be written in Python, which is a widely used programming language. If you don't know how to write Python, don't worry - there are plenty of resources online as well as examples below to help you get started.<br><br>
+
+                <b> The basics </b><br>
+                In your script, only one function is required:<br>
+                <code>update(self, delta)</code>
+                <br><br>
+
+                This function will dictate what your character does every frame. You will probably want to instruct your bot to either go somewhere or shoot something. You might want to make use of these functions:<br><br>
+                <code>move_to(self, entity)<br></code>
+                <code>move_to_pos(self, pos)<br></code>
+                <code>shoot(self, enemy)</code>
+                <br><br>
+                To explain what the arguments represent, it's important to note that everything in the game is an 'Entity'. Every entity has a set of attributes that you can access freely (and in some cases modify), such as their position, velocity or health. So if you have a reference to a powerup's entity, by calling<br><br>
+
+                <code>move_to(self, powerup)</code><br><br>
+
+                your character will move towards the powerup. If you prefer to deal with coordinates directly, every entity's position can be accessed by their '.pos' attribute, e.g. powerup.pos. This returns a Vector, which has a x and a y attribute. Therefore, calling<br><br>
+
+                <code>move_to_pos(self, powerup.pos)</code><br><br>
+
+                also moves your bot towards the powerup. Similarly, you can use the<br><br>
+                <code>move_from(self, entity)</code>
+                <code>move_from_pos(self, pos)</code><br><br>
+                which make your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
+                <code>move_to(self, powerup, 80)</code><br><br>
+                makes your character go towards the powerup with speed 80.<br><br>
+                
+
+                <b>How do you get hold of these entities?</b><br><br>
+                You have access to these lists, which you can freely use in your code:<br>
+                <code>enemies_visible</code>, which contains all the enemy entities that your character can see<br>
+                <code>enemies_attackable</code>, which contains all the enemy entities that your character can attack<br>
+                <code>powerups_visible</code>, which contrains all the powerups that your character can see<br><br>
+
+                You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. For this purpose, you can use this function:<br><br>
+
+                <code>get_nearest(self, entities)</code><br><br>
+
+                which returns the closest entity from a given list. For example, <br><br>
+
+                <code>get_nearest(self, enemies_visible)</code><br><br>
+
+                will return the nearest enemy that your character can see. If you'd prefer to iterate through the list yourself, you might find this function useful<br><br>
+
+                <code>distance_to(self, entity)</code><br><br>
+
+                which simply returns how far the given entity is from you.<br><br>
+
+                With these functions you can actually already write a very simple AI! Here's a very basic example:
+
+<pre>
+def update(self, delta):
+    # Find the closest enemy, move towards it and shoot it
+    closest_enemy = get_nearest(self, enemies_visible)
+    move_to(self, closest_enemy)
+    shoot(self, closest_enemy)
+</pre>
+                
+And that's it! Now to make it smarter, you might want to try to pick up powerups, avoid enemies if your health is low or shoot only if your ammo is high.<br><br>
+                <b>Advanced</b><br><br>
+
+                In order to cooperate with your teammates, your bot can send 'messages', to their bots. To do this, call this function:<br><br>
+                <code>say(self, string, *body)</code><br><br>
+                This broadcasts a message to all other players' characters. In order to respond to these messages, in your script you should define the function<br><br>
+                <code>respond(self, message)</code><br><br>
+                which will be called when your bot receives a message. Using this mechanism, you can share information with other people's bots in the middle of the game, such as enemy positions and
+                coordinate your actions. This will prove invaluable when trying to clear more difficult waves.<br>
+            Here's an example with messaging.<br><br>
+<pre>
+target = None
+
+# Response function for received messages.
+def respond(self, message):
+    global target
+    # If someone is asking for help, assume that the message's body contains
+    # their entity and set that as a target.
+    if message.string == 'Help':
+        target = message.body
+    # Otherwise if someone says they're ok, we no longer need to go to them.
+    elif message.string == 'Ok':
+        if target == message.body:
+            target = None
+
+def update(self, delta):
+    # If our health is below 50%, call for help
+    if self.health < self.healthMax / 2:
+        say(self, 'Help', self)
+    # Otherwise say we're ok.
+    elif self.health >= self.healthMax / 2:
+        say(self, 'Ok', self)
+
+    # If someone needs help, go to them
+    if target is not None:
+        move_to(self, target)
+</pre>
+<br><br>
+        In order to use messaging effectively, you'll need to coordinate with your teammates - agree on what the message strings look like and what the message body is. 
+
+                
+
+                
+                <br><br><br>For further information on what's available to you, check the Scripting Reference section below.
+
 	    </div>
           </div>
         </div>
