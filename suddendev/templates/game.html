@@ -15,6 +15,7 @@
       var FRAMERATE = 60;
       var WAITTEXT = "Press ready to begin!";
       var MAXPLAYERS = 4;
+      var HEALTHBARWIDTH = 24;
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
@@ -92,31 +93,33 @@
         var tempStates = JSON.parse(data).result;
         for (i = 0; i < tempStates[0].events.length; i++) {
           if (tempStates[0].events[i].name === "Game_Start") {
-            clearStates();
+            startGame(tempStates[0]);
             break;
           }
         }
         states = states.concat(tempStates);
-        stage.removeChild(waitingText);
+      }
+
+      function startGame(state) {
+        clearStates();
         for (i = 0; i < players.length; i++) {
-          create_player(states[0].players[i]);
+          create_player(state.players[i]);
         }
+        stage.removeChild(waitingText);
         timer = 0;
-        create_core(states[0].core);
         inGame = true;
+        create_core(state.core);
         ticker.start();
         if (test) {
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
           toggleClasses("readyBtn", ["inactive", "noEvents"], false);
         }
-        ticker.start();
       }
 
-      var health_bar_width = 24;
       function create_health_bar() {
         var red = new PIXI.Graphics();
         var green = new PIXI.Graphics();
-        var width = health_bar_width;
+        var width = HEALTHBARWIDTH;
         var height = 4;
         var radius = 2;
         red.beginFill(0xff0000);
@@ -186,7 +189,7 @@
         var health = create_health_bar();
         // console.log(health.width);
         health.y = data.size + 2;
-        health.x = -health_bar_width/2;
+        health.x = -HEALTHBARWIDTH/2;
         container.addChild(health);
 
         container.position = data.pos;
