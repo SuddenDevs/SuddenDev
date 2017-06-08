@@ -1,5 +1,6 @@
 from .entity import Entity
 from .vector import Vector
+from .event import Event, EventType
 
 import random
 

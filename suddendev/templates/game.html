@@ -34,13 +34,18 @@
       var playerCount = 0;
 
       //Game state
-      var ticker = null
-      var playerDict = {}
-      var enemies = {}
-      var pickups = {}
-      var core = null
+      var ticker = null;
+      var playerDict = {};
+      var enemies = {};
+      var pickups = {};
+      var attacks = [];
+      var core = null;
+      var timer = 0;
 
       var states = [];
+
+      //Game parameters
+      var attack_fade = 0.2;
 
       //Initialise connection to server
       function initSocket() {
@@ -80,13 +85,16 @@
         for (i = 0; i < playerCount; i++) {
           create_player(states[0].players[i]);
         }
+        timer = 0;
+        create_core(states[0].core);
         inGame = true;
       }
 
+      var health_bar_width = 24;
       function create_health_bar() {
         var red = new PIXI.Graphics();
         var green = new PIXI.Graphics();
-        var width = 24;
+        var width = health_bar_width;
         var height = 4;
         var radius = 2;
         red.beginFill(0xff0000);
@@ -144,6 +152,43 @@
         playerDict[data.tag].name = name;
       }
 
+      function create_core(data) {
+        var container = new PIXI.Container();
+        var sprite = new PIXI.Graphics();
+        var size = 10;
+
+        sprite.beginFill(PIXI.utils.rgb2hex([0, 1, 1]));
+        sprite.drawCircle(0, 0, size);
+        container.addChild(sprite);
+
+        var health = create_health_bar();
+        console.log(health.width);
+        health.y = data.size + 2;
+        health.x = -health_bar_width/2;
+        container.addChild(health);
+
+        container.position = data.pos;
+        stage.addChild(container);
+        console.log("add core");
+
+        core = {
+          container: container,
+          sprite: sprite,
+          health: health
+        };
+      }
+
+      function create_attack(from, to) {
+        var graphics = new PIXI.Graphics();
+        var width = 2;
+        graphics.lineStyle(2, PIXI.utils.rgb2hex([1, 0, 0]));
+        graphics.moveTo(from.x, from.y);
+        graphics.lineTo(to.x, to.y);
+        stage.addChild(graphics);
+        attacks.push({sprite: graphics,
+                      timer: 0});
+      }
+
       function create_enemy(data) {
         data.color = ENEMYC;
         enemies[data.tag] = create_entity_triangle(data);
@@ -172,7 +217,11 @@
 
         container.position = data.pos;
         stage.addChild(container);
-        pickups[data.tag] = container;
+        pickups[data.tag] = {
+          container: container,
+          sprite: sprite,
+          label: label
+        };
       }
 
       function clearup_powerup(tag) {
@@ -188,6 +237,18 @@
       function clearup_enemy(tag) {
         stage.removeChild(enemies[tag].container);
         delete enemies[tag];
+      }
+
+      function find_entity(tag) {
+        //Players
+        if (tag in playerDict) {
+          return playerDict[tag];
+        } else if (tag in enemies) {
+          return enemies[tag];
+        } else if (core.tag == tag) {
+          return core;
+        }
+        return null;
       }
 
       //Update player details/scripts
@@ -322,12 +383,18 @@
         renderer.render(stage);
       }
 
-      function game_loop(delta) {
+      function game_loop() {
+        delta = ticker.elapsedMS/1000;
+        timer += delta;
         fpsText.text = Math.round(ticker.FPS * 100) / 100;
         if (inGame && states.length > 0) {
           process_state(states[0]);
           states.splice(0, 1);
         }
+
+        //Effects
+        draw_attacks(delta);
+
         draw();
       }
 
@@ -360,6 +427,8 @@
             case "Game_End":
               //console.log('RIP game');
               break;
+            case "Attack":
+              create_attack(body[0].pos, body[1].pos);
             default:
               //console.log("Unknown event: " + e.name);
           }
@@ -369,16 +438,31 @@
         draw_enemies(state.enemies);
         draw_pickups(state.powerups);
         draw_players(state.players);
-        //draw_core(state.core);
+        draw_core(state.core);
       }
 
       function vector_to_rotation(dir) {
         return Math.atan2(dir.y, dir.x) + Math.PI/6;
       }
 
-      function draw_core(core_state) {
-        //core.x = core_state.pos.x
-        //core.y = core_state.pos.y
+      function draw_attacks(delta) {
+        for (i = 0; i < attacks.length; i++) {
+          var a = attacks[i];
+          a.timer = a.timer + delta;
+          console.log("update attack");
+          if (a.timer >= attack_fade) {
+            stage.removeChild(a.sprite);
+            attacks.splice(i, 1);   
+            console.log("remove attack");
+            i--;
+          } else {
+            a.sprite.alpha = 1 - a.timer/attack_fade;
+          }
+        }
+      }
+
+      function draw_core(data) {
+        core.health.getChildAt(1).scale.x = data.health/data.healthMax;
       }
 
       //Create equilateral triangle facing DIR
@@ -428,7 +512,7 @@
 
       function draw_pickups(list) {
         for (i = 0; i < list.length; i++) {
-          //nothing! 
+          list[i].rotation = (timer * 20) % 20;
         }
       }
 
