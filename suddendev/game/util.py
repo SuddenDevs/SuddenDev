@@ -8,6 +8,9 @@ import sys
 # self.damage = 999999999
 # shoot(self, enemy)
 def shoot(self, enemy):
+    if self is None or enemy is None:
+        return
+
     if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable
             and self.ammo > 0 and self.attack_timer == 0):
         # Point towards the target
@@ -31,7 +34,7 @@ def say_also_to_self(self, string, *body):
     _say(self, string, True, body)
 
 def _say(self, string, to_self, body):
-    if string is not None:
+    if self is not None and string is not None:
         self.has_message = True
         if len(body) == 1:
             body = body[0]
@@ -39,29 +42,44 @@ def _say(self, string, to_self, body):
 
 # Returns distance from self to the target's position.
 def distance_to(self, target):
+    if self is None or target is None:
+        return sys.maxsize
+
     return Vector.Distance(self.pos, target.pos)
 
 # Sets the velocity vector, scaled to the given speed, pointing to the target.
 # If speed is not given, defaults to self.speed.
 def move_to_pos(self, pos, speed=None):
+    if self is None or pos is None:
+        return
+
     if speed is None:
         speed = self.speed
 
     self.vel = Vector.Normalize(pos - self.pos) * speed
 
 def move_from_pos(self, pos, speed=None):
+    if self is None or pos is None:
+        return
+
     if speed is None:
         speed = self.speed
 
     self.vel = Vector.Normalize(self.pos - pos) * speed
 
 def move_to(self, target, speed=None):
+    if self is None or target is None:
+        return
+
     if speed is None:
         speed = self.speed
 
     self.vel = Vector.Normalize(target.pos - self.pos) * speed
 
 def move_from(self, target, speed=None):
+    if self is None or target is None:
+        return
+
     if speed is None:
         speed = self.speed
 
@@ -70,6 +88,12 @@ def move_from(self, target, speed=None):
 # Given self and a list of entities, returns the nearest entity and the 
 # distance to that entity
 def get_nearest(self, entities, with_distance=False):
+    if self is None or entities is None:
+        if with_distance:
+            return None, sys.maxsize
+        else:
+            return None
+
     nearest_distance = sys.maxsize
     nearest = None
 
@@ -87,6 +111,12 @@ def get_nearest(self, entities, with_distance=False):
 # Given self and a list of entities, returns the farthest entity and the 
 # distance to that entity
 def get_farthest(self, entities, with_distance=False):
+    if self is None or entities is None:
+        if with_distance:
+            return None, -1
+        else:
+            return None
+
     farthest_distance = -1
     farthest = None
 
