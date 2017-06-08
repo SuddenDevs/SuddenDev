@@ -38,7 +38,7 @@ def joined(message):
 
     # TODO: gaurd against no player entry
     player_name = get_name_of_player(player_id)
-    fsio.emit('message', player_name + ' has joined!', room=game_id, namespace=NAMESPACE)
+    fsio.emit('message_room', player_name + ' has joined!', room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
@@ -65,7 +65,7 @@ def left(message):
 
         # TODO: guard against no player entry
         player_name = get_name_of_player(player_id)
-        fsio.emit('message', player_name + ' has left.', room=game_id, namespace=NAMESPACE)
+        fsio.emit('message_room', player_name + ' has left.', room=game_id, namespace=NAMESPACE)
 
         run_game_if_everyone_ready(game_id)
 
@@ -88,7 +88,7 @@ def submit_code(message):
 
     # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)
-    fsio.emit('message', player_name + ' has submitted a new script.', room=game_id, namespace=NAMESPACE)
+    fsio.emit('message_room', player_name + ' has submitted a new script.', room=game_id, namespace=NAMESPACE)
 
 @socketio.on('test', namespace=NAMESPACE)
 def test(message):
@@ -111,13 +111,13 @@ def test(message):
         else:
             player_scripts.append(player['script'])
 
-    fsio.emit('message', 'Running a test for you...', namespace=NAMESPACE)
+    fsio.emit('message_room', 'Running a test for you...', room=flask.request.sid, namespace=NAMESPACE)
 
     # TODO: specify test run in call
-    handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE)
+    handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, flask.request.sid)
     result = handle.get()
 
-    fsio.emit('message', 'Test complete!', namespace=NAMESPACE)
+    fsio.emit('message_result', 'Test complete!', room=flask.request.sid, namespace=NAMESPACE)
 
 @socketio.on('play', namespace=NAMESPACE)
 def play(message):
@@ -129,7 +129,7 @@ def play(message):
 
     # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)
-    fsio.emit('message', player_name + ' is ready to go!', room=game_id, namespace=NAMESPACE)
+    fsio.emit('message_room', player_name + ' is ready to go!', room=game_id, namespace=NAMESPACE)
 
     run_game_if_everyone_ready(game_id)
 
@@ -142,10 +142,10 @@ def run_game_if_everyone_ready(game_id):
             player_names.append(player['name'])
             player_scripts.append(player['script'])
 
-        fsio.emit('message', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
-        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE)
+        fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
+        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id)
         result = handle.get()
-        fsio.emit('message', 'Run complete!', room=game_id, namespace=NAMESPACE)
+        fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)
         reset_all_players(game_id)
 
 def update_players(game_id):

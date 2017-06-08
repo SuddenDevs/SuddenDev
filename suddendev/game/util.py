@@ -8,7 +8,7 @@ def user_print(self, string):
     if self is None or string is None:
         return
 
-    self.game.add_stdout(string)
+    self.game.events_add(Event(EventType.PRINT, string))
 
 # TODO: This should be restricted to the dummy and access the real player's
 # damage for verification, otherwise someone could do:

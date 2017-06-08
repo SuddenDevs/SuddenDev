@@ -134,7 +134,7 @@ class Player(Entity):
             signal.alarm(0)
         except Exception:
             # Set color to red to signify the bot is broken
-            self.game.add_error(traceback.format_exc())
+            self.game.events_add(Event(EventType.ERROR, traceback.format_exc()))
             self.color = Color3(255,0,0)
             return False
 
@@ -170,7 +170,7 @@ class Player(Entity):
             # If script is broken, set color to red to signify the bot is broken
             # and reset to default script
             # TODO: Send an event and stack trace
-            self.game.add_error(traceback.format_exc())
+            self.game.events_add(Event(EventType.ERROR, traceback.format_exc()))
             self.color = Color3(255,0,0)
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, self.game)
 

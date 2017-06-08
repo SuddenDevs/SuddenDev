@@ -68,13 +68,13 @@
           });
           socket.on(EVENTS.ROOM_MSG, function(data) {
             printToConsole(data, "#00F");
-          })
+          });
           socket.on(EVENTS.ERROR, function(data) {
             printToConsole(data, "#F00");
-          })
+          });
           socket.on(EVENTS.GAME_RESULT, function(data) {
             printToConsole(data, "#0F0");
-          })
+          });
         });
         window.onbeforeunload = function(e) {
             socket.emit(EVENTS.LEFT, {});
@@ -641,6 +641,8 @@
         editor.$blockScrolling = Infinity;
         editor.getSession().setMode("ace/mode/python");
         editor.getSession().setUseWrapMode(true);
+        editor.getSession().setTabSize(4);
+        editor.getSession().setUseSoftTabs(true);
         editor.setValue(scripts[0], 1);
       }
 
@@ -696,6 +698,7 @@
           </div>
           <div class="controls">
             <button class="controls" onclick="revertCode()">Revert</button>
+            <button class="controls" onclick="printToConsole(editor.getValue(), '#000')">Print</button>
             <button id="tab0" class="controls tabBtn active hidden" onclick="setEditorTab(0)">Player1</button>
             <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">Player2</button>
             <button id="tab2" class="controls tabBtn hidden" onclick="setEditorTab(2)">Player3</button>
