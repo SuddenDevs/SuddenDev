@@ -90,6 +90,8 @@
 
       //Function to start the game
       function readyGame(data) {
+        console.log("game starting");
+
         var tempStates = JSON.parse(data).result;
         for (i = 0; i < tempStates[0].events.length; i++) {
           if (tempStates[0].events[i].name === "Game_Start") {
@@ -161,6 +163,14 @@
                                           fontSize: 12,
                                           fill: "black",
                                           align: "center"});
+
+        var circle = new PIXI.Graphics();
+        circle.beginFill(PIXI.utils.rgb2hex([0.9, 1, 0.95]));
+        circle.drawCircle(0, 0, data.range_visible);
+        stage.addChild(circle);
+        stage.setChildIndex(circle, 0);
+        circle.position = data.pos;
+
         ammo.anchor.x = 0.5;
         ammo.anchor.y = -1.5;
         ammo.y = -data.size/2 - 2;
@@ -171,10 +181,13 @@
                                           fill: "black"});
         name.anchor.x = 0.5;
         name.anchor.y = 2;
-        playerDict[data.tag].container.addChild(ammo);
-        playerDict[data.tag].container.addChild(name);
-        playerDict[data.tag].ammo = ammo;
-        playerDict[data.tag].name = name;
+
+        var p = playerDict[data.tag];
+        p.container.addChild(ammo);
+        p.container.addChild(name);
+        p.ammo = ammo;
+        p.name = name;
+        p.visible_area = circle;
       }
 
       function create_core(data) {
@@ -285,7 +298,7 @@
                                 x: p.container.x,
                                 y: p.container.y
                         },
-                        addAtBack: true,
+                        addAtBack: false,
                         spawnType: "burst",
                         particlesPerWave: 8,
                         particleSpacing: 45,
@@ -338,7 +351,7 @@
                                 x: e.container.x,
                                 y: e.container.y
                         },
-                        addAtBack: true,
+                        addAtBack: false,
                         spawnType: "point",
                 }
         );
@@ -633,6 +646,7 @@
           var player = playerDict[data.tag];
           update_entity(player, data, delta);
           player.ammo.text = data.ammo.toString();
+          player.visible_area.position = data.pos;
         }
       } 
 
