@@ -16,7 +16,8 @@
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
-                    "PLAY":'play', "MESSAGE":'message'};
+                    "PLAY":'play', "ERROR":'message_error',
+                    "ROOM_MSG":"message_room", "GAME_RESULT":'message_result'};
 
       var editor = null;
       var socket = null;
@@ -31,7 +32,6 @@
       var waitingText = null;
       var players = [];
       var playerID = {{user.id}};
-      var playerCount = 0;
 
       //Game state
       var ticker = null;
@@ -63,8 +63,14 @@
           socket.on(EVENTS.UPDATE, function(data) {
             updateRoom(data);
           });
-          socket.on(EVENTS.MESSAGE, function(data) {
-            printToConsole(data);
+          socket.on(EVENTS.ROOM_MSG, function(data) {
+            printToConsole(data, "#00F");
+          })
+          socket.on(EVENTS.ERROR, function(data) {
+            printToConsole(data, "#F00");
+          })
+          socket.on(EVENTS.GAME_RESULT, function(data) {
+            printToConsole(data, "#0F0");
           })
         });
         window.onbeforeunload = function(e) {
@@ -82,7 +88,7 @@
       function readyGame(data) {
         states = states.concat(JSON.parse(data).result);
         stage.removeChild(waitingText);
-        for (i = 0; i < playerCount; i++) {
+        for (i = 0; i < players.length; i++) {
           create_player(states[0].players[i]);
         }
         timer = 0;
@@ -264,8 +270,8 @@
         }
 
         //Check if players have left
-        if (playerCount > room.players.length) {
-          for (i = 0; i < playerCount; i++) {
+        if (players.length > room.players.length) {
+          for (i = 0; i < players.length; i++) {
             var present = false;
             for (j = 0; j < room.players.length; j++) {
               if (players[i].id == room.players[j].id) {
@@ -286,11 +292,15 @@
           return false;
         }
         players.push(player);
-        var t = document.getElementById("tab" + playerCount);
+        var t = document.getElementById("tab" + (players.length - 1));
+        t.innerHTML = player.name;
+        scripts[players.length - 1] = player.script;
         if (t.classList.contains("hidden")) {
           t.classList.remove("hidden");
+          if (players.length - 1 == 0) {
+            editor.setValue(scripts[0]);
+          }
         }
-        playerCount++;
         return true;
       }
 
@@ -532,7 +542,7 @@
         var tabs = document.getElementsByClassName("tabBtn");
         tabs[currentTab].classList.toggle("active");
         tabs[tabi].classList.toggle("active");
-        updateScripts();
+        scripts[currentTab] = editor.getValue();
         editor.setValue(scripts[tabi]);
         editor.focus();
         currentTab = tabi;
@@ -548,9 +558,14 @@
       }
 
       //Prints to the on screen console
-      function printToConsole(data){
+      function printToConsole(data, color){
         var c = document.getElementById("console");
-        c.value = data + "\n" + c.value;
+        var s = document.createElement("span");
+        s.innerHTML = data + "\n";
+        s.classList.add("console");
+        s.style.color = color;
+        c.appendChild(s);
+        c.scrollTop = c.scrollHeight;
       }
 
     </script>
@@ -583,7 +598,7 @@
           </div>
           <div class="controls">
             <button class="controls" onclick="revertCode()">Revert</button>
-            <button id="tab0" class="controls tabBtn active" onclick="setEditorTab(0)">Player1</button>
+            <button id="tab0" class="controls tabBtn active hidden" onclick="setEditorTab(0)">Player1</button>
             <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">Player2</button>
             <button id="tab2" class="controls tabBtn hidden" onclick="setEditorTab(2)">Player3</button>
             <button id="tab3" class="controls tabBtn hidden" onclick="setEditorTab(3)">Player4</button>
@@ -592,15 +607,9 @@
       </div>
       <div class="row detailRow">
         <div class="container-fluid detailGrid greyBorder">
-          <div class="row detailRow">
-            <div class="col-sm-8 detailCol">
-              <textarea readonly id="console" type="text" class="console"></textarea>
-            </div>
-            <div class="col-sm-4 detailCol">
-              <span style="width: 100%">Player1</span><br>
-              <span style="width: 100%">Player2</span><br>
-              <span style="width: 100%">Player3</span><br>
-              <span style="width: 100%">Player4</span>
+          <div class="row inDetailRow">
+            <div class="col-sm detailCol">
+              <div id="console" class="console"></div>
             </div>
           </div>
         </div>
