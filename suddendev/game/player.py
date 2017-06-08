@@ -24,6 +24,7 @@ import random
 import sys
 import inspect
 import signal
+import traceback
 
 class Player(Entity):
     def __init__(self, name, color, game, script):
@@ -129,9 +130,9 @@ class Player(Entity):
             signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
             exec(script, self.scope)
             signal.alarm(0)
-        except Exception as e:
+        except Exception:
             # Set color to red to signify the bot is broken
-            self.game.errors.append(str(e))
+            self.game.errors.append(traceback.format_exc())
             self.color = Color3(255,0,0)
             return False
 
@@ -163,11 +164,11 @@ class Player(Entity):
             signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
             self.script_update(self.dummy, delta)
             signal.alarm(0)
-        except Exception as e:
+        except Exception:
             # If script is broken, set color to red to signify the bot is broken
             # and reset to default script
             # TODO: Send an event and stack trace
-            self.game.errors.append(str(e))
+            self.game.errors.append(traceback.format_exc())
             self.color = Color3(255,0,0)
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, self.game)
 
@@ -209,8 +210,8 @@ class Player(Entity):
                         signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
                         p.script_respond(p.dummy, self.dummy.message)
                         signal.alarm(0)
-                    except Exception as e:
-                        self.game.errors.append(str(e))
+                    except Exception:
+                        self.game.errors.append(traceback.format_exc())
                         p.script_respond = None
 
     def __str__(self):
