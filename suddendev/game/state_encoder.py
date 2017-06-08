@@ -44,6 +44,8 @@ class StateEncoder(json.JSONEncoder):
         json = self.serializeEntity(p)
         json['name'] = p.name
         json['ammo'] = p.ammo
+        json['range_visible'] = p.range_visible
+        json['range_attackable'] = p.range_attackable
         json['color'] = self.serializeColor(p.color)
         return json
 
@@ -69,6 +71,7 @@ class StateEncoder(json.JSONEncoder):
         result = []
         for e in enemies:
             json = self.serializeEntity(e)
+            json['range_attackable'] = e.range_attackable
             result.append(json)
         return result
 
@@ -116,6 +119,8 @@ class StateEncoder(json.JSONEncoder):
                         self.serializeEntity(e.body[0]),
                         self.serializeEntity(e.body[1]),
                         ]
+            elif e.event_type == EventType.MESSAGE_SENT:
+                body = serializeMessage(self, e.body[0])
 
             json['body'] = body
             result.append(json)

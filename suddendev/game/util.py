@@ -51,6 +51,7 @@ def _say(self, string, to_self, body):
         if len(body) == 1:
             body = body[0]
         self.message = Message(source=self, string=string, to_self=to_self, body=body)
+        self.game.events_add(Event(EventType.MESSAGE_SENT, self.message))
 
 # Returns distance from self to the target's position.
 def distance_to(self, target):
