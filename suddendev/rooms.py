@@ -56,7 +56,12 @@ PLAYER_JSON_TEMPLATE = {
                                 #                       - 'editing' still editing, not ready
 }
 
-# Additionally, for each active user we have a mapping to their current game.
+# Additionally, for each active user we have:
+USER_JSON_TEMPLATE = {
+    'game_id': None,
+    'name': None,
+}
+
 # (This is literally just <player_id> -> <game_id>)
 # To keep track of current rooms, we have a set of game_ids
 # with key 'rooms'.
@@ -186,7 +191,10 @@ def add_player_to_room(game_id, player_id, name):
     redis.set(game_id, json.dumps(game_json))
     # TODO: release lock for game_id
 
-    redis.set(player_id, game_id)
+    user_json = dict(USER_JSON_TEMPLATE)
+    user_json['game_id'] = game_id
+    user_json['name'] = name
+    redis.set(player_id, json.dumps(user_json))
 
     return True, ""
 
@@ -221,7 +229,22 @@ def get_room_of_player(player_id):
     Return the id of the game a player belongs to.
     If there is no such game, return None.
     """
-    return redis.get(player_id)
+    entry = redis.get(player_id)
+    if entry is not None:
+        return json.loads(entry)['game_id']
+    else:
+        return None
+
+def get_name_of_player(player_id):
+    """
+    Return the display name of a player.
+    If there is no entry for the player, return None.
+    """
+    entry = redis.get(player_id)
+    if entry is not None:
+        return json.loads(entry)['name']
+    else:
+        return None
 
 def room_exists(game_id):
     # TODO: acquire lock for 'rooms'

@@ -15,6 +15,7 @@ from .rooms import (
     set_player_ready,
     all_players_are_ready,
     reset_all_players,
+    get_name_of_player,
 )
 
 NAMESPACE = '/game-session'
@@ -25,14 +26,19 @@ def joined(message):
 
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
-
     if game_id is None:
         flask.flash("sorry something isn't quite right... try joining another game")
         return flask.redirect(flask.url_for('.main.lobby'))
 
+
     # subscribe client to room broadcasts
     fsio.join_room(game_id)
+
     update_players(game_id)
+
+    # TODO: gaurd against no player entry
+    player_name = get_name_of_player(player_id)
+    fsio.emit('message', player_name + ' has joined!', room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
@@ -43,10 +49,12 @@ def left(message):
 
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
-    if game_id is not None:
-        fsio.leave_room(game_id)
-        remove_player_from_room(game_id, player_id)
 
+    if game_id is None:
+        return 
+
+    fsio.leave_room(game_id)
+    remove_player_from_room(game_id, player_id)
 
     if get_players_in_room(game_id) == []:
         # TODO: remove room from redis
@@ -54,6 +62,10 @@ def left(message):
     else:
         # notify players that one has left
         update_players(game_id)
+
+        # TODO: guard against no player entry
+        player_name = get_name_of_player(player_id)
+        fsio.emit('message', player_name + ' has left.', room=game_id, namespace=NAMESPACE)
 
         run_game_if_everyone_ready(game_id)
 
@@ -73,6 +85,10 @@ def submit_code(message):
 
     set_script(game_id, player_id, message)
     update_players(game_id)
+
+    # TODO: guard against no player entry
+    player_name = get_name_of_player(player_id)
+    fsio.emit('message', player_name + ' has submitted a new script.', room=game_id, namespace=NAMESPACE)
 
 @socketio.on('test', namespace=NAMESPACE)
 def test(message):
@@ -95,16 +111,26 @@ def test(message):
         else:
             player_scripts.append(player['script'])
 
+    fsio.emit('message', 'Running a test for you...', namespace=NAMESPACE)
+
     # TODO: specify test run in call
     handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE)
     result = handle.get()
 
+    fsio.emit('message', 'Test complete!', namespace=NAMESPACE)
+
 @socketio.on('play', namespace=NAMESPACE)
 def play(message):
     """Sent by clients to indicate they are ready to play."""
+
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
     set_player_ready(game_id, player_id)
+
+    # TODO: guard against no player entry
+    player_name = get_name_of_player(player_id)
+    fsio.emit('message', player_name + ' is ready to go!', room=game_id, namespace=NAMESPACE)
+
     run_game_if_everyone_ready(game_id)
 
 def run_game_if_everyone_ready(game_id):
@@ -116,8 +142,10 @@ def run_game_if_everyone_ready(game_id):
             player_names.append(player['name'])
             player_scripts.append(player['script'])
 
+        fsio.emit('message', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
         handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE)
         result = handle.get()
+        fsio.emit('message', 'Run complete!', room=game_id, namespace=NAMESPACE)
         reset_all_players(game_id)
 
 def update_players(game_id):
