@@ -30,7 +30,6 @@
       var fpsText = null;
       var waitingText = null;
       var players = [];
-      var playerNames = [];
       var playerID = {{user.id}};
       var playerCount = 0;
 
@@ -78,7 +77,6 @@
         states = JSON.parse(data).result;
         stage.removeChild(waitingText);
         for (i = 0; i < playerCount; i++) {
-          stage.addChild(playerNames[i]);
           create_player(states[0].players[i]);
         }
         inGame = true;
@@ -130,10 +128,19 @@
                                           fill: "black",
                                           align: "center"});
         ammo.anchor.x = 0.5;
-        ammo.anchor.y = 1;
+        ammo.anchor.y = -1.5;
         ammo.y = -data.size/2 - 2;
+
+        var name = new PIXI.Text(data.name,
+                                        { fontFamily:"Arial",
+                                          fontSize:"12", 
+                                          fill: "black"});
+        name.anchor.x = 0.5;
+        name.anchor.y = 2;
         playerDict[data.tag].container.addChild(ammo);
+        playerDict[data.tag].container.addChild(name);
         playerDict[data.tag].ammo = ammo;
+        playerDict[data.tag].name = name;
       }
 
       function create_enemy(data) {
@@ -203,8 +210,6 @@
         if (t.classList.contains("hidden")) {
           t.classList.remove("hidden");
         }
-        var name = new PIXI.Text(player.name, {fontFamily:"Arial", fontSize:"12", fill: "black"});
-        playerNames.push(name);
         playerCount++;
         return true;
       }
