@@ -96,9 +96,8 @@ def test(message):
             player_scripts.append(player['script'])
 
     # TODO: specify test run in call
-    handle = play_game.delay(game_id, player_names, player_scripts)
+    handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE)
     result = handle.get()
-    fsio.emit('result', result, namespace=NAMESPACE)
 
 @socketio.on('play', namespace=NAMESPACE)
 def play(message):
@@ -117,10 +116,9 @@ def run_game_if_everyone_ready(game_id):
             player_names.append(player['name'])
             player_scripts.append(player['script'])
 
-        handle = play_game.delay(game_id, player_names, player_scripts)
+        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE)
         result = handle.get()
         reset_all_players(game_id)
-        fsio.emit('result', result, room=game_id, namespace=NAMESPACE)
 
 def update_players(game_id):
     game_json_string = get_room_state_json_string(game_id)

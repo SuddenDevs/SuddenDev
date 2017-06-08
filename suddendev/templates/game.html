@@ -42,7 +42,6 @@
       var core = null
 
       var states = [];
-      var statei = 0;
 
       //Initialise connection to server
       function initSocket() {
@@ -75,7 +74,7 @@
 
       //Function to start the game
       function readyGame(data) {
-        states = JSON.parse(data).result;
+        states = states.concat(JSON.parse(data).result);
         stage.removeChild(waitingText);
         for (i = 0; i < playerCount; i++) {
           stage.addChild(playerNames[i]);
@@ -231,7 +230,7 @@
 
       function submitCode() {
         if (editor.getValue() !== scripts[0]) {
-          console.log("saved");
+          //console.log("saved");
           scripts[0] = editor.getValue();
           socket.emit(EVENTS.SUBMIT, scripts[0]);
         }
@@ -252,7 +251,6 @@
         pickups = {};
         core = null;
         states = [];
-        statei = 0;
         inGame = false;
         for (i = stage.children.length - 1; i >= 0; i--) {
           stage.removeChild(stage.children[i]);
@@ -301,9 +299,9 @@
 
       function game_loop(delta) {
         fpsText.text = Math.round(ticker.FPS * 100) / 100;
-        if (inGame && statei < states.length) {
-          process_state(states[statei]);
-          statei++;
+        if (inGame && states.length > 0) {
+          process_state(states[0]);
+          states.splice(0, 1);
         }
         draw();
       }
@@ -319,26 +317,26 @@
           var body = e.body;
           switch (e.name) {
             case "Enemy_Spawn":
-              console.log('Creating enemy ' + body.tag);
+              //console.log('Creating enemy ' + body.tag);
               create_enemy(body);
               break;
             case "Enemy_Death":
-              console.log('RIP enemy ' + body.tag);
+              //console.log('RIP enemy ' + body.tag);
               clearup_enemy(body.tag);
               break;
             case "Powerup_Spawn":
-              console.log('Creating powerup' + body.tag);
+              //console.log('Creating powerup' + body.tag);
               create_powerup(body);
               break;
             case "Powerup_Used":
-              console.log('RIP powerup' + body.tag);
+              //console.log('RIP powerup' + body.tag);
               clearup_powerup(body.tag);
               break;
             case "Game_End":
-              console.log('RIP game');
+              //console.log('RIP game');
               break;
             default:
-              console.log("Unknown event: " + e.name);
+              //console.log("Unknown event: " + e.name);
           }
         }
 

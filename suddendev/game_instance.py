@@ -10,6 +10,7 @@ import time
 NAMESPACE = '/game-session'
 
 class GameInstance:
+
     def __init__(self, game_id, player_names, scripts):
         #TODO: take wave no. as a parameter
         wave = 1
@@ -42,10 +43,8 @@ class GameInstance:
                 batch.append(encodeState(self.game))
                 self.game.events_flush()
 
-            # if state_counter == batchSize or not self.game.active:
-                # #Client Update
-                # yield batch 
-                # batch = []
-                # state_counter = 0
-            if not self.game.active:
-                return batch
+            if state_counter == gc.BATCHSIZE or not self.game.active:
+                #Client Update
+                yield batch 
+                batch = []
+                state_counter = 0
