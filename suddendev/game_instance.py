@@ -1,13 +1,9 @@
 #!/usr/bin/python3
 from .game.game import Game
 from .game.state_encoder import StateEncoder, encodeState
-from . import socketio
 from .game.game_config import GameConfig as gc
-import time
 import datetime
 import time
-
-NAMESPACE = '/game-session'
 
 class GameInstance:
     def __init__(self, game_id, player_names, scripts):

@@ -92,8 +92,6 @@ class Game:
             return 'Win'
         elif len(self.players) == 0:
             return 'Loss'
-        elif self.time >= self.gc.TIME_LIMIT:
-            return 'Timeout'
         else:
             return None
 
