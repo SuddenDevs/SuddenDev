@@ -21,6 +21,8 @@ class Map:
 
 class Game:
     def __init__(self, wave, player_names, scripts):
+        self.errors = []
+
         self.walls = []
         self.events = []
         self.enemies = []
@@ -67,6 +69,7 @@ class Game:
 
     #### Main Loop ####
     def tick(self, delta):
+        self.errors = []
 
         #Timekeeping
         self.time += delta
@@ -85,6 +88,8 @@ class Game:
         if result is not None:
             self.active = False
             self.events_add(Event(EventType.GAME_END, result))
+
+        return self.errors
 
     def check_if_game_over(self):
         if len(self.enemies) == 0 and self.enemy_count >= self.gc.ENEMY_LIMIT:

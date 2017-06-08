@@ -17,6 +17,7 @@ from .util import (
         get_farthest
         )
 from .message import Message
+from .game_config import GameConfig as gc
 
 import math
 import random
@@ -128,8 +129,9 @@ class Player(Entity):
             signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
             exec(script, self.scope)
             signal.alarm(0)
-        except:
+        except Exception as e:
             # Set color to red to signify the bot is broken
+            self.game.errors.append(str(e))
             self.color = Color3(255,0,0)
             return False
 
@@ -161,10 +163,11 @@ class Player(Entity):
             signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
             self.script_update(self.dummy, delta)
             signal.alarm(0)
-        except:
+        except Exception as e:
             # If script is broken, set color to red to signify the bot is broken
             # and reset to default script
             # TODO: Send an event and stack trace
+            self.game.errors.append(str(e))
             self.color = Color3(255,0,0)
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, self.game)
 
@@ -206,12 +209,17 @@ class Player(Entity):
                         signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
                         p.script_respond(p.dummy, self.dummy.message)
                         signal.alarm(0)
-                    except:
+                    except Exception as e:
+                        self.game.errors.append(str(e))
                         p.script_respond = None
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
 
+class TimeoutException(Exception):
+    pass
+
 # Handler for SIGALRM for timing out user scripts.
 def timeout_handler(signum, frame):
-    raise Exception
+    raise TimeoutException('Function timed out. Allowed time for functions is ' +
+            str(gc.SCRIPT_TIMEOUT) + ' seconds.')
