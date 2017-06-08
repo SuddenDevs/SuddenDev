@@ -20,18 +20,22 @@ def shoot(self, enemy):
 
         self.attack_timer = self.attack_delay
 
-# Broadcasts a message to all players. Only one of the args have to be set in
-# order for the message to be sent. If to_self is set, the message is also
-# sent to the sender himself.
-def say(self, mtype=None, string=None, entity=None, vector=None, to_self=False):
-    if (mtype is not None or
-        string is not None or
-        entity is not None or
-        vector is not None):
+# Broadcasts a message to all players, excluding the sender. string has to be
+# set in order for the message to be sent. If only one argument is provided as
+# the body, the argument is unpacked from a list to the object itself for convenience.
+def say(self, string, *body):
+    _say(self, string, False, body)
 
+# Broadcasts a message to all players, including the sender.
+def say_also_to_self(self, string, *body):
+    _say(self, string, True, body)
+
+def _say(self, string, to_self, body):
+    if string is not None:
         self.has_message = True
-        self.message = Message(source=self, mtype=mtype, 
-                entity=entity, string=string, vector=vector, to_self=to_self)
+        if len(body) == 1:
+            body = body[0]
+        self.message = Message(source=self, string=string, to_self=to_self, body=body)
 
 # Returns distance from self to the target's position.
 def distance_to(self, target):

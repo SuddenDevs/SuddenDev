@@ -20,8 +20,13 @@ class Enemy(Entity):
         if self.attack_timer > 0:
             self.attack_timer -= 1
 
-        #Find Nearest Player
         ps = self.game.players
+
+        # Everyone's already dead
+        if len(ps) == 0:
+            return super().update(delta)
+
+        # Find nearest player
         target = ps[0].pos
         target_player = ps[0]
         mag_min = Vector.Length(self.pos - target)

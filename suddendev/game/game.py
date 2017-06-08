@@ -26,15 +26,17 @@ class Game:
         self.enemies = []
         self.powerups = []
 
-        self.enemy_spawn_timer = 0
-        self.powerup_spawn_timer = 0
+        self.wave = wave
+        self.gc = GameConfig(wave)
+
+        self.enemy_spawn_timer = self.gc.ENEMY_SPAWN_DELAY
+        self.enemy_count = 0
+
+        self.powerup_spawn_timer = self.gc.POW_SPAWN_DELAY
         self.powerup_count = 0
 
         self.time = 0
         self.active = True
-
-        self.wave = wave
-        self.gc = GameConfig(wave)
 
         #Map
         self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
@@ -65,10 +67,11 @@ class Game:
 
     #### Main Loop ####
     def tick(self, delta):
+
         #Timekeeping
         self.time += delta
-        self.enemy_spawn_timer += delta
-        self.powerup_spawn_timer += delta
+        self.enemy_spawn_timer -= delta
+        self.powerup_spawn_timer -= delta
 
         # Update entities
         self.update_players(delta)
@@ -78,13 +81,28 @@ class Game:
         self.spawn_enemies()
 
         #Ending Conditions / Wave Conditions
-        if self.time >= self.gc.TIME_LIMIT:
+        result = self.check_if_game_over()
+        if result is not None:
             self.active = False
-            self.events_add(Event(EventType.GAME_END))
+            self.events_add(Event(EventType.GAME_END, result))
+
+    def check_if_game_over(self):
+        if len(self.enemies) == 0 and self.enemy_count >= self.gc.ENEMY_LIMIT:
+            return 'Win'
+        elif len(self.players) == 0:
+            return 'Loss'
+        elif self.time >= self.gc.TIME_LIMIT:
+            return 'Timeout'
+        else:
+            return None
 
     def update_players(self, delta):
         #Update Players
         for p in self.players:
+            if p.health <= 0:
+                self.players.remove(p)
+                self.events_add(Event(EventType.PLAYER_DEATH, p))
+
             pos = self.clamp_pos(p.update(delta))
             if not self.collides_with_walls(pos, p.size):
                 p.pos = pos
@@ -112,7 +130,7 @@ class Game:
         powerupTypes = [powerup for _, powerup in PowerupType.__members__.items()]
 
         #Powerup Spawning
-        if (self.powerup_spawn_timer > self.gc.POW_SPAWN_DELAY
+        if (self.powerup_spawn_timer <= 0
             and self.powerup_count < self.gc.POW_LIMIT
             and random.random() < self.gc.POW_SPAWN_PROBABILITY):
 
@@ -123,13 +141,14 @@ class Game:
 
     def spawn_enemies(self):
         #Enemy Spawning
-        if (self.enemy_spawn_timer > self.gc.ENEMY_SPAWN_DELAY
-            and len(self.enemies) < self.gc.ENEMY_LIMIT
+        if (self.enemy_spawn_timer <= 0
+            and self.enemy_count < self.gc.ENEMY_LIMIT
             and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
 
             #Spawn Enemy
             enemy = Enemy(self)
             self.enemies.append(enemy)
+            self.enemy_count += 1
             self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
 
     def clamp_pos(self, pos):
