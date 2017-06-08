@@ -15,7 +15,7 @@ class GameConfig:
     BATCHSIZE = 500
 
     # Game
-    TIME_LIMIT = 15
+    TIME_LIMIT = 180
 
     MAP_WIDTH = 800
     MAP_HEIGHT = 600

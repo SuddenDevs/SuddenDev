@@ -16,7 +16,7 @@
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
-                    "PLAY":'play'};
+                    "PLAY":'play', "MESSAGE":'message'};
 
       var editor = null;
       var socket = null;
@@ -30,7 +30,6 @@
       var fpsText = null;
       var waitingText = null;
       var players = [];
-      var playerNames = [];
       var playerID = {{user.id}};
       var playerCount = 0;
 
@@ -59,7 +58,9 @@
           socket.on(EVENTS.UPDATE, function(data) {
             updateRoom(data);
           });
-          socket.on
+          socket.on(EVENTS.MESSAGE, function(data) {
+            printToConsole(data);
+          })
         });
         window.onbeforeunload = function(e) {
             socket.emit(EVENTS.LEFT, {});
@@ -77,7 +78,6 @@
         states = states.concat(JSON.parse(data).result);
         stage.removeChild(waitingText);
         for (i = 0; i < playerCount; i++) {
-          stage.addChild(playerNames[i]);
           create_player(states[0].players[i]);
         }
         inGame = true;
@@ -129,10 +129,19 @@
                                           fill: "black",
                                           align: "center"});
         ammo.anchor.x = 0.5;
-        ammo.anchor.y = 1;
+        ammo.anchor.y = -1.5;
         ammo.y = -data.size/2 - 2;
+
+        var name = new PIXI.Text(data.name,
+                                        { fontFamily:"Arial",
+                                          fontSize:"12", 
+                                          fill: "black"});
+        name.anchor.x = 0.5;
+        name.anchor.y = 2;
         playerDict[data.tag].container.addChild(ammo);
+        playerDict[data.tag].container.addChild(name);
         playerDict[data.tag].ammo = ammo;
+        playerDict[data.tag].name = name;
       }
 
       function create_enemy(data) {
@@ -184,10 +193,28 @@
       //Update player details/scripts
       function updateRoom(data) {
         var room = JSON.parse(data);
+
+        //Check if players have joined
         for (i = 0; i < room.players.length; i++) {
           tryAddPlayer(room.players[i]);
           if (i != 0) {
             scripts[i] = players[i].script;
+          }
+        }
+
+        //Check if players have left
+        if (playerCount > room.players.length) {
+          for (i = 0; i < playerCount; i++) {
+            var present = false;
+            for (j = 0; j < room.players.length; j++) {
+              if (players[i].id == room.players[j].id) {
+                present = true;
+              }
+            }
+            if (!present) {
+              players.splice(i, 1);
+              i--;
+            }
           }
         }
       }
@@ -202,9 +229,8 @@
         if (t.classList.contains("hidden")) {
           t.classList.remove("hidden");
         }
-        var name = new PIXI.Text(player.name, {fontFamily:"Arial", fontSize:"12", fill: "black"});
-        playerNames.push(name);
         playerCount++;
+        printToConsole(player.name + " has joined the room!");
         return true;
       }
 
@@ -438,6 +464,12 @@
         editor.setValue(scripts[0], 1);
       }
 
+      //Prints to the on screen console
+      function printToConsole(data){
+        var c = document.getElementById("console");
+        c.value = data + "\n" + c.value;
+      }
+
     </script>
 {% endblock %}
 {% block body %}
@@ -468,14 +500,10 @@
           </div>
           <div class="controls">
             <button class="controls" onclick="revertCode()">Revert</button>
-            <button id="tab0" class="controls tabBtn active" 
-                    onclick="setEditorTab(0)">Player1</button>
-            <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">
-                    Player2</button>
-            <button id="tab2" class="controls tabBtn hidden" onclick="setEditorTab(2)">
-                    Player3</button>
-            <button id="tab3" class="controls tabBtn hidden" onclick="setEditorTab(3)">
-                    Player4</button>
+            <button id="tab0" class="controls tabBtn active" onclick="setEditorTab(0)">Player1</button>
+            <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">Player2</button>
+            <button id="tab2" class="controls tabBtn hidden" onclick="setEditorTab(2)">Player3</button>
+            <button id="tab3" class="controls tabBtn hidden" onclick="setEditorTab(3)">Player4</button>
           </div>
         </div>
       </div>
@@ -483,6 +511,7 @@
         <div class="container-fluid detailGrid greyBorder">
           <div class="row detailRow">
             <div class="col-sm-8 detailCol">
+              <textarea readonly id="console" type="text" class="console"></textarea>
             </div>
             <div class="col-sm-4 detailCol">
               <span style="width: 100%">Player1</span><br>
