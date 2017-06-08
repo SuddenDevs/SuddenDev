@@ -1,5 +1,6 @@
 from .vector import Vector
 from .message import Message
+from .event import Event, EventType
 import sys
 
 # TODO: This should be restricted to the dummy and access the real player's
@@ -21,7 +22,11 @@ def shoot(self, enemy):
         self.ammo -= 1
         enemy.injure(self.damage)
 
+        # Cool down
         self.attack_timer = self.attack_delay
+
+        # Add event
+        self.game.events_add(Event(EventType.ATTACK, self, enemy))
 
 # Broadcasts a message to all players, excluding the sender. string has to be
 # set in order for the message to be sent. If only one argument is provided as

@@ -69,4 +69,8 @@ class Enemy(Entity):
             # Deal damage
             enemy.injure(self.damage)
 
+            # Cool down
             self.attack_timer = self.attack_delay
+
+            # Add event
+            self.game.events_add(Event(EventType.ATTACK, self, enemy))

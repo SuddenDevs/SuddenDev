@@ -14,3 +14,4 @@ class EventType(Enum):
     GAME_START = 'Game_Start'
     GAME_END = 'Game_End'
     MESSAGE_SENT = 'Message_Sent'
+    ATTACK = 'Attack'

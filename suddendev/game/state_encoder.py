@@ -111,6 +111,11 @@ class StateEncoder(json.JSONEncoder):
                 body = self.serializePowerup(e.body[0]);
             elif e.event_type == EventType.GAME_END:
                 body = e.body[0]
+            elif e.event_type == EventType.ATTACK:
+                body = [
+                        self.serializeEntity(e.body[0]),
+                        self.serializeEntity(e.body[1]),
+                        ]
 
             json['body'] = body
             result.append(json)
