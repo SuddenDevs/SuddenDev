@@ -69,7 +69,7 @@ def left(message):
 
         run_game_if_everyone_ready(game_id)
 
-@socketio.on('submit_code', namespace=NAMESPACE)
+@socketio.on('submit', namespace=NAMESPACE)
 def submit_code(message):
     """Sent by clients when submitting code."""
 

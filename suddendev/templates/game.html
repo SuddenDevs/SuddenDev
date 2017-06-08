@@ -397,7 +397,6 @@
         players.push(player);
         var t = document.getElementById("tab" + (players.length - 1));
         t.innerHTML = player.name;
-        scripts[players.length - 1] = player.script;
         if (t.classList.contains("hidden")) {
           t.classList.remove("hidden");
           if (players.length - 1 == 0) {
@@ -429,7 +428,6 @@
 
       function submitCode() {
         if (editor.getValue() !== scripts[0]) {
-          //console.log("saved");
           scripts[0] = editor.getValue();
           socket.emit(EVENTS.SUBMIT, scripts[0]);
         }
@@ -545,6 +543,9 @@
               break;
             case "Error":
               printToConsole(body, "#F00");
+              break;
+            case "Message_Sent":
+              printToConsole(body.source.name + " sent message: " + body.string, "#ABC");
               break;
             default:
               //console.log("Unknown event: " + e.name);

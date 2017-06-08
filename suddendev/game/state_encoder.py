@@ -95,8 +95,9 @@ class StateEncoder(json.JSONEncoder):
                 'source' : self.serializePlayer(message.source),
                 'string' : message.string,
                 'to_self' : message.to_self,
-                'body' : body
+                'body' : message.body
                 }
+        return json
 
     def serializeEvents(self, events):
         result = []
@@ -120,7 +121,7 @@ class StateEncoder(json.JSONEncoder):
                         self.serializeEntity(e.body[1]),
                         ]
             elif e.event_type == EventType.MESSAGE_SENT:
-                body = serializeMessage(self, e.body[0])
+                body = self.serializeMessage(e.body[0])
 
             json['body'] = body
             result.append(json)
