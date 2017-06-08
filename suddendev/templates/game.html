@@ -24,6 +24,7 @@
       var editor = null;
       var socket = null;
       var inGame = false;
+      var test = false;
       var currentTab = 0;
       var scripts = [`{{user.script}}`,"","",""];
 
@@ -96,6 +97,11 @@
         timer = 0;
         create_core(states[0].core);
         inGame = true;
+        if (test) {
+          test = false;
+          toggleClasses("testBtn", ["inactive", "noEvents"], false);
+          toggleClasses("readyBtn", ["inactive", "noEvents"], false);
+        }
       }
 
       var health_bar_width = 24;
@@ -377,6 +383,9 @@
       function testCode() {
         clearStates();
         socket.emit(EVENTS.TEST, editor.getValue());
+        toggleClasses("testBtn", ["noEvents", "inactive"], true);
+        toggleClasses("readyBtn", ["noEvents", "inactive"], true);
+        test = true;
       }
 
       function revertCode() {
@@ -402,12 +411,8 @@
 
       //Ready up
       function readyUp() {
-        var b = document.getElementById("readyBtn");
-        b.classList.add("active");
-        b.classList.add("noEvents");
-        var tb = document.getElementById("testBtn");
-        tb.classList.add("noEvents");
-        tb.classList.add("active");
+        toggleClasses("readyBtn", ["active", "noEvents"], true);
+        toggleClasses("testBtn", ["noEvents","inactive"], true);
         socket.emit(EVENTS.PLAY, {});
       }
 
@@ -604,6 +609,17 @@
         s.style.color = color;
         c.appendChild(s);
         c.scrollTop = c.scrollHeight;
+      }
+
+      function toggleClasses(id, classes, add) {
+        var e = document.getElementById(id).classList;
+        for (i = 0; i < classes.length; i++) {
+          if (add) {
+            e.add(classes[i]);
+          } else {
+            e.remove(classes[i]);
+          }
+        }
       }
 
     </script>
