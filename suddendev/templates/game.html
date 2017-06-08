@@ -4,6 +4,7 @@
   <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
   <script type="text/javascript" src="{{url_for('static', filename='pixi-particles.min.js')}}"></script>
+  <script type="text/javascript" src="{{url_for('static', filename='pixi-extra-filters.min.js')}}"></script>
 
   <script>
       //Colors and static variables
@@ -148,15 +149,51 @@
 
         container.position = data.pos;
         stage.addChild(container);
+
+        var emitter = new PIXI.particles.Emitter(
+                stage,
+                [sprite.generateCanvasTexture()],
+                {
+                        alpha: {
+                                start: 1,
+                                end: 1
+                        },
+                        scale: {
+                                start: 1,
+                                end: 0.2
+                        },
+                        speed: {
+                                start: 0,
+                                end: 0
+                        },
+                        lifetime: {
+                                min: 1,
+                                max: 1
+                        },
+                        frequency: 0.001,
+                        emitterLifetime: -1,
+                        maxParticles: 100,
+                        pos: {
+                                x: container.x,
+                                y: container.y
+                        },
+                        addAtBack: false,
+                        spawnType: "point"
+                }
+        );
+        emitter.emit = true;
+
         return {
           container: container,
           sprite: sprite,
+          emitter: emitter,
           health: health,
         };
       }
 
       function create_player(data) {
-        playerDict[data.tag] = create_entity_triangle(data);
+        var player = create_entity_triangle(data);
+        playerDict[data.tag] = player;
 
         var ammo = new PIXI.Text(data.ammo.toString(),
                                         { fontFamily: "Arial",
@@ -171,6 +208,9 @@
         stage.setChildIndex(circle, 0);
         circle.position = data.pos;
 
+        //Glow
+        player.container.filters = [new PIXI.filters.GlowFilter(6, 0.8, 0, data.color, 1)];
+
         ammo.anchor.x = 0.5;
         ammo.anchor.y = -1.5;
         ammo.y = -data.size/2 - 2;
@@ -182,12 +222,11 @@
         name.anchor.x = 0.5;
         name.anchor.y = 2;
 
-        var p = playerDict[data.tag];
-        p.container.addChild(ammo);
-        p.container.addChild(name);
-        p.ammo = ammo;
-        p.name = name;
-        p.visible_area = circle;
+        player.container.addChild(ammo);
+        player.container.addChild(name);
+        player.ammo = ammo;
+        player.name = name;
+        player.visible_area = circle;
       }
 
       function create_core(data) {
@@ -629,6 +668,8 @@
         if (data.vel.x != 0 || data.vel.y != 0) {
           entity.sprite.rotation = vector_to_rotation(data.vel);
           entity.health.getChildAt(1).scale.x = data.health/data.healthMax;
+          entity.emitter.updateOwnerPos(data.pos);
+          entity.emitter.update(delta);
         }
       }
 

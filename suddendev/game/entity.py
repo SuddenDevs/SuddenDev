@@ -17,6 +17,7 @@ def entity_init(self):
     self.size = gc.E_SIZE
     self.healthMax = gc.E_HEALTHMAX
     self.health = self.healthMax
+    self.vel_prev = self.vel
 
 class Dummy():
     def __init__(self):
@@ -38,4 +39,6 @@ class Entity():
             self.health = max(0, self.health - damage)
 
     def update(self, delta):
-        return self.pos + self.vel * delta
+        accel = self.vel - self.vel_prev
+        self.vel_prev = self.vel_prev + accel * 0.25;
+        return self.pos + self.vel_prev * delta

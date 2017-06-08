@@ -63,8 +63,6 @@ class Player(Entity):
 
         self.dummy.name = self.name 
         self.dummy.color = self.color 
-        self.dummy.vel = self.vel 
-        self.dummy.speed = self.speed
         self.dummy.range_visible = self.range_visible
         self.dummy.range_attackable = self.range_attackable
 
