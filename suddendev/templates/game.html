@@ -3,6 +3,8 @@
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_game.css')}}">
   <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.5.1/pixi.min.js"></script>
+  <script type="text/javascript" src="{{url_for('static', filename='pixi-particles.min.js')}}"></script>
+
   <script>
       //Colors and static variables
       var ENEMYC = "#000000";
@@ -181,7 +183,6 @@
 
         container.position = data.pos;
         stage.addChild(container);
-        console.log("add core");
 
         core = {
           container: container,
@@ -215,6 +216,8 @@
         sprite.drawRect(0, 0, size, size);
         sprite.x = -size/2;
         sprite.y = -size/2;
+        sprite.pivot.x = size/2;
+        sprite.pivot.y = size/2;
         container.addChild(sprite);
 
         var label = new PIXI.Text(data.value.toString(),
@@ -227,11 +230,61 @@
         label.y = -size/2 - 2;
         container.addChild(label);
 
+        var emitter = new PIXI.particles.Emitter(
+                container,
+                [sprite.generateCanvasTexture()],
+                {
+                        alpha: {
+                                start: 0.8,
+                                end: 0.1
+                        },
+                        scale: {
+                                start: 1,
+                                end: 0.3
+                        },
+                        color: {
+                                start: "fb1010",
+                                end: "f5b830"
+                        },
+                        speed: {
+                                start: 200,
+                                end: 100
+                        },
+                        startRotation: {
+                                min: 0,
+                                max: 360
+                        },
+                        rotationSpeed: {
+                                min: 0,
+                                max: 0
+                        },
+                        lifetime: {
+                                min: 0.5,
+                                max: 0.5
+                        },
+                        frequency: 0.008,
+                        emitterLifetime: 0.31,
+                        maxParticles: 1000,
+                        pos: {
+                                x: 0,
+                                y: 0
+                        },
+                        addAtBack: false,
+                        spawnType: "circle",
+                        spawnCircle: {
+                                x: 0,
+                                y: 0,
+                                r: 10
+                        }
+                }
+        );
+
         container.position = data.pos;
         stage.addChild(container);
         pickups[data.tag] = {
           container: container,
           sprite: sprite,
+          emitter: emitter,
           label: label
         };
       }
@@ -414,7 +467,7 @@
       }
 
       //Clear shape drawer, then draw game state to gameCanvas
-      function process_state(state) {
+      function process_state(state, delta) {
         //Process events
         //Create & delete entities
 
@@ -451,7 +504,7 @@
 
         //Update
         draw_enemies(state.enemies);
-        draw_pickups(state.powerups);
+        draw_pickups(state.powerups, delta);
         draw_players(state.players);
         draw_core(state.core);
       }
@@ -464,11 +517,9 @@
         for (i = 0; i < attacks.length; i++) {
           var a = attacks[i];
           a.timer = a.timer + delta;
-          console.log("update attack");
           if (a.timer >= attack_fade) {
             stage.removeChild(a.sprite);
             attacks.splice(i, 1);   
-            console.log("remove attack");
             i--;
           } else {
             a.sprite.alpha = 1 - a.timer/attack_fade;
@@ -525,9 +576,11 @@
         }
       } 
 
-      function draw_pickups(list) {
+      function draw_pickups(list, delta) {
         for (i = 0; i < list.length; i++) {
-          list[i].rotation = (timer * 20) % 20;
+          var p = pickups[list[i].tag];
+          p.sprite.rotation = (timer * 20) % 20;
+          p.emitter.update(delta);
         }
       }
 
