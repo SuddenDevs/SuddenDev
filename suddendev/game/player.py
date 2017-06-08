@@ -7,6 +7,7 @@ from .event import Event, EventType
 from .util import (
         shoot,
         say,
+        say_also_to_self,
         distance_to,
         move_to,
         move_from,
@@ -15,7 +16,7 @@ from .util import (
         get_nearest,
         get_farthest
         )
-from .message import Message, MessageType
+from .message import Message
 
 import math
 import random
@@ -91,12 +92,12 @@ class Player(Entity):
             'math' : math,
             'Vector' : Vector,
             'PowerupType' : PowerupType,
-            'MessageType' : MessageType,
             'core' : game.core,
             'random' : random,
             'sys' : sys,
 
             'say' : say,
+            'say_also_to_self' : say_also_to_self,
             'shoot' : shoot,
             'move_to' : move_to,
             'move_from' : move_from,

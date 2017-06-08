@@ -90,10 +90,7 @@ class StateEncoder(json.JSONEncoder):
     def serializeMessage(self, message):
         json = {
                 'source' : self.serializePlayer(message.source),
-                'mtype' : message.mtype.value,
                 'string' : message.string,
-                'entity' : self.serializeEntity(message.entity),
-                'vector' : self.serializeVector(message.vector),
                 'to_self' : message.to_self,
                 'body' : body
                 }
