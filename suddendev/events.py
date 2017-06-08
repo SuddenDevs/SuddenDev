@@ -124,7 +124,5 @@ def run_game_if_everyone_ready(game_id):
 
 def update_players(game_id):
     game_json_string = get_room_state_json_string(game_id)
-    print(game_json_string)
     if game_json_string is not None:
-        print('sending')
         fsio.emit('update', game_json_string, room=game_id, namespace=NAMESPACE)
