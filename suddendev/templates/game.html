@@ -89,7 +89,14 @@
 
       //Function to start the game
       function readyGame(data) {
-        states = states.concat(JSON.parse(data).result);
+        var tempStates = JSON.parse(data).result;
+        for (i = 0; i < tempStates[0].events.length; i++) {
+          if (tempStates[0].events[i].name === "Game_Start") {
+            clearStates();
+            break;
+          }
+        }
+        states = states.concat(tempStates);
         stage.removeChild(waitingText);
         for (i = 0; i < players.length; i++) {
           create_player(states[0].players[i]);
@@ -99,10 +106,10 @@
         inGame = true;
         ticker.start();
         if (test) {
-          test = false;
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
           toggleClasses("readyBtn", ["inactive", "noEvents"], false);
         }
+        ticker.start();
       }
 
       var health_bar_width = 24;
@@ -177,7 +184,7 @@
         container.addChild(sprite);
 
         var health = create_health_bar();
-        console.log(health.width);
+        // console.log(health.width);
         health.y = data.size + 2;
         health.x = -health_bar_width/2;
         container.addChild(health);
@@ -459,6 +466,7 @@
         toggleClasses("readyBtn", ["active", "noEvents"], true);
         toggleClasses("testBtn", ["noEvents","inactive"], true);
         socket.emit(EVENTS.PLAY, {});
+        test = false;
       }
 
       //Initialise gameCanvas - initialise stage, add shape drawer
@@ -523,10 +531,18 @@
               clearup_pickup(body.tag);
               break;
             case "Game_End":
-              console.log('RIP game');
+              // console.log('RIP game');
+              endGame();
               break;
             case "Attack":
               create_attack(body[0].pos, body[1].pos);
+              break;
+            case "Print":
+              printToConsole(body, "#F0F");
+              break;
+            case "Error":
+              printToConsole(body, "#F00");
+              break;
             default:
               //console.log("Unknown event: " + e.name);
           }
@@ -537,6 +553,16 @@
         draw_pickups(state.powerups, delta);
         draw_players(state.players, delta);
         draw_core(state.core);
+      }
+
+      function endGame() {
+        ticker.stop();
+        if (!test) {
+          toggleClasses("readyBtn", ["active", "noEvents"], false);
+          toggleClasses("testBtn", ["inactive", "noEvents"], false);
+        } else {
+          test = false;
+        }
       }
 
       function vector_to_rotation(dir) {
@@ -615,7 +641,7 @@
 
       //Pause game, update pause button
       function togglePause() {
-        if (ticker.started) {
+        if (ticker.started && inGame) {
           ticker.stop();
         } else {
           ticker.start();
