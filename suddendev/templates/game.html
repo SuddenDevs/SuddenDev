@@ -97,6 +97,7 @@
         timer = 0;
         create_core(states[0].core);
         inGame = true;
+        ticker.start();
         if (test) {
           test = false;
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
@@ -138,7 +139,7 @@
         return {
           container: container,
           sprite: sprite,
-          health: health
+          health: health,
         };
       }
 
@@ -207,10 +208,10 @@
         enemies[data.tag] = create_entity_triangle(data);
       }
 
-      function create_powerup(data) {
+      function create_pickup(data) {
         var container = new PIXI.Container();
         var sprite = new PIXI.Graphics();
-        var size = 10;
+        var size = data.size;
 
         sprite.beginFill(PIXI.utils.rgb2hex([1, 0, 1]));
         sprite.drawRect(0, 0, size, size);
@@ -233,53 +234,57 @@
         container.position = data.pos;
         stage.addChild(container);
 
-        var emitter = new PIXI.particles.Emitter(
-                container,
-                [sprite.generateCanvasTexture(new PIXI.Point(1,1), 1)],
-                {
-                        alpha: {
-                                start: 0.8,
-                                end: 0.1
-                        },
-                        scale: {
-                                start: 2,
-                                end: 0.3
-                        },
-                        speed: {
-                                start: 200,
-                                end: 100
-                        },
-                        lifetime: {
-                                min: 2,
-                                max: 2
-                        },
-                        frequency: 40,
-                        emitterLifetime: 10,
-                        maxParticles: 1000,
-                        pos: {
-                                x: 0,
-                                y: 0
-                        },
-                        addAtBack: false,
-                        spawnType: "circle",
-                        spawnCircle: {
-                                x: 0,
-                                y: 0,
-                                r: 10
-                        }
-                }
-        );
-
         pickups[data.tag] = {
           container: container,
           sprite: sprite,
-          emitter: emitter,
           label: label
         };
       }
 
-      function clearup_powerup(tag) {
-        stage.removeChild(pickups[tag]);
+      function clearup_pickup(tag) {
+        var p = pickups[tag];
+
+        var emitter = new PIXI.particles.Emitter(
+                stage,
+                [p.sprite.generateCanvasTexture()],
+                {
+                        alpha: {
+                                start: 1,
+                                end: 0.9
+                        },
+                        scale: {
+                                start: 0.6,
+                                end: 0.2
+                        },
+                        speed: {
+                                start: 200,
+                                end: 0
+                        },
+                        lifetime: {
+                                min: 0.2,
+                                max: 0.2
+                        },
+                        startRotation: {
+                          min: 0,
+                          max: 360
+                        },
+                        frequency: 0.005,
+                        emitterLifetime: 0.01,
+                        maxParticles: 7,
+                        pos: {
+                                x: p.container.x,
+                                y: p.container.y
+                        },
+                        addAtBack: true,
+                        spawnType: "burst",
+                        particlesPerWave: 8,
+                        particleSpacing: 45,
+                        angleStart: 0
+                }
+        );
+
+        stage.removeChild(p.container);
+        emitter.playOnceAndDestroy();
         delete pickups[tag];
       }
 
@@ -289,7 +294,47 @@
       }
 
       function clearup_enemy(tag) {
-        stage.removeChild(enemies[tag].container);
+        //Particles!
+        var e = enemies[tag];
+
+        var emitter = new PIXI.particles.Emitter(
+                stage,
+                [e.sprite.generateCanvasTexture()],
+                {
+                        alpha: {
+                                start: 0.9,
+                                end: 0.8
+                        },
+                        scale: {
+                                start: 0.7,
+                                end: 0.5
+                        },
+                        speed: {
+                                start: 150,
+                                end: 0
+                        },
+                        lifetime: {
+                                min: 0.4,
+                                max: 0.2
+                        },
+                        startRotation: {
+                          min: 0,
+                          max: 360
+                        },
+                        frequency: 0.0001,
+                        emitterLifetime: 0.01,
+                        maxParticles: 7,
+                        pos: {
+                                x: e.container.x,
+                                y: e.container.y
+                        },
+                        addAtBack: true,
+                        spawnType: "point",
+                }
+        );
+
+        stage.removeChild(e.container);
+        emitter.playOnceAndDestroy();
         delete enemies[tag];
       }
 
@@ -420,7 +465,6 @@
       function initCanvas() {
         ticker = new PIXI.ticker.Ticker();
         ticker.add(game_loop);
-        ticker.start();
 
         var canvas = document.getElementById("gameCanvas");
         renderer = PIXI.autoDetectRenderer(800, 600, {view: canvas, antialias: true});
@@ -445,14 +489,14 @@
         timer += delta;
         fpsText.text = Math.round(ticker.FPS * 100) / 100;
         if (inGame && states.length > 0) {
-          process_state(states[0]);
+          process_state(states[0], delta);
           states.splice(0, 1);
+
+          //Effects
+          draw_attacks(delta);
+
+          draw();
         }
-
-        //Effects
-        draw_attacks(delta);
-
-        draw();
       }
 
       //Clear shape drawer, then draw game state to gameCanvas
@@ -472,10 +516,11 @@
               clearup_enemy(body.tag);
               break;
             case "Powerup_Spawn":
-              create_powerup(body);
+              create_pickup(body);
               break;
             case "Powerup_Used":
-              clearup_powerup(body.tag);
+              console.log("powerup_used");
+              clearup_pickup(body.tag);
               break;
             case "Game_End":
               console.log('RIP game');
@@ -488,9 +533,9 @@
         }
 
         //Update
-        draw_enemies(state.enemies);
+        draw_enemies(state.enemies, delta);
         draw_pickups(state.powerups, delta);
-        draw_players(state.players);
+        draw_players(state.players, delta);
         draw_core(state.core);
       }
 
@@ -536,7 +581,7 @@
         return shape;
       }
 
-      function update_entity(entity, data) {
+      function update_entity(entity, data, delta) {
         entity.container.position = data.pos;
         if (data.vel.x != 0 || data.vel.y != 0) {
           entity.sprite.rotation = vector_to_rotation(data.vel);
@@ -545,18 +590,18 @@
       }
 
       // Draw every object in a list the same color
-      function draw_enemies(list) {
+      function draw_enemies(list, delta) {
         for (i = 0; i < list.length; i++) {
-          update_entity(enemies[list[i].tag], list[i]);
+          update_entity(enemies[list[i].tag], list[i], delta);
         }
       }
 
       // Draw every player and update name locations
-      function draw_players(list) {
+      function draw_players(list, delta) {
         for (i = 0; i < list.length; i++) {
           var data = list[i];
           var player = playerDict[data.tag];
-          update_entity(player, data);
+          update_entity(player, data, delta);
           player.ammo.text = data.ammo.toString();
         }
       } 
@@ -564,8 +609,7 @@
       function draw_pickups(list, delta) {
         for (i = 0; i < list.length; i++) {
           var p = pickups[list[i].tag];
-          p.sprite.rotation = (timer * 20) % 20;
-          p.emitter.update(delta);
+          p.sprite.rotation = (timer * 5) % 20;
         }
       }
 
