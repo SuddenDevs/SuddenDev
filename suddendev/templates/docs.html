@@ -4,102 +4,162 @@
 
   <div class="container">
       {{ suddendev_header() }}
-      Your code should define an <code>update(self, delta)</code> function, where <code>delta</code> refers to the time between frames.<br>
-      You can access the following attributes of your bot:<br>
-      <code>self.vel</code> - velocity of the bot<br>
-      You will probably want to modify this in order to move your bot. The velocity should be assigned to a vector as follows:<br>
-      <code>self.vel = Vector(x, y)</code><br>
-      The coordinate system starts at <code>(0,0)</code> at the top left corner, so for example<br>
-      <code>self.vel = Vector(10,0)</code> will make the bot move to the right with speed <code>10</code>, whereas
-      <code>self.vel = Vector(-1,-1)</code> will make the bot move down and left with speed <code>√2
-      </code>, i.e. the magnitude of the vector.
-      <br><br><br>
 
-      <b>Must define:</b><br>
-      <code>update(self, delta)</code><br><br>
+      <h2>A co-op survival game where your code plays for you.</h2>
+      <br>
 
-      <b>Can define:</b><br>
-      <code>respond(self, message)</code><br><br>
+        <div class="panel panel-primary">
+            <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseZero">
+              <h4 class="panel-title">
+	        <a class="accordion-toggle">
+                Getting Started
+                </a>
+              </h4>
+            </div>
+          <div id="collapseZero" class="panel-collapse collapse in">
+            <div class="panel-body">
+	    Your bones don't break, mine do. That's clear. Your cells react to bacteria and viruses differently than mine. You don't get sick, I do. That's also clear. But for some reason, you and I react the exact same way to water. We swallow it too fast, we choke. We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I. We're on the same curve, just on opposite ends.
+	    </div>
+          </div>
+        </div>
+        <div class="panel panel-primary">
+          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+            <h4 class="panel-title">
+              <a class="accordion-toggle">
+              Gameplay Basics
+              </a>
+            </h4>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse">
+            <div class="panel-body">
+	    Now that we know who you are, I know who I am. I'm not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain's going to be? He's the exact opposite of the hero. And most times they're friends, like you and me! I should've known way back when... You know why, David? Because of the kids. They called me Mr Glass.
+	    </div>
+          </div>
+        </div>
+        <div class="panel panel-primary">
+          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+            <h4 class="panel-title">
+              <a class="accordion-toggle">
+              Scripting Basics
+              </a>
+            </h4>
+          </div>
+          <div id="collapseTwo" class="panel-collapse collapse">
+            <div class="panel-body">
+	    Now that we know who you are, I know who I am. I'm not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain's going to be? He's the exact opposite of the hero. And most times they're friends, like you and me! I should've known way back when... You know why, David? Because of the kids. They called me Mr Glass.
+	    </div>
+          </div>
+        </div>
+        <div class="panel panel-primary">
+          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+            <h4 class="panel-title">
+              <a class="accordion-toggle">
+	      Scripting Reference
+              </a>
+            </h4>
+          </div>
+          <div id="collapseThree" class="panel-collapse collapse">
+            <div class="panel-body">
+              Your code should define an <code>update(self, delta)</code> function, where <code>delta</code> refers to the time between frames.<br>
+              You can access the following attributes of your bot:<br>
+              <code>self.vel</code> - velocity of the bot<br>
+              You will probably want to modify this in order to move your bot. The velocity should be assigned to a vector as follows:<br>
+              <code>self.vel = Vector(x, y)</code><br>
+              The coordinate system starts at <code>(0,0)</code> at the top left corner, so for example<br>
+              <code>self.vel = Vector(10,0)</code> will make the bot move to the right with speed <code>10</code>, whereas
+              <code>self.vel = Vector(-1,-1)</code> will make the bot move down and left with speed <code>√2
+              </code>, i.e. the magnitude of the vector.
+              <br><br><br>
 
-      <b>Can access as libraries</b><br>
-      <code>math</code><br>
-      <code>random</code><br>
-      <code>sys</code><br>
-      <code>__builtins__</code> (which is a super long list of built in keywords)<br><br>
+              <b>Must define:</b><br>
+              <code>update(self, delta)</code><br><br>
 
-      <b>Can access as lists:</b><br>
-      <code>enemies_visible</code><br>
-      <code>enemies_attackable</code><br>
-      <code>powerups_visible</code><br><br>
+              <b>Can define:</b><br>
+              <code>respond(self, message)</code><br><br>
 
-      <b>Can access</b><br>
-      <code>core</code><br><br>
+              <b>Can access as libraries</b><br>
+              <code>math</code><br>
+              <code>random</code><br>
+              <code>sys</code><br>
+              <code>__builtins__</code> (which is a super long list of built in keywords)<br><br>
 
-      <b>Can access as attributes (prepend with <code>self.</code>):</b><br>
-      (can also access most of these things for enemies and stuff)<br>
-      stuff in <b>bold</b> can be modified.<br>
-      <code>tag</code><br>
-      <code>pos</code><br>
-      <b><code>vel</code></b><br>
-      <code>speed</code><br>
-      <code>size</code><br>
-      <code>healthMax</code><br>
-      <code>health</code><br><br>
+              <b>Can access as lists:</b><br>
+              <code>enemies_visible</code><br>
+              <code>enemies_attackable</code><br>
+              <code>powerups_visible</code><br><br>
 
-      <code>ammo</code><br>
-      <code>name</code><br>
-      <code>color</code><br>
-      <code>speed</code><br>
-      <code>range_visible</code><br>
-      <code>range_attackable</code><br>
-      <code>damage</code><br>
-      <code>attack_delay</code><br>
-      <code>has_message</code><br>
-      <code>message</code><br><br>
+              <b>Can access</b><br>
+              <code>core</code><br><br>
 
-      <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
-      <b><code>shoot(self, enemy)</code></b><br>
-      <b><code>say(self, mtype=None, string=None, entity=None, vector=None, to_self=False)</code></b><br> 
-      <code>distance_to(self, target)</code><br>
-      <code>move_to_pos(self, pos, speed=None)</code><br>
-      <code>move_from_pos(self, pos, speed=None)</code><br>
-      <b><code>move_to(self, target, speed=None)</code></b><br>
-      <code>move_from(self, target, speed=None)</code><br>
-      <code>get_nearest(self, entities, with_distance=False)</code><br>
-      <code>get_farthest(self, entities, with_distance=False)</code><br><br>
+              <b>Can access as attributes (prepend with <code>self.</code>):</b><br>
+              (can also access most of these things for enemies and stuff)<br>
+              stuff in <b>bold</b> can be modified.<br>
+              <code>tag</code><br>
+              <code>pos</code><br>
+              <b><code>vel</code></b><br>
+              <code>speed</code><br>
+              <code>size</code><br>
+              <code>healthMax</code><br>
+              <code>health</code><br><br>
 
-      <b>Message:</b><br>
-      <b><code>source</code></b><br>
-      <code>to_self</code><br>
-      At least one of the following fields must be set:<br>
-      <code>mtype</code><br>
-      <code>string</code><br>
-      <code>entity</code><br>
-      <code>vector</code><br><br>
+              <code>ammo</code><br>
+              <code>name</code><br>
+              <code>color</code><br>
+              <code>speed</code><br>
+              <code>range_visible</code><br>
+              <code>range_attackable</code><br>
+              <code>damage</code><br>
+              <code>attack_delay</code><br>
+              <code>has_message</code><br>
+              <code>message</code><br><br>
 
-      <b>Vectors:</b><br>
-      Initialise as:<br>
-      <code>Vector(x, y)</code><br><br>
-      Vector functions:<br>
-      <code>DistanceSqrd(point1, point2)</code><br>
-      <code>Distance(point1, point2)</code><br>
-      <code>LengthSqrd(vec)</code><br>
-      <code>Length(vec)</code><br>
-      <code>Normalize(vec)</code><br>
-      <code>Dot(a, b)</code><br>
-      <code>ProjectOnto(w, v)</code><br><br>
+              <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
+              <b><code>shoot(self, enemy)</code></b><br>
+              <b><code>say(self, mtype=None, string=None, entity=None, vector=None, to_self=False)</code></b><br> 
+              <code>distance_to(self, target)</code><br>
+              <code>move_to_pos(self, pos, speed=None)</code><br>
+              <code>move_from_pos(self, pos, speed=None)</code><br>
+              <b><code>move_to(self, target, speed=None)</code></b><br>
+              <code>move_from(self, target, speed=None)</code><br>
+              <code>get_nearest(self, entities, with_distance=False)</code><br>
+              <code>get_farthest(self, entities, with_distance=False)</code><br><br>
 
-      <b>Enums:</b><br>
-      MessageType<br>
-      <code>HELP = 'help'</code><br>
-      <code>OK = 'ok'</code><br>
-      <code>KILL = 'kill'</code><br>
-      <code>NEED_AMMO = 'need ammo'</code><br>
-      <code>LOW_HEALTH = 'low health'</code><br><br>
+              <b>Message:</b><br>
+              <b><code>source</code></b><br>
+              <code>to_self</code><br>
+              At least one of the following fields must be set:<br>
+              <code>mtype</code><br>
+              <code>string</code><br>
+              <code>entity</code><br>
+              <code>vector</code><br><br>
 
-      PowerupType<br>
-      <code>AMMO_UP</code><br>
-      <code>HEALTH_UP</code><br>
+              <b>Vectors:</b><br>
+              Initialise as:<br>
+              <code>Vector(x, y)</code><br><br>
+              Vector functions:<br>
+              <code>DistanceSqrd(point1, point2)</code><br>
+              <code>Distance(point1, point2)</code><br>
+              <code>LengthSqrd(vec)</code><br>
+              <code>Length(vec)</code><br>
+              <code>Normalize(vec)</code><br>
+              <code>Dot(a, b)</code><br>
+              <code>ProjectOnto(w, v)</code><br><br>
+
+              <b>Enums:</b><br>
+              MessageType<br>
+              <code>HELP = 'help'</code><br>
+              <code>OK = 'ok'</code><br>
+              <code>KILL = 'kill'</code><br>
+              <code>NEED_AMMO = 'need ammo'</code><br>
+              <code>LOW_HEALTH = 'low health'</code><br><br>
+
+              PowerupType<br>
+              <code>AMMO_UP</code><br>
+              <code>HEALTH_UP</code><br>
+	    </div>
+          </div>
+        </div>
+
       <br><br>
   </div>
 {% endblock %}
