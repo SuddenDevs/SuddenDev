@@ -11,6 +11,20 @@ LOBBY_ADJECTIVES = [
     'fiery',
     'quiet',
     'flaming',
+    'dead',
+    'not a dead',
+    'self-conscious',
+    'proud',
+    'drowned',
+    'abused',
+    'optimistic',
+    'cheery',
+    'emotional',
+    'sensitive',
+    'quick',
+    'reliable',
+    'manly',
+    'posh',
 ]
 
 LOBBY_NOUNS = [
@@ -24,4 +38,12 @@ LOBBY_NOUNS = [
     'rainbow boa',
     'lizard',
     'serpent',
+    'mamba',
+    'tarantula',
+    'king cobra',
+    'tiger snake',
+    'South American bushmaster',
+    'Mozambique spitting cobra',
+    'krait',
+    'viper'
 ]
