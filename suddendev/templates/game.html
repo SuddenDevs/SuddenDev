@@ -112,7 +112,24 @@
       }
 
       function startWaiting(state) {
-        waitingText = new PIXI.Text(WAITTEXT, {fontFamily: "Arial", fontSize: 20, fill: "black"});
+        var style = new PIXI.TextStyle({
+          fontFamily: 'Arial',
+          fontSize: 36,
+          fontWeight: 'bold',
+          fill: ['#ffffff'], // gradient
+          align: 'center',
+          //stroke: '#4a1850',
+          strokeThickness: 5,
+          dropShadow: true,
+          dropShadowColor: '#000000',
+          dropShadowBlur: 10,
+          dropShadowAngle: Math.PI / 6,
+          dropShadowDistance: 1,
+          wordWrap: true,
+          wordWrapWidth: 440
+        });
+
+        waitingText = new PIXI.Text(WAITTEXT, style);
         waitingText.x = 400;
         waitingText.y = 200;
         waitingText.anchor.x = 0.5;
@@ -668,7 +685,7 @@
               break;
             case "Game_End":
               // console.log('RIP game');
-              endGame();
+              endGame(body);
               break;
             case "Attack":
               create_attack(body[0].pos, body[1].pos);
@@ -712,7 +729,7 @@
         draw();
       }
 
-      function endGame() {
+      function endGame(msg) {
         timer_end = TIME_AFTER_END;
         inGame = false;
         if (!test) {
@@ -724,7 +741,7 @@
         //Blur
         background_layer.filters = [blurFilter];
         game_layer.filters = [blurFilter];
-        waitingText.text = "GAME OVER";
+        waitingText.text = msg;
         waitingText.visible = true;
       }
 

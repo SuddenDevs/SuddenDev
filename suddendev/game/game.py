@@ -89,9 +89,9 @@ class Game:
 
     def check_if_game_over(self):
         if len(self.enemies) == 0 and self.enemy_count >= self.gc.ENEMY_LIMIT:
-            return 'Win'
+            return 'Wave ' + str(self.wave) + ' cleared!'
         elif len(self.players) == 0:
-            return 'Loss'
+            return 'Game Over'
         else:
             return None
 
