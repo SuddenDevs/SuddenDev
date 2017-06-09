@@ -46,7 +46,7 @@ class GameConfig:
     P_SPEED = 80
     P_RANGE_VISIBLE = 300
     P_RANGE_ATTACKABLE = 80
-    P_AMMO = 6
+    P_AMMO = 10
     P_DAMAGE = 75
     P_ATTACK_DELAY = 10
     P_DEFAULT_SCRIPT = """

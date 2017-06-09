@@ -17,6 +17,7 @@
       var WAITTEXT = "Press 'Ready' to begin!";
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
+      var TIME_AFTER_END = 5; //How long to continue animating after round
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
@@ -39,6 +40,12 @@
       var players = [];
       var playerID = {{user.id}};
 
+      //Layers
+      var hud_layer = null;
+      var game_layer = null;
+      var background_layer = null;
+      var blurFilter = null;
+
       //Game state
       var ticker = null;
       var playerDict = {};
@@ -47,6 +54,8 @@
       var attacks = [];
       var core = null;
       var timer = 0;
+      var last_state = null;
+      var timer_end = 0;
 
       var states = [];
 
@@ -105,13 +114,11 @@
       }
 
       function startWaiting(state) {
-        draw_grid();
-
         waitingText = new PIXI.Text(WAITTEXT, {fontFamily: "Arial", fontSize: 20, fill: "black"});
         waitingText.x = 400;
         waitingText.y = 200;
         waitingText.anchor.x = 0.5;
-        stage.addChild(waitingText);
+        hud_layer.addChild(waitingText);
       }
 
       function draw_grid() {
@@ -131,33 +138,26 @@
           grid.moveTo(0, i * cell_size);
           grid.lineTo(renderer.width, i * cell_size);
         }
-        stage.addChildAt(grid, 0);
+        background_layer.addChildAt(grid, 0);
       }
 
       function startGame(state) {
         clearStates();
-        stage.removeChild(waitingText);
+        waitingText.visible = false;
         for (i = 0; i < players.length; i++) {
           create_player(state.players[i]);
         }
-        stage.removeChild(waitingText);
-        timer = 0;
         inGame = true;
         create_core(state.core);
-        ticker.start();
         if (test) {
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
           toggleClasses("readyBtn", ["inactive", "noEvents"], false);
         }
         
-        draw_grid();
-
-        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
-        fpsText.x = 10;
-        fpsText.y = 10;
-        stage.addChild(fpsText);
-
+        background_layer.filters = [];
+        game_layer.filters = [];
         renderer.render(stage);
+        ticker.start();
       }
 
       function create_health_bar() {
@@ -189,10 +189,10 @@
         container.addChild(health);
 
         container.position = data.pos;
-        stage.addChild(container);
+        game_layer.addChild(container);
 
         var emitter = new PIXI.particles.Emitter(
-                stage,
+                game_layer,
                 [sprite.generateCanvasTexture()],
                 {
                         alpha: {
@@ -245,8 +245,8 @@
         var circle = new PIXI.Graphics();
         circle.beginFill(data.color);
         circle.drawCircle(0, 0, data.range_visible);
-        stage.addChild(circle);
-        stage.setChildIndex(circle, 0);
+        game_layer.addChild(circle);
+        game_layer.setChildIndex(circle, 0);
         circle.position = data.pos;
         circle.alpha = 0.1;
 
@@ -287,7 +287,7 @@
         container.addChild(health);
 
         container.position = data.pos;
-        stage.addChild(container);
+        game_layer.addChild(container);
 
         core = {
           container: container,
@@ -302,7 +302,7 @@
         graphics.lineStyle(2, PIXI.utils.rgb2hex([1, 0, 0]));
         graphics.moveTo(from.x, from.y);
         graphics.lineTo(to.x, to.y);
-        stage.addChild(graphics);
+        game_layer.addChild(graphics);
         attacks.push({sprite: graphics,
                       timer: 0});
       }
@@ -336,7 +336,7 @@
         container.addChild(label);
 
         container.position = data.pos;
-        stage.addChild(container);
+        game_layer.addChild(container);
 
         pickups[data.tag] = {
           container: container,
@@ -349,7 +349,7 @@
         var p = pickups[tag];
 
         var emitter = new PIXI.particles.Emitter(
-                stage,
+                game_layer,
                 [p.sprite.generateCanvasTexture()],
                 {
                         alpha: {
@@ -387,13 +387,13 @@
                 }
         );
 
-        stage.removeChild(p.container);
+        game_layer.removeChild(p.container);
         emitter.playOnceAndDestroy();
         delete pickups[tag];
       }
 
       function clearup_player(tag) {
-        stage.removeChild(playerDict[tag].container);
+        game_layer.removeChild(playerDict[tag].container);
         delete playerDict[tag];
       }
 
@@ -402,7 +402,7 @@
         var e = enemies[tag];
 
         var emitter = new PIXI.particles.Emitter(
-                stage,
+                game_layer,
                 [e.sprite.generateCanvasTexture()],
                 {
                         alpha: {
@@ -437,7 +437,7 @@
                 }
         );
 
-        stage.removeChild(e.container);
+        game_layer.removeChild(e.container);
         emitter.playOnceAndDestroy();
         delete enemies[tag];
       }
@@ -540,14 +540,16 @@
       }
 
       function clearStates() {
+        timer = 0;
+        timer_end = 0;
         playerDict = {};
         enemies = {};
         pickups = {};
         core = null;
         states = [];
         inGame = false;
-        for (i = stage.children.length - 1; i >= 0; i--) {
-          stage.removeChild(stage.children[i]);
+        for (i = game_layer.children.length - 1; i >= 0; i--) {
+          game_layer.removeChild(game_layer.children[i]);
         }
       }
 
@@ -574,6 +576,23 @@
         stage = new PIXI.Container();
         renderer.backgroundColor = 0xffffff;
 
+        background_layer = new PIXI.Container();
+        game_layer = new PIXI.Container();
+        hud_layer = new PIXI.Container();
+        
+        stage.addChild(background_layer);
+        stage.addChild(game_layer);
+        stage.addChild(hud_layer);
+
+        blurFilter = new PIXI.filters.BlurFilter(2, 1, 3);
+
+        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
+        fpsText.x = 10;
+        fpsText.y = 10;
+        hud_layer.addChild(fpsText);
+        
+        draw_grid();
+
         startWaiting();
         draw();
       }
@@ -581,15 +600,21 @@
       function game_loop() {
         delta = ticker.elapsedMS/1000;
         timer += delta;
+        timer_end -= delta;
         fpsText.text = Math.round(ticker.FPS * 100) / 100;
-        if (inGame && states.length > 0) {
-          process_state(states[0], delta);
-          states.splice(0, 1);
-
-          //Effects
-          draw_attacks(delta);
-
-          draw();
+        if (inGame) {
+          if (states.length > 0) {
+            last_state = states[0]
+            process_state(last_state, delta);
+            states.splice(0, 1);
+          } else {
+            //Waiting for game data...
+          }
+        } else if (timer_end > 0) {
+          blurFilter.blur = 2 * (1 - timer_end / TIME_AFTER_END);
+          process_state_end(last_state, delta); 
+        } else {
+          ticker.stop();
         }
       }
 
@@ -613,7 +638,6 @@
               create_pickup(body);
               break;
             case "Powerup_Used":
-              console.log("powerup_used");
               clearup_pickup(body.tag);
               break;
             case "Game_End":
@@ -637,21 +661,45 @@
           }
         }
 
-        //Update
+        //Updates
         draw_enemies(state.enemies, delta);
         draw_pickups(state.powerups, delta);
         draw_players(state.players, delta);
         draw_core(state.core);
+
+        //Effects
+        draw_attacks(delta);
+
+        draw();
+      }
+
+      function process_state_end(state, delta) {
+        //Updates
+        draw_enemies(state.enemies, delta);
+        draw_pickups(state.powerups, delta);
+        draw_players(state.players, delta);
+        draw_core(state.core);
+
+        //Effects
+        draw_attacks(delta);
+
+        draw();
       }
 
       function endGame() {
-        ticker.stop();
+        timer_end = TIME_AFTER_END;
+        inGame = false;
         if (!test) {
           toggleClasses("readyBtn", ["active", "noEvents"], false);
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
         } else {
           test = false;
         }
+        //Blur
+        background_layer.filters = [blurFilter];
+        game_layer.filters = [blurFilter];
+        waitingText.text = "GAME OVER";
+        waitingText.visible = true;
       }
 
       function vector_to_rotation(dir) {
@@ -663,7 +711,7 @@
           var a = attacks[i];
           a.timer = a.timer + delta;
           if (a.timer >= attack_fade) {
-            stage.removeChild(a.sprite);
+            game_layer.removeChild(a.sprite);
             attacks.splice(i, 1);   
             i--;
           } else {
