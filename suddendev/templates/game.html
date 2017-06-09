@@ -14,7 +14,7 @@
       var NAMEOFFS = 10;
       var EDITFONTSIZE = 15;
       var FRAMERATE = 60;
-      var WAITTEXT = "Press ready to begin!";
+      var WAITTEXT = "Press 'Ready' to begin!";
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
@@ -34,6 +34,7 @@
       var stage = null;
       var renderer = null
       var fpsText = null;
+      var mainText = null;
       var waitingText = null;
       var players = [];
       var playerID = {{user.id}};
@@ -103,8 +104,39 @@
         states = states.concat(tempStates);
       }
 
+      function startWaiting(state) {
+        draw_grid();
+
+        waitingText = new PIXI.Text(WAITTEXT, {fontFamily: "Arial", fontSize: 20, fill: "black"});
+        waitingText.x = 400;
+        waitingText.y = 200;
+        waitingText.anchor.x = 0.5;
+        stage.addChild(waitingText);
+      }
+
+      function draw_grid() {
+        //Grid
+        var cell_size = 20;
+        var across = renderer.width / cell_size;
+        var up = renderer.height / cell_size;
+        var grid = new PIXI.Graphics();
+        grid.lineStyle(1, "black", 0.1);
+        //Vertical
+        for (i = 0; i < across; i++) {
+          grid.moveTo(i * cell_size, 0);
+          grid.lineTo(i * cell_size, renderer.height);
+        }
+        //Horizontal
+        for (i = 0; i < across; i++) {
+          grid.moveTo(0, i * cell_size);
+          grid.lineTo(renderer.width, i * cell_size);
+        }
+        stage.addChildAt(grid, 0);
+      }
+
       function startGame(state) {
         clearStates();
+        stage.removeChild(waitingText);
         for (i = 0; i < players.length; i++) {
           create_player(state.players[i]);
         }
@@ -117,6 +149,15 @@
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
           toggleClasses("readyBtn", ["inactive", "noEvents"], false);
         }
+        
+        draw_grid();
+
+        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
+        fpsText.x = 10;
+        fpsText.y = 10;
+        stage.addChild(fpsText);
+
+        renderer.render(stage);
       }
 
       function create_health_bar() {
@@ -202,11 +243,12 @@
                                           align: "center"});
 
         var circle = new PIXI.Graphics();
-        circle.beginFill(PIXI.utils.rgb2hex([0.9, 1, 0.95]));
+        circle.beginFill(data.color);
         circle.drawCircle(0, 0, data.range_visible);
         stage.addChild(circle);
         stage.setChildIndex(circle, 0);
         circle.position = data.pos;
+        circle.alpha = 0.1;
 
         //Glow
         player.container.filters = [new PIXI.filters.GlowFilter(6, 0.8, 0, data.color, 1)];
@@ -532,17 +574,8 @@
         stage = new PIXI.Container();
         renderer.backgroundColor = 0xffffff;
 
-        waitingText = new PIXI.Text(WAITTEXT, {fontFamily: "Arial", fontSize: 20, fill: "black"});
-        waitingText.x = 400;
-        waitingText.y = 200;
-        waitingText.anchor.x = 0.5;
-        stage.addChild(waitingText);
-
-        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
-        fpsText.x = 10;
-        fpsText.y = 10;
-        stage.addChild(fpsText);
-        renderer.render(stage);
+        startWaiting();
+        draw();
       }
 
       function game_loop() {
