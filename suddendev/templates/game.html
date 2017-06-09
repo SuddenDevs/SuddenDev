@@ -14,7 +14,7 @@
       var NAMEOFFS = 10;
       var EDITFONTSIZE = 15;
       var FRAMERATE = 60;
-      var WAITTEXT = "Press 'Ready' to begin!";
+      var WAITTEXT = "Press ready to begin!";
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
       var TIME_AFTER_END = 5; //How long to continue animating after round
@@ -29,16 +29,15 @@
       var inGame = false;
       var test = false;
       var currentTab = 0;
-      var scripts = [`{{user.script|safe}}`,"","",""];
+      var players = [];
+      var playerID = {{user.id}};
+      var scripts = [];
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var stage = null;
       var renderer = null
       var fpsText = null;
-      var mainText = null;
       var waitingText = null;
-      var players = [];
-      var playerID = {{user.id}};
 
       //Layers
       var hud_layer = null;
@@ -101,7 +100,6 @@
 
       //Function to start the game
       function readyGame(data) {
-        console.log("game starting");
 
         var tempStates = JSON.parse(data).result;
         for (i = 0; i < tempStates[0].events.length; i++) {
@@ -153,7 +151,7 @@
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
           toggleClasses("readyBtn", ["inactive", "noEvents"], false);
         }
-        
+
         background_layer.filters = [];
         game_layer.filters = [];
         renderer.render(stage);
@@ -248,7 +246,7 @@
         game_layer.addChild(circle);
         game_layer.setChildIndex(circle, 0);
         circle.position = data.pos;
-        circle.alpha = 0.1;
+        circle.alpha = 0.25;
 
         //Glow
         player.container.filters = [new PIXI.filters.GlowFilter(6, 0.8, 0, data.color, 1)];
@@ -458,13 +456,26 @@
       function updateRoom(data) {
         var room = JSON.parse(data);
 
-        //Check if players have joined
+        var i;
+        //Check if player has joined
         for (i = 0; i < room.players.length; i++) {
-          tryAddPlayer(room.players[i]);
-          if (i != 0) {
-            scripts[i] = players[i].script;
+          if (room.players[i].id == playerID) {
+            tryAddPlayer(room.players[i]);
+            break;
           }
         }
+
+        //Check if players have joined
+        for (j = 0; j < room.players.length; j++) {
+          tryAddPlayer(room.players[j]);
+          if (room.players[j].id != playerID) {
+            var s = getScript(room.players[j].id);
+            scripts[s].script = room.players[j].script;
+            scripts[s].name = room.players[j].name;
+          }
+        }
+
+        i = 0;
 
         //Check if players have left
         if (players.length > room.players.length) {
@@ -476,9 +487,19 @@
               }
             }
             if (!present) {
+              scripts.splice(getScript(players[i].id), 1);
               players.splice(i, 1);
+              toggleClasses("tab" + (i), ["hidden"], false);
               i--;
             }
+          }
+        }
+      }
+
+      function getScript(id) {
+        for (i = 0; i < scripts.length; i++) {
+          if (scripts[i].id == id) {
+            return i
           }
         }
       }
@@ -489,12 +510,13 @@
           return false;
         }
         players.push(player);
+        scripts.push({"script":player.script, "id":player.id, "name":player.name});
         var t = document.getElementById("tab" + (players.length - 1));
         t.innerHTML = player.name;
         if (t.classList.contains("hidden")) {
           t.classList.remove("hidden");
           if (players.length - 1 == 0) {
-            editor.setValue(scripts[0]);
+            editor.setValue(scripts[0].script);
           }
         }
         return true;
@@ -521,9 +543,9 @@
       }
 
       function submitCode() {
-        if (editor.getValue() !== scripts[0]) {
-          scripts[0] = editor.getValue();
-          socket.emit(EVENTS.SUBMIT, scripts[0]);
+        if (editor.getValue() !== scripts[0].script) {
+          scripts[0].script = editor.getValue();
+          socket.emit(EVENTS.SUBMIT, scripts[0].script);
         }
       }
 
@@ -536,7 +558,9 @@
       }
 
       function revertCode() {
-        editor.setValue(scripts[0]);
+        if (currentTab == 0){
+          editor.setValue(scripts[0].script);
+        }
       }
 
       function clearStates() {
@@ -795,8 +819,9 @@
         var tabs = document.getElementsByClassName("tabBtn");
         tabs[currentTab].classList.toggle("active");
         tabs[tabi].classList.toggle("active");
-        scripts[currentTab] = editor.getValue();
-        editor.setValue(scripts[tabi]);
+        scripts[currentTab].script = editor.getValue();
+        editor.setValue(scripts[tabi].script);
+        editor.setReadOnly(tabi != 0);
         editor.focus();
         currentTab = tabi;
       }
@@ -809,7 +834,7 @@
         editor.getSession().setUseWrapMode(true);
         editor.getSession().setTabSize(4);
         editor.getSession().setUseSoftTabs(true);
-        editor.setValue(scripts[0], 1);
+        editor.setValue(`{{user.script}}`, 1);
       }
 
       //Prints to the on screen console
