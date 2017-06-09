@@ -26,7 +26,7 @@ from flask_login import LoginManager
 login_manager = LoginManager()
 
 from redis import StrictRedis, BlockingConnectionPool
-redis = StrictRedis.from_url(Config.REDIS_URL, decode_responses=True, charset="utf-8",
-        max_connections=Config.REDIS_CONNECTION_MAX, socket_connect_timeout=1, retry_on_timeout=True)
+redis = StrictRedis.from_url(Config.REDIS_URL, decode_responses=True, charset="utf-8")
+        #max_connections=Config.REDIS_CONNECTION_MAX, socket_connect_timeout=1, retry_on_timeout=True)
 
 from . import routes, events
