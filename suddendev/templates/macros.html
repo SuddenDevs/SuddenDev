@@ -1,7 +1,13 @@
 {% macro suddendev_header() %}
+  <style>
+    @font-face {font-family: Hyperspace; src: url('Hyperspace.otf');}
+    h1 {
+      font-family: Hyperspace
+    }
+  </style>
   <div class="page-header">
-  	<div>
-	  	<img src="{{ url_for('static', filename='logo_64.png')}}">
+    <div>
+	    <img src="{{ url_for('static', filename='logo_64.png')}}">
 	    <h1 style="display:inline-block; white-space:pre">   S U D D E N _ D E V</h1>
     </div>
     	<p class="lead" style="white-space:pre">                 Strategize. Script. Survive.</p>
