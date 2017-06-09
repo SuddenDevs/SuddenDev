@@ -5,36 +5,10 @@ import json
 from . import redis
 from .models import User
 from .lobby_names import LOBBY_ADJECTIVES, LOBBY_NOUNS
+from .game.game_config import GameConfig as gc
 
 # max num of players in a game
 MAX_PLAYER_COUNT = 4
-
-# TODO: proper db setup for the default script, and general tracking of user scripts
-# TODO: get rid of this
-DEFAULT_SCRIPT = """
-# Attacking script
-timer = 0
-
-def update(player, delta):
-    global timer
-    timer += delta
-	
-    # Find Target
-    min_dist = sys.float_info.max
-    target = None
-    for e in enemies_visible:
-        mag = Vector.Length(e.pos - player.pos)
-        if mag < min_dist:
-            min_dist = mag
-            target = e
-			
-    if target is not None:
-        diff = player.pos - target.pos
-        mag = min(player.speed, min_dist)
-        player.vel = Vector.Normalize(diff) * mag
-    else:
-        player.vel = Vector(0,0)
-"""
 
 # Below dicts describe the loose schema being used to manage games on Redis.
 # Redis hashes do not support nesting, so we get past this
@@ -51,11 +25,11 @@ GAME_JSON_TEMPLATE = {
 
 # These form part of a GAME_JSON in the 'players' list.
 PLAYER_JSON_TEMPLATE = {
-    'id': None,                 # the system-wide id of the player
-    'name': None,               # the display name of the player (possibly not unique)
-    'script': DEFAULT_SCRIPT,   # the most recently submitted script by the player
-    'status': 'editing'         # current player status - 'ready' locked-in waiting to run
-                                #                       - 'editing' still editing, not ready
+    'id': None,                      # the system-wide id of the player
+    'name': None,                    # the display name of the player (possibly not unique)
+    'script': gc.P_DEFAULT_SCRIPT,   # the most recently submitted script by the player
+    'status': 'editing'              # current player status - 'ready' locked-in waiting to run
+                                     #                       - 'editing' still editing, not ready
 }
 
 # Additionally, for each active user we have:

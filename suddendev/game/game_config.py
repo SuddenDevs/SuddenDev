@@ -24,9 +24,9 @@ class GameConfig:
 
     BASE_ENEMY_SPEED = 30
     BASE_ENEMY_SPAWN_DELAY = 1
-    BASE_ENEMY_LIMIT = 3
+    BASE_ENEMY_LIMIT = 5
     BASE_ENEMY_RANGE_ATTACKABLE = 15
-    BASE_ENEMY_DAMAGE = 10
+    BASE_ENEMY_DAMAGE = 20
 
     # Probability of an enemy spawning on each frame, if the enemy limit has
     # not been reached. The expected number of frames between enemy spawn is
@@ -44,34 +44,21 @@ class GameConfig:
 
     # Player
     P_SPEED = 80
-    P_RANGE_VISIBLE = 400
-    P_RANGE_ATTACKABLE = 20
+    P_RANGE_VISIBLE = 300
+    P_RANGE_ATTACKABLE = 80
     P_AMMO = 6
-    P_DAMAGE = 80
+    P_DAMAGE = 75
     P_ATTACK_DELAY = 10
     P_DEFAULT_SCRIPT = """
-timer = 0
+# Default script
+# Check the documentation to read more about how to script your bot!
 
 def update(player, delta):
-    global timer
-    timer += delta
-
-    # Find Target
-    min_dist = sys.float_info.max
-    target = None
-    for e in enemies_visible:
-        mag = Vector.Length(e.pos - player.pos)
-        if mag < min_dist:
-            min_dist = mag
-            target = e
-
-    if target is not None:
-        diff = player.pos - target.pos
-        mag = min(player.speed, min_dist)
-        player.vel = Vector.Normalize(diff) * mag
-    else:
-        player.vel = Vector(0,0)
-    """
+    # Find the closest enemy, move towards it and shoot it
+    closest_enemy = get_nearest(player, enemies_visible)
+    move_to(player, closest_enemy)
+    shoot(player, closest_enemy)
+"""
 
     # Entity
     E_POS = Vector(0,0)
