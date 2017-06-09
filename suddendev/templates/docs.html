@@ -52,14 +52,13 @@
 
                 <b> The basics </b><br>
                 In your script, only one function is required:<br>
-                <code>update(self, delta)</code>
+                <code><b>update(player, delta)</b></code>
                 <br><br>
 
                 This function will dictate what your character does every frame. You will probably want to instruct your bot to either go somewhere or shoot something. You might want to make use of these functions:<br><br>
-                <code>move_to(self, entity)<br></code>
-                <code>move_to_pos(self, pos)<br></code>
-                <code>shoot(self, enemy)</code>
-                <br><br>
+                <b><code>move_to(self, entity)</code></b><br>
+                <b><code>shoot(self, enemy)</code></b><br>
+                <br>
                 To explain what the arguments represent, it's important to note that everything in the game is an 'Entity'. Every entity has a set of attributes that you can access freely (and in some cases modify), such as their position, velocity or health. So if you have a reference to a powerup's entity, by calling<br><br>
 
                 <code>move_to(self, powerup)</code><br><br>
