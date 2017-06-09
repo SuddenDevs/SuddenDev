@@ -543,10 +543,10 @@
       }
 
       function submitCode() {
-        if (editor.getValue() !== scripts[0].script) {
+        if (editor.getValue() !== scripts[0].script && currentTab == 0) {
           scripts[0].script = editor.getValue();
-          socket.emit(EVENTS.SUBMIT, scripts[0].script);
         }
+        socket.emit(EVENTS.SUBMIT, scripts[0].script);
       }
 
       function testCode() {
@@ -579,11 +579,13 @@
 
       //Function to leave the game
       function leaveGame() {
+        submitCode();
         window.location.href = "{{ url_for('main.lobby') }}";
       }
 
       //Ready up
       function readyUp() {
+        submitCode();
         toggleClasses("readyBtn", ["active", "noEvents"], true);
         toggleClasses("testBtn", ["noEvents","inactive"], true);
         socket.emit(EVENTS.PLAY, {});
@@ -811,7 +813,7 @@
           ticker.start();
         }
         var b = document.getElementById("pauseBtn");
-        b.innerHTML = (ticker.started) ? "Unpause" : "Pause";
+        b.innerHTML = (b.innerHTML === "Pause") ? "Unpause" : "Pause";
         b.classList.toggle("active");
       }
 
@@ -889,7 +891,6 @@
           </div>
           <div class="controls">
             <button class="controls" onclick="revertCode()">Revert</button>
-            <button class="controls" onclick="printToConsole(editor.getValue(), '#000')">Print</button>
             <button id="tab0" class="controls tabBtn active hidden" onclick="setEditorTab(0)">Player1</button>
             <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">Player2</button>
             <button id="tab2" class="controls tabBtn hidden" onclick="setEditorTab(2)">Player3</button>
