@@ -26,6 +26,7 @@ from flask_login import LoginManager
 login_manager = LoginManager()
 
 from redis import StrictRedis
-redis = StrictRedis.from_url(Config.REDIS_URL, decode_responses=True, charset="utf-8")
+redis = StrictRedis.from_url(Config.REDIS_URL, decode_responses=True, charset="utf-8",
+        max_connections=Config.REDIS_CONNECTION_MAX)
 
 from . import routes, events

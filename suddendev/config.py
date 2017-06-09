@@ -12,6 +12,7 @@ class Config(object):
     CELERY_BROKER_URL = os.environ['REDIS_URL']
     CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
     REDIS_URL = os.environ['REDIS_URL']
+    REDIS_CONNECTION_MAX = 10
 
     CLIENT_ID = '690133088753-kk72josco183eb8smpq4dgkrqmd0eovm.apps.googleusercontent.com'
     AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
