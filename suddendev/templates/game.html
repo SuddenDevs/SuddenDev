@@ -27,7 +27,7 @@
       var inGame = false;
       var test = false;
       var currentTab = 0;
-      var scripts = [`{{user.script}}`,"","",""];
+      var scripts = [`{{user.script|safe}}`,"","",""];
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var stage = null;
