@@ -55,9 +55,9 @@ class GameConfig:
 
 def update(player, delta):
     # Find the closest enemy, move towards it and shoot it
-    closest_enemy = get_nearest(player, enemies_visible)
-    move_to(player, closest_enemy)
-    shoot(player, closest_enemy)
+    closest_enemy = get_nearest(enemies_visible)
+    move_to(closest_enemy)
+    shoot(closest_enemy)
 """
 
     # Entity

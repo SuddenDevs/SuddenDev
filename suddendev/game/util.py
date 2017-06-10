@@ -8,13 +8,8 @@ def user_print(self, string):
     if self is None or string is None:
         return
 
-    self.game.events_add(Event(EventType.PRINT, string))
+    self.game.events_add(Event(EventType.PRINT, str(string)))
 
-# TODO: This should be restricted to the dummy and access the real player's
-# damage for verification, otherwise someone could do:
-# 
-# self.damage = 999999999
-# shoot(self, enemy)
 def shoot(self, enemy):
     if self is None or enemy is None:
         return
@@ -47,11 +42,23 @@ def say_also_to_self(self, string, *body):
 
 def _say(self, string, to_self, body):
     if self is not None and string is not None:
-        self.has_message = True
         if len(body) == 1:
             body = body[0]
-        self.message = Message(source=self, string=string, to_self=to_self, body=body)
-        self.game.events_add(Event(EventType.MESSAGE_SENT, self.message))
+        msg = Message(source=self, string=string, to_self=to_self, body=body)
+        self.game.events_add(Event(EventType.MESSAGE_SENT, msg))
+
+        for p in self.game.players:
+            if p.script_respond is None:
+                continue
+            # Only respond to own message if it's marked as such
+            if to_self or p is not self:
+                try:
+                    signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
+                    p.script_respond(p.dummy, self.dummy.message)
+                    signal.alarm(0)
+                except Exception:
+                    self.game.add_error(traceback.format_exc())
+                    p.script_respond = None
 
 # Returns distance from self to the target's position.
 def distance_to(self, target):

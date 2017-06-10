@@ -4,21 +4,11 @@ from .powerup import PowerupType
 from .sandbox import builtins
 from .color import Color3
 from .event import Event, EventType
-from .util import (
-        user_print,
-        shoot,
-        say,
-        say_also_to_self,
-        distance_to,
-        move_to,
-        move_from,
-        move_to_pos,
-        move_from_pos,
-        get_nearest,
-        get_farthest
-        )
+from .util import *
 from .message import Message
 from .game_config import GameConfig as gc
+
+from functools import partial
 
 import math
 import random
@@ -110,16 +100,16 @@ class Player(Entity):
             'sys' : sys,
 
             'say' : say,
-            'say_also_to_self' : say_also_to_self,
-            'shoot' : shoot,
-            'move_to' : move_to,
-            'move_from' : move_from,
-            'move_to_pos' : move_to_pos,
-            'move_from_pos' : move_from_pos,
-            'get_nearest' : get_nearest,
-            'get_farthest' : get_farthest,
-            'distance_to' : distance_to,
-            'print' : user_print,
+            'say_also_to_self' : partial(say_also_to_self, self),
+            'shoot' : partial(shoot, self),
+            'move_to' : partial(move_to, self),
+            'move_from' : partial(move_from, self),
+            'move_to_pos' : partial(move_to_pos, self),
+            'move_from_pos' : partial(move_from_pos, self),
+            'get_nearest' : partial(get_nearest, self),
+            'get_farthest' : partial(get_farthest, self),
+            'distance_to' : partial(distance_to, self),
+            'print' : partial(user_print, self),
 
             '__builtins__' : builtins
         }
@@ -152,7 +142,6 @@ class Player(Entity):
         return False
 
     def update(self, delta):
-
         # Update what the player knows about the world
         self.update_game_state_info()
 
@@ -178,14 +167,6 @@ class Player(Entity):
 
         self.vel = self.dummy.vel
 
-        # TODO: way to fix this?
-        # Have to update this because shoot() runs on the dummy
-        self.attack_timer = self.dummy.attack_timer
-        self.ammo = self.dummy.ammo
-
-        # Send message if there's one to be sent
-        self.send_message_if_needed()
-
         # Reset dummy
         self.reset_dummy()
 
@@ -196,23 +177,6 @@ class Player(Entity):
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
         self.scope['powerups_visible'] = self.powerups_visible()
-
-    def send_message_if_needed(self):
-        # If there's a message to be sent, have everyone respond
-        if self.dummy.has_message and self.dummy.message is not None:
-            self.game.events_add(Event(EventType.MESSAGE_SENT, self.dummy.message))
-            for p in self.game.players:
-                if p.script_respond is None:
-                    continue
-                # Only respond to own message if it's marked as such
-                if self.dummy.message.to_self or p is not self:
-                    try:
-                        signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
-                        p.script_respond(p.dummy, self.dummy.message)
-                        signal.alarm(0)
-                    except Exception:
-                        self.game.add_error(traceback.format_exc())
-                        p.script_respond = None
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
