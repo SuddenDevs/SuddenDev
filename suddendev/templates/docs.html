@@ -18,14 +18,14 @@
             </div>
           <div id="collapseZero" class="panel-collapse collapse in">
             <div class="panel-body">
-	      <p>There's really only two things you need to know:</p>
 	      <ol>
-		<li>The <i>core</i> (the thing in the middle) needs to be protected</li>
-		<li>At least one of your team needs to survive</li>
+		<li>Protect the blue circle</li>
+		<li>For each wave, at least one player needs to survive</li>
+                <li>Don't die and don't run out of ammo</li>
 	      </ol>
 
-	      <p>The rest you can work out as you go, just keep this page open for reference.</p>
-	      <p>Head to the <a href={{ url_for('.lobby') }}>lobby</a>, create a game, play around, invite friends and beat the game.</p>
+	      <p>Keep this page open for reference.</p>
+	      <p>Head to the <a href={{ url_for('.lobby') }}>lobby</a>, create a game, invite friends and try to survive as many waves as possible.</p>
 	    </div>
           </div>
         </div>
@@ -43,15 +43,15 @@
 	      <ol>
 		<li>Move (obviously)</li>
 		<li>See what's nearby</li>
-		<li>Fire at close-by soulless enemy triangles</li>
-		<li>Message other fierce little triangles (your team)</li>
+		<li>Attack enemy triangles</li>
+		<li>Message other little triangles (your team)</li>
 	      </ol>
-	      <p>Your triangle has finite health and ammo, but can replenish both via grabbing pickups.</p>
-	      <p>You will form a team of triangles to defend the circular <i>core</i> from oncoming waves.</p>
+	      <p>Your triangle has finite health and ammo, but can replenish both by grabbing pickups.</p>
+	      <p>You can form a team of triangles to defend the circle from incoming waves.</p>
 	      <p>At the end of each wave, you are reborn with full health, ready to fight again.
-	      The ultimate aim is to clear all the waves, and beat the stage. It's <b>hard</b>.</p>
+	      The ultimate aim is to clear as many waves as possible. Each wave is harder than the last. </p>
 
-	      <p>You'll need as much help as possible (up to 3 team-mates), and some clever strategies to get there.
+	      <p>You'll need as much help as possible (up to 3 team-mates), and some clever strategies to succeed.
 	      Give it your best shot, and have fun!</p>
 	    </div>
           </div>
@@ -66,24 +66,25 @@
           </div>
           <div id="collapseTwo" class="panel-collapse collapse">
             <div class="panel-body">
-                In order to control your character, you will have to write a script - a series of instructions which will tell your bot where to go and what to do. This script will have to be written in Python, which is a widely used programming language. If you don't know how to write Python, don't worry - there are plenty of resources online as well as examples below to help you get started.<br><br>
+                This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
+                You'll be writing in <b>Python</b>, a popular scripting language. There are plenty of resources online, as well as examples below, to help you get started.<br><br>
 
-                <b> The basics </b><br>
-                In your script, only one function is required:<br>
+                <b> The Basics </b><br>
+                In your script, you only need to define one function:<br>
                 <code><b>update(player, delta)</b></code>
                 <br><br>
+                This function will be called 30 times per second when the game is running. What you write in it will determine how your triangle behaves.
+                The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
-                This function will dictate what your character does every frame. You will probably want to instruct your bot to either go somewhere or shoot something. You might want to make use of these functions:<br><br>
-                <b><code>move_to(self, entity)</code></b><br>
-                <b><code>shoot(self, enemy)</code></b><br>
+                We've provided some built-in functions to help you get started:
+                <b><code>move_to(position)</code></b><br>
+                <b><code>shoot(entity)</code></b><br>
                 <br>
-                To explain what the arguments represent, it's important to note that everything in the game is an 'Entity'. Every entity has a set of attributes that you can access freely (and in some cases modify), such as their position, velocity or health. So if you have a reference to a powerup's entity, by calling<br><br>
+                Everything in the game is an 'Entity' - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a powerup that you want to grab, call<br><br>
 
-                <code>move_to(self, powerup)</code><br><br>
+                <code>move_to(somePowerup.pos)</code><br><br>
 
-                your character will move towards the powerup. If you prefer to deal with coordinates directly, every entity's position can be accessed by their '.pos' attribute, e.g. powerup.pos. This returns a Vector, which has a x and a y attribute. Therefore, calling<br><br>
-
-                <code>move_to_pos(self, powerup.pos)</code><br><br>
+                to make your character move towards the powerup. This function just sets the velocity of your character to be towards the powerup.
 
                 also moves your bot towards the powerup. Similarly, you can use the<br><br>
                 <code>move_from(self, entity)</code>

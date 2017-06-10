@@ -67,18 +67,7 @@ def distance_to(self, target):
 
     return Vector.Distance(self.pos, target.pos)
 
-# Sets the velocity vector, scaled to the given speed, pointing to the target.
-# If speed is not given, defaults to self.speed.
-def move_to_pos(self, pos, speed=None):
-    if self is None or pos is None:
-        return
-
-    if speed is None:
-        speed = self.speed
-
-    self.vel = Vector.Normalize(pos - self.pos) * speed
-
-def move_from_pos(self, pos, speed=None):
+def move_from(self, position, speed=None):
     if self is None or pos is None:
         return
 
@@ -87,23 +76,15 @@ def move_from_pos(self, pos, speed=None):
 
     self.vel = Vector.Normalize(self.pos - pos) * speed
 
-def move_to(self, target, speed=None):
+#speed defaults to self.speed
+def move_to(self, position, speed=None):
     if self is None or target is None:
         return
 
     if speed is None:
         speed = self.speed
 
-    self.vel = Vector.Normalize(target.pos - self.pos) * speed
-
-def move_from(self, target, speed=None):
-    if self is None or target is None:
-        return
-
-    if speed is None:
-        speed = self.speed
-
-    self.vel = Vector.Normalize(self.pos - target.pos) * speed
+    self.vel = Vector.Normalize(position - self.pos) * speed
 
 # Given self and a list of entities, returns the nearest entity and the 
 # distance to that entity
