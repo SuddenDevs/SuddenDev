@@ -36,38 +36,21 @@ def joined(message):
 
     update_players(game_id)
 
-    # TODO: gaurd against no player entry
+    # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)
     fsio.emit('message_room', player_name + ' has joined!', room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
     """Sent by clients when they leave a room."""
-
-    # TODO: need to also account for ungraceful exit
-    # - setup a heartbeat?
-
     player_id = flask_login.current_user.id
-    game_id = get_room_of_player(player_id)
+    manage_player_leaves(player_id)
 
-    if game_id is None:
-        return 
-
-    fsio.leave_room(game_id)
-    remove_player_from_room(game_id, player_id)
-
-    if get_players_in_room(game_id) == []:
-        # TODO: remove room from redis
-        pass
-    else:
-        # notify players that one has left
-        update_players(game_id)
-
-        # TODO: guard against no player entry
-        player_name = get_name_of_player(player_id)
-        fsio.emit('message_room', player_name + ' has left.', room=game_id, namespace=NAMESPACE)
-
-        run_game_if_everyone_ready(game_id)
+@socketio.on('disconnect', namespace=NAMESPACE)
+def left(message):
+    """Received when a client ungracefully leaves a room."""
+    player_id = flask_login.current_user.id
+    manage_player_leaves(player_id)
 
 @socketio.on('submit', namespace=NAMESPACE)
 def submit_code(message):
@@ -134,6 +117,28 @@ def play(message):
     fsio.emit('message_room', player_name + ' is ready to go!', room=game_id, namespace=NAMESPACE)
 
     run_game_if_everyone_ready(game_id)
+
+def manage_player_leaves(player_id):
+    game_id = get_room_of_player(player_id)
+
+    if game_id is None:
+        return 
+
+    fsio.leave_room(game_id)
+    remove_player_from_room(game_id, player_id)
+
+    if get_players_in_room(game_id) == []:
+        # TODO: remove room from redis
+        pass
+    else:
+        # notify players that one has left
+        update_players(game_id)
+
+        player_name = get_name_of_player(player_id)
+        if player_name is not None:
+            fsio.emit('message_room', player_name + ' has left.', room=game_id, namespace=NAMESPACE)
+
+        run_game_if_everyone_ready(game_id)
 
 def run_game_if_everyone_ready(game_id):
     if all_players_are_ready(game_id):
