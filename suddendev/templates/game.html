@@ -398,10 +398,10 @@
       function create_message(string) {
         var font_size = 16;
         var padding = 4;
-        var length = 60;
+        var text_length = 40;
         var elipses = "...";
-        if (string.length > length) {
-          string = string.substring(0, length-3) + "...";
+        if (string.length > text_length) {
+          string = string.substring(0, text_length-3) + "...";
         }
 
         var text = new PIXI.Text(string,
