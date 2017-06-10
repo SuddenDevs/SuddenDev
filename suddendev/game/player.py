@@ -58,6 +58,8 @@ class Player(Entity):
 
         self.dummy.damage = self.damage 
         self.dummy.attack_delay = self.attack_delay
+        self.dummy.attack_timer = self.attack_timer
+        self.dummy.ammo = self.ammo
 
         self.has_message = False
         self.message = None
@@ -107,6 +109,9 @@ class Player(Entity):
             'move_to_pos' : partial(move_to_pos, self),
             'move_from_pos' : partial(move_from_pos, self),
             'get_nearest' : partial(get_nearest, self),
+            'get_nearest_enemy' : partial(get_nearest_enemy, self),
+            'get_nearest_attackable_enemy' : partial(get_nearest_attackable_enemy, self),
+            'get_nearest_powerup' : partial(get_nearest_powerup, self),
             'get_farthest' : partial(get_farthest, self),
             'distance_to' : partial(distance_to, self),
             'print' : partial(user_print, self),
@@ -115,7 +120,6 @@ class Player(Entity):
         }
 
         # If the script throws an error, just give up
-        # TODO: Inform user somehow
         try:
             signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
             exec(script, self.scope)
@@ -162,8 +166,14 @@ class Player(Entity):
         except Exception:
             # If script is broken, set color to red to signify the bot is broken
             # and reset to default script
-            # TODO: Send an event and stack trace
-            self.game.events_add(Event(EventType.ERROR, traceback.format_exc()))
+            # Format traceback
+            exp, val, tb = sys.exc_info()
+            listing = traceback.format_exception(exp, val, tb)
+
+            del listing[0]
+            del listing[0]
+            # Set color to red to signify the bot is broken
+            self.game.events_add(Event(EventType.ERROR, listing))
             self.color = Color3(255,0,0)
             self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, self.game)
 

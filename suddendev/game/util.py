@@ -54,7 +54,7 @@ def _say(self, string, to_self, body):
             if to_self or p is not self:
                 try:
                     signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
-                    p.script_respond(p.dummy, self.dummy.message)
+                    p.script_respond(p.dummy, msg)
                     signal.alarm(0)
                 except Exception:
                     self.game.add_error(traceback.format_exc())
@@ -104,6 +104,15 @@ def move_from(self, target, speed=None):
         speed = self.speed
 
     self.vel = Vector.Normalize(self.pos - target.pos) * speed
+
+def get_nearest_enemy(self):
+    return get_nearest(self, self.enemies_visible())
+
+def get_nearest_attackable_enemy(self):
+    return get_nearest(self, self.enemies_attackable())
+
+def get_nearest_powerup(self):
+    return get_nearest(self, self.powerups_visible())
 
 # Given self and a list of entities, returns the nearest entity and the 
 # distance to that entity
