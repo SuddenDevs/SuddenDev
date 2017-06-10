@@ -47,7 +47,7 @@ def left(message):
     manage_player_leaves(player_id)
 
 @socketio.on('disconnect', namespace=NAMESPACE)
-def left(message):
+def disconnect():
     """Received when a client ungracefully leaves a room."""
     player_id = flask_login.current_user.id
     manage_player_leaves(player_id)
