@@ -97,15 +97,12 @@ class Player(Entity):
             'shoot' : partial(shoot, self),
             'move_to' : partial(move_to, self),
             'move_from' : partial(move_from, self),
-            'move_to_pos' : partial(move_to_pos, self),
-            'move_from_pos' : partial(move_from_pos, self),
             'get_nearest' : partial(get_nearest, self),
             'get_nearest_enemy' : partial(get_nearest_enemy, self),
             'get_nearest_attackable_enemy' : partial(get_nearest_attackable_enemy, self),
             'get_nearest_powerup' : partial(get_nearest_powerup, self),
             'get_farthest' : partial(get_farthest, self),
             'distance_to' : partial(distance_to, self),
-            'distance_to_pos' : partial(distance_to_pos, self),
             'print' : partial(user_print, self),
 
             '__builtins__' : builtins

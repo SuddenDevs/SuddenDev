@@ -1,4 +1,5 @@
 from .vector import Vector
+from .entity import Entity
 from .message import Message
 from .event import Event, EventType
 import sys
@@ -73,18 +74,22 @@ def distance_to(self, target):
     if self is None or target is None:
         return sys.maxsize
 
-    return Vector.Distance(self.pos, target.pos)
-
-def distance_to_pos(self, pos):
-    if self is None or pos is None:
+    if isinstance(target, Entity):
+        target = target.pos
+    elif not isinstance(target, Vector):
         return sys.maxsize
 
-    return Vector.Distance(self.pos, pos)
+    return Vector.Distance(self.pos, target)
 
 # Sets the velocity vector, scaled to the given speed, pointing to the target.
 # If speed is not given, defaults to self.speed.
-def move_to_pos(self, pos, speed=None):
-    if self is None or pos is None:
+def move_to(self, target, speed=None):
+    if self is None or target is None:
+        return
+
+    if isinstance(target, Entity):
+        target = target.pos
+    elif not isinstance(target, Vector):
         return
 
     if speed is None:
@@ -92,31 +97,24 @@ def move_to_pos(self, pos, speed=None):
 
     # Prevent spazzing out
     distance_thresh = 3
-    if distance_to_pos(self, pos) < distance_thresh:
+    if distance_to(self, target) < distance_thresh:
         speed = 0.01
 
-    self.vel = Vector.Normalize(pos - self.pos) * speed
-
-def move_from_pos(self, pos, speed=None):
-    if self is None or pos is None:
-        return
-
-    if speed is None:
-        speed = self.speed
-
-    self.vel = Vector.Normalize(self.pos - pos) * speed
-
-def move_to(self, target, speed=None):
-    if self is None or target is None:
-        return
-
-    move_to_pos(self, target.pos, speed=speed)
+    self.vel = Vector.Normalize(target - self.pos) * speed
 
 def move_from(self, target, speed=None):
     if self is None or target is None:
         return
 
-    move_from_pos(self, target.pos, speed=speed)
+    if isinstance(target, Entity):
+        target = target.pos
+    elif not isinstance(target, Vector):
+        return
+
+    if speed is None:
+        speed = self.speed
+
+    self.vel = Vector.Normalize(self.pos - target) * speed
 
 # Gets nearest enemy within visible range.
 def get_nearest_enemy(self):

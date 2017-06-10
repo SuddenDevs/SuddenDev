@@ -6,6 +6,4 @@ if [ ! -d redis-stable/src ]; then
 fi
 cd redis-stable
 make
-rm redis.conf
-cp ../redis.conf .
-src/redis-server
+src/redis-server ../redis.conf
