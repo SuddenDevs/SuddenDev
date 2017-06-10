@@ -313,3 +313,9 @@ def reset_all_players(game_id):
 
     redis.set(game_id, json.dumps(game_json))
     # TODO: release lock for game_id
+
+def remove_room(game_id):
+    """Remove the entry for room with given id."""
+    # TODO: acquire lock for game_id
+    redis.delete(game_id)
+    # TODO: release lock for game_id

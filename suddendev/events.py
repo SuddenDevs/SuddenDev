@@ -16,6 +16,7 @@ from .rooms import (
     all_players_are_ready,
     reset_all_players,
     get_name_of_player,
+    remove_room,
 )
 
 NAMESPACE = '/game-session'
@@ -33,12 +34,11 @@ def joined(message):
 
     # subscribe client to room broadcasts
     fsio.join_room(game_id)
-
     update_players(game_id)
 
-    # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)
-    fsio.emit('message_room', player_name + ' has joined!', room=game_id, namespace=NAMESPACE)
+    if player_name is not None:
+        fsio.emit('message_room', player_name + ' has joined!', room=game_id, namespace=NAMESPACE)
 
 @socketio.on('left', namespace=NAMESPACE)
 def left(message):
@@ -69,9 +69,9 @@ def submit_code(message):
     set_script(game_id, player_id, message)
     update_players(game_id)
 
-    # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)
-    fsio.emit('message_room', player_name + ' has submitted a new script.', room=game_id, namespace=NAMESPACE)
+    if player_name is not None:
+        fsio.emit('message_room', player_name + ' has submitted a new script.', room=game_id, namespace=NAMESPACE)
 
 @socketio.on('test', namespace=NAMESPACE)
 def test(message):
@@ -114,7 +114,8 @@ def play(message):
 
     # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)
-    fsio.emit('message_room', player_name + ' is ready to go!', room=game_id, namespace=NAMESPACE)
+    if player_name is not None:
+        fsio.emit('message_room', player_name + ' is ready to go!', room=game_id, namespace=NAMESPACE)
 
     run_game_if_everyone_ready(game_id)
 
@@ -128,8 +129,7 @@ def manage_player_leaves(player_id):
     remove_player_from_room(game_id, player_id)
 
     if get_players_in_room(game_id) == []:
-        # TODO: remove room from redis
-        pass
+        remove_room(game_id)
     else:
         # notify players that one has left
         update_players(game_id)
