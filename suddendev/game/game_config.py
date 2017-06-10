@@ -15,9 +15,13 @@ class GameConfig:
     BATCHSIZE = 500
 
     # Game
+    TIME_LIMIT = 300
 
     MAP_WIDTH = 800
     MAP_HEIGHT = 600
+
+    # Core
+    CORE_HEALTH = 400
 
     # Enemy
     ENEMY_ATTACK_DELAY = 30
@@ -25,8 +29,9 @@ class GameConfig:
     BASE_ENEMY_SPEED = 30
     BASE_ENEMY_SPAWN_DELAY = 1
     BASE_ENEMY_LIMIT = 5
-    BASE_ENEMY_RANGE_ATTACKABLE = 15
-    BASE_ENEMY_DAMAGE = 20
+    BASE_ENEMY_RANGE_VISIBLE = 200
+    BASE_ENEMY_RANGE_ATTACKABLE = 30
+    BASE_ENEMY_DAMAGE = 10
 
     # Probability of an enemy spawning on each frame, if the enemy limit has
     # not been reached. The expected number of frames between enemy spawn is
@@ -38,8 +43,9 @@ class GameConfig:
     ENEMY_SPEED_SCALE = 1
     ENEMY_DAMAGE_SCALE = 2
     ENEMY_RANGE_ATTACKABLE_SCALE = 1
+    ENEMY_RANGE_VISIBLE_SCALE = 10
     ENEMY_SPAWN_DELAY_SCALE = 0
-    ENEMY_LIMIT_SCALE = 3
+    ENEMY_LIMIT_SCALE = 2
     ENEMY_SPAWN_PROBABILITY_SCALE = 0.1
 
     # Player
@@ -54,10 +60,10 @@ class GameConfig:
 # Check the documentation to read more about how to script your bot!
 
 def update(player, delta):
-    # Find the closest enemy, move towards it and shoot it
-    closest_enemy = get_nearest_enemy()
-    move_to(closest_enemy)
-    shoot(closest_enemy)
+    # Find the nearest enemy, move towards it and shoot it
+    nearest_enemy = get_nearest_enemy()
+    move_to(nearest_enemy)
+    shoot(nearest_enemy)
 """
 
     # Entity
@@ -84,6 +90,7 @@ def update(player, delta):
         scale = wave - 1
 
         # Enemy
+        self.ENEMY_RANGE_VISIBLE = self.BASE_ENEMY_RANGE_VISIBLE + scale * self.ENEMY_RANGE_VISIBLE_SCALE
         self.ENEMY_SPEED = self.BASE_ENEMY_SPEED + scale * self.ENEMY_SPEED_SCALE
         self.ENEMY_RANGE_ATTACKABLE = self.BASE_ENEMY_RANGE_ATTACKABLE + scale * self.ENEMY_RANGE_ATTACKABLE_SCALE
         self.ENEMY_DAMAGE = self.BASE_ENEMY_DAMAGE + scale * self.ENEMY_DAMAGE_SCALE

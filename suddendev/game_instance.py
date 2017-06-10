@@ -6,9 +6,7 @@ import datetime
 import time
 
 class GameInstance:
-    def __init__(self, game_id, player_names, scripts):
-        #TODO: take wave no. as a parameter
-        wave = 1
+    def __init__(self, game_id, player_names, scripts, wave=1):
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
         self.game = Game(wave, player_names, scripts)

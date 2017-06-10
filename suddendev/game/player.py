@@ -64,29 +64,21 @@ class Player(Entity):
         self.has_message = False
         self.message = None
 
-    def powerups_visible(self):
+    def get_in_range(self, entities, dist):
         in_range = []
-        for p in self.game.powerups:
-            d = Vector.Length(p.pos - self.pos)
-            if d <= self.range_visible:
+        for p in entities:
+            if distance_to(self, p) <= dist:
                 in_range.append(p)
         return in_range                
 
+    def powerups_visible(self):
+        return self.get_in_range(self.game.powerups, self.range_visible)
+
     def enemies_visible(self):
-        in_range = []
-        for e in self.game.enemies:
-            d = Vector.Length(e.pos - self.pos)
-            if d <= self.range_visible:
-                in_range.append(e)
-        return in_range                
+        return self.get_in_range(self.game.enemies, self.range_visible)
 
     def enemies_attackable(self):
-        in_range = []
-        for e in self.game.enemies:
-            d = Vector.Length(e.pos - self.pos)
-            if d <= self.range_attackable:
-                in_range.append(e)
-        return in_range                
+        return self.get_in_range(self.game.enemies, self.range_attackable)
 
     def try_apply_script(self, script, game):
         if script is None:
@@ -113,6 +105,7 @@ class Player(Entity):
             'get_nearest_powerup' : partial(get_nearest_powerup, self),
             'get_farthest' : partial(get_farthest, self),
             'distance_to' : partial(distance_to, self),
+            'distance_to_pos' : partial(distance_to_pos, self),
             'print' : partial(user_print, self),
 
             '__builtins__' : builtins

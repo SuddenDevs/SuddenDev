@@ -1,6 +1,7 @@
 from .entity import Entity
 from .vector import Vector
 from .event import Event, EventType
+from .util import *
 
 import random
 
@@ -12,6 +13,7 @@ class Enemy(Entity):
                             random.random() * self.game.map.height)
         self.speed = self.game.gc.ENEMY_SPEED
 
+        self.range_visible = self.game.gc.ENEMY_RANGE_VISIBLE
         self.range_attackable = self.game.gc.ENEMY_RANGE_ATTACKABLE
         self.damage = self.game.gc.ENEMY_DAMAGE
         self.attack_delay = self.game.gc.ENEMY_ATTACK_DELAY
@@ -21,42 +23,39 @@ class Enemy(Entity):
         if self.attack_timer > 0:
             self.attack_timer -= 1
 
-        ps = self.game.players
+        players = []
 
         # Everyone's already dead
-        if len(ps) == 0:
+        if len(self.game.players) == 0:
             return super().update(delta)
 
-        # Find nearest player
-        target = ps[0].pos
-        target_player = ps[0]
-        mag_min = Vector.Length(self.pos - target)
-        for p in ps:
-            mag = Vector.Length(self.pos - p.pos)
-            if mag < mag_min:
-                target = p.pos
-                target_player = p
-                mag_min = mag
+        for p in self.game.players:
+            if distance_to(self, p) <= self.range_visible:
+                players.append(p)
 
-        distance_thresh = 3
+        if len(players) == 0:
+            if distance_to(self, self.game.core) > self.range_attackable:
+                move_to(self, self.game.core)
+
+            if distance_to(self, self.game.core) <= self.range_attackable:
+                enemy_shoot(self, self.game.core)
+                return super().update(delta)
+
+        # Find nearest player
+        nearest_player, distance = get_nearest(self, players, True)
 
         # If health < 50%, run away, otherwise run towards
         if self.health >= self.healthMax / 2:
+            if distance <= self.range_attackable:
+                move_to(self, nearest_player)
+
             # Shoot if possible
-            if mag_min <= self.range_attackable and self.attack_timer == 0:
-                self.shoot(p)
+            if distance <= self.range_attackable and self.attack_timer == 0:
+                enemy_shoot(self, nearest_player)
                 return super().update(delta)
-
-            # Prevent spazzing when on top of player
-            if mag_min < distance_thresh:
-                self.vel = Vector(0,0)
-                return super().update(delta)
-            to = target - self.pos
         else:
-            to = self.pos - target
-        mag = Vector.Length(to)
+            move_from(self, nearest_player)
 
-        self.vel = Vector.Normalize(to) * min(mag, self.speed)
         return super().update(delta)
 
     #TODO duplication with player.shoot()

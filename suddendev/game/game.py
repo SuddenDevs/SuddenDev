@@ -44,6 +44,8 @@ class Game:
         #Core
         self.core = Core()
         self.core.pos = Vector(self.map.width/2, self.map.height/2)
+        self.core.healthMax = self.gc.CORE_HEALTH
+        self.core.health = self.core.healthMax
 
         #Players
         self.init_players(player_names, scripts)
@@ -90,8 +92,10 @@ class Game:
     def check_if_game_over(self):
         if len(self.enemies) == 0 and self.enemy_count >= self.gc.ENEMY_LIMIT:
             return 'Wave ' + str(self.wave) + ' cleared!'
-        elif len(self.players) == 0:
+        elif len(self.players) == 0 or self.core.health <= 0:
             return 'Game Over'
+        elif self.time >= self.gc.TIME_LIMIT:
+            return 'Time limit reached!'
         else:
             return None
 

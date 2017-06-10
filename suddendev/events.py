@@ -114,7 +114,9 @@ def test(message):
     fsio.emit('message_room', 'Running a test for you...', room=flask.request.sid, namespace=NAMESPACE)
 
     # TODO: specify test run in call
-    handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, flask.request.sid)
+    # TODO: Give choice for a wave
+    wave = 1
+    handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, flask.request.sid, wave=wave)
     result = handle.get()
 
     fsio.emit('message_result', 'Test complete!', room=flask.request.sid, namespace=NAMESPACE)
@@ -143,7 +145,9 @@ def run_game_if_everyone_ready(game_id):
             player_scripts.append(player['script'])
 
         fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
-        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id)
+        # TODO: Give choice for a wave
+        wave = 1
+        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id, wave=wave)
         result = handle.get()
         fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)
         reset_all_players(game_id)

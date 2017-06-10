@@ -11,24 +11,32 @@ def user_print(self, string):
     self.game.events_add(Event(EventType.PRINT, str(string)))
 
 def shoot(self, enemy):
+    _shoot(self, enemy, is_player=True)
+
+def enemy_shoot(self, enemy):
+    _shoot(self, enemy, is_player=False)
+
+def _shoot(self, enemy, is_player):
     if self is None or enemy is None:
         return
 
-    if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable
-            and self.ammo > 0 and self.attack_timer == 0):
-        # Point towards the target
-        self.vel = enemy.pos - self.pos
-        self.vel = Vector.Normalize(self.vel) * 0.01
+    if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable and self.attack_timer == 0):
+        if not is_player or self.ammo > 0:
+            # Point towards the target
+            self.vel = enemy.pos - self.pos
+            self.vel = Vector.Normalize(self.vel) * 0.01
 
-        # Deal damage
-        self.ammo -= 1
-        enemy.injure(self.damage)
+            if is_player:
+                self.ammo -= 1
 
-        # Cool down
-        self.attack_timer = self.attack_delay
+            # Deal damage
+            enemy.injure(self.damage)
 
-        # Add event
-        self.game.events_add(Event(EventType.ATTACK, self, enemy))
+            # Cool down
+            self.attack_timer = self.attack_delay
+
+            # Add event
+            self.game.events_add(Event(EventType.ATTACK, self, enemy))
 
 # Broadcasts a message to all players, excluding the sender. string has to be
 # set in order for the message to be sent. If only one argument is provided as
@@ -67,7 +75,29 @@ def distance_to(self, target):
 
     return Vector.Distance(self.pos, target.pos)
 
-def move_from(self, position, speed=None):
+def distance_to_pos(self, pos):
+    if self is None or pos is None:
+        return sys.maxsize
+
+    return Vector.Distance(self.pos, pos)
+
+# Sets the velocity vector, scaled to the given speed, pointing to the target.
+# If speed is not given, defaults to self.speed.
+def move_to_pos(self, pos, speed=None):
+    if self is None or pos is None:
+        return
+
+    if speed is None:
+        speed = self.speed
+
+    # Prevent spazzing out
+    distance_thresh = 3
+    if distance_to_pos(self, pos) < distance_thresh:
+        speed = 0.01
+
+    self.vel = Vector.Normalize(pos - self.pos) * speed
+
+def move_from_pos(self, pos, speed=None):
     if self is None or pos is None:
         return
 
@@ -76,24 +106,37 @@ def move_from(self, position, speed=None):
 
     self.vel = Vector.Normalize(self.pos - pos) * speed
 
-#speed defaults to self.speed
-def move_to(self, position, speed=None):
+def move_to(self, target, speed=None):
     if self is None or target is None:
         return
 
-    if speed is None:
-        speed = self.speed
+    move_to_pos(self, target.pos, speed=speed)
 
-    self.vel = Vector.Normalize(position - self.pos) * speed
+def move_from(self, target, speed=None):
+    if self is None or target is None:
+        return
 
+    move_from_pos(self, target.pos, speed=speed)
+
+# Gets nearest enemy within visible range.
 def get_nearest_enemy(self):
     return get_nearest(self, self.enemies_visible())
 
+# Gets nearest enemy within attackable range.
 def get_nearest_attackable_enemy(self):
     return get_nearest(self, self.enemies_attackable())
 
-def get_nearest_powerup(self):
-    return get_nearest(self, self.powerups_visible())
+# Gets nearest powerup of the given type, or of any type if none is given.
+def get_nearest_powerup(self, powerup_type=None):
+    if powerup_type is None:
+        return get_nearest(self, self.powerups_visible())
+    else:
+        powerups = self.powerups_visible()
+        valid = []
+        for p in powerups:
+            if p.powerup_type == powerup_type:
+                valid.append(p)
+        return get_nearest(self, valid)
 
 # Given self and a list of entities, returns the nearest entity and the 
 # distance to that entity
