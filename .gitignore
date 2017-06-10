@@ -10,7 +10,7 @@ tags
 .DS_Store
 
 # Redis directory
-redis*
+redis-stable/
 
 # C extensions
 *.so

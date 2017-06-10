@@ -21,6 +21,9 @@ class Config(object):
                 'https://www.googleapis.com/auth/userinfo.profile']
     CLIENT_SECRET = os.environ['CLIENT_SECRET']
 
+    REDIS_MAX_CONNECTIONS = 10
+    CELERY_MAX_CONNECTIONS = 5
+
 class ProductionConfig(Config):
     DEBUG = False
 
