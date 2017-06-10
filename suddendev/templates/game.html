@@ -18,6 +18,7 @@
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
       var TIME_AFTER_END = 5; //How long to continue animating after round
+      var MSG_DISPLAY_TIME = 4;
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
@@ -168,9 +169,6 @@
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
           toggleClasses("readyBtn", ["inactive", "noEvents"], false);
         }
-
-        background_layer.filters = [];
-        game_layer.filters = [];
         renderer.render(stage);
         ticker.start();
       }
@@ -204,10 +202,10 @@
         container.addChild(health);
 
         container.position = data.pos;
-        game_layer.addChild(container);
+        entity_layer.addChildAt(container, 0);
 
         var emitter = new PIXI.particles.Emitter(
-                game_layer,
+                particle_layer,
                 [sprite.generateCanvasTexture()],
                 {
                         alpha: {
@@ -260,10 +258,10 @@
         var circle = new PIXI.Graphics();
         circle.beginFill(data.color);
         circle.drawCircle(0, 0, data.range_visible);
-        game_layer.addChild(circle);
-        game_layer.setChildIndex(circle, 0);
+        particle_layer.addChildAt(circle, 0);
         circle.position = data.pos;
-        circle.alpha = 0.25;
+        circle.alpha = 0.15;
+        circle.blendMode = PIXI.BLEND_MODES.LIGHTEN;
 
         //Glow
         player.container.filters = [new PIXI.filters.GlowFilter(6, 0.8, 0, data.color, 1)];
@@ -274,7 +272,7 @@
 
         var name = new PIXI.Text(data.name,
                                         { fontFamily:"Arial",
-                                          fontSize:"12", 
+                                          fontSize:"16", 
                                           fill: "black"});
         name.anchor.x = 0.5;
         name.anchor.y = 2;
@@ -289,23 +287,60 @@
       function create_core(data) {
         var container = new PIXI.Container();
         var sprite = new PIXI.Graphics();
-        var size = 10;
 
-        sprite.beginFill(PIXI.utils.rgb2hex([0, 1, 1]));
-        sprite.drawCircle(0, 0, size);
         container.addChild(sprite);
 
         var health = create_health_bar();
-        // console.log(health.width);
         health.y = data.size + 2;
         health.x = -HEALTHBARWIDTH/2;
         container.addChild(health);
 
         container.position = data.pos;
-        game_layer.addChild(container);
+        entity_layer.addChildAt(container, 0);
+
+        var texture = new PIXI.Graphics();
+        texture.beginFill(PIXI.utils.rgb2hex([0,1,1]));
+        texture.drawCircle(0, 0, data.size);
+
+        var emitter = new PIXI.particles.Emitter(
+                particle_layer,
+                [texture.generateCanvasTexture()],
+                {
+                        scale: {
+                          start: 0.5,
+                          end: 0.2
+                        },
+                        speed: {
+                          start: 40,
+                          end: 0
+                        },
+                        lifetime: {
+                          min: 0.2,
+                          max: 0.8
+                        },
+                        color: {
+                          start: "#00ffff",
+                          end: "#00ffff"
+                        },
+                        startRotation: {
+                          min: 0,
+                          max: 360
+                        },
+                        frequency: 0.01,
+                        emitterLifetime: -1,
+                        maxParticles: 100,
+                        pos: {
+                          x: container.x,
+                          y: container.y
+                        },
+                        addAtBack: false,
+                        spawnType: "point",
+                }
+        );
 
         core = {
           container: container,
+          emitter: emitter,
           sprite: sprite,
           health: health
         };
@@ -317,7 +352,7 @@
         graphics.lineStyle(2, PIXI.utils.rgb2hex([1, 0, 0]));
         graphics.moveTo(from.x, from.y);
         graphics.lineTo(to.x, to.y);
-        game_layer.addChild(graphics);
+        particle_layer.addChild(graphics);
         attacks.push({sprite: graphics,
                       timer: 0});
       }
@@ -351,7 +386,7 @@
         container.addChild(label);
 
         container.position = data.pos;
-        game_layer.addChild(container);
+        entity_layer.addChildAt(container, 0);
 
         pickups[data.tag] = {
           container: container,
@@ -360,11 +395,52 @@
         };
       }
 
+      function create_message(string) {
+        var font_size = 16;
+        var padding = 4;
+        var length = 60;
+        var elipses = "...";
+        if (string.length > length) {
+          string = string.substring(0, length-3) + "...";
+        }
+
+        var text = new PIXI.Text(string,
+                                        { fontFamily:"Arial",
+                                          fontSize: font_size,
+                                          fill: "black",
+                                          align: "left"});
+        text.position.x = padding;
+        text.position.y = padding;
+
+        var bubble = new PIXI.Graphics();
+        bubble.lineStyle(1, "black", 0.5);
+        bubble.beginFill(PIXI.utils.rgb2hex([1,1,1]));
+        bubble.drawRoundedRect(0, 0, text.width + padding * 2,
+                                      text.height + padding * 2, padding);
+
+        bubble.addChild(text);
+        return bubble;
+      }
+
+      function player_say(player, string) {
+        var p = playerDict[player.tag];
+        if (p.message) {
+          p.container.removeChild(p.message.container);
+          p.message = null;
+        }
+
+        var msg = create_message(string);
+        msg.x = -msg.width/2;
+        msg.y = -msg.height - player.size - 20;
+        p.container.addChild(msg);
+        p.message = {container: msg, timer: MSG_DISPLAY_TIME};
+      }
+
       function clearup_pickup(tag) {
         var p = pickups[tag];
 
         var emitter = new PIXI.particles.Emitter(
-                game_layer,
+                particle_layer,
                 [p.sprite.generateCanvasTexture()],
                 {
                         alpha: {
@@ -402,13 +478,13 @@
                 }
         );
 
-        game_layer.removeChild(p.container);
+        entity_layer.removeChild(p.container);
         emitter.playOnceAndDestroy();
         delete pickups[tag];
       }
 
       function clearup_player(tag) {
-        game_layer.removeChild(playerDict[tag].container);
+        entity_layer.removeChild(playerDict[tag].container);
         delete playerDict[tag];
       }
 
@@ -417,7 +493,7 @@
         var e = enemies[tag];
 
         var emitter = new PIXI.particles.Emitter(
-                game_layer,
+                particle_layer,
                 [e.sprite.generateCanvasTexture()],
                 {
                         alpha: {
@@ -452,9 +528,53 @@
                 }
         );
 
-        game_layer.removeChild(e.container);
+        entity_layer.removeChild(e.container);
         emitter.playOnceAndDestroy();
         delete enemies[tag];
+      }
+      
+      function clearup_core() {
+        var emitter = new PIXI.particles.Emitter(
+                particle_layer,
+                [core.sprite.generateCanvasTexture()],
+                {
+                        alpha: {
+                                start: 1,
+                                end: 0.8
+                        },
+                        scale: {
+                                start: 1.2,
+                                end: 0.5
+                        },
+                        color: {
+                                start: "ff0000",
+                                end: "0f0202"
+                        },
+                        speed: {
+                                start: 400,
+                                end: 0
+                        },
+                        lifetime: {
+                                min: 1,
+                                max: 0.5
+                        },
+                        startRotation: {
+                          min: 0,
+                          max: 360
+                        },
+                        frequency: 0.0001,
+                        emitterLifetime: 0.01,
+                        maxParticles: 400,
+                        pos: {
+                                x: core.position.x,
+                                y: core.position.y
+                        },
+                        addAtBack: false,
+                        spawnType: "point",
+                }
+        );
+        core.container.visible = false;
+        emitter.playOnceAndDestroy();
       }
 
       function find_entity(tag) {
@@ -589,8 +709,8 @@
         core = null;
         states = [];
         inGame = false;
-        for (i = game_layer.children.length - 1; i >= 0; i--) {
-          game_layer.removeChild(game_layer.children[i]);
+        for (i = 0; i < game_layer.children.length; i++) {
+          game_layer.getChildAt(i).removeChildren();
         }
       }
 
@@ -619,15 +739,27 @@
         stage = new PIXI.Container();
         renderer.backgroundColor = 0xffffff;
 
-        background_layer = new PIXI.Container();
-        game_layer = new PIXI.Container();
         hud_layer = new PIXI.Container();
+
+        game_layer = new PIXI.Container();
+        entity_layer = new PIXI.Container();
+        particle_layer = new PIXI.Container();
+
+        background_layer = new PIXI.Container();
+
+        game_layer.addChild(particle_layer);
+        game_layer.addChild(entity_layer);
+        game_layer.width = renderer.width;
+        game_layer.height = renderer.height;
         
         stage.addChild(background_layer);
         stage.addChild(game_layer);
         stage.addChild(hud_layer);
 
         blurFilter = new PIXI.filters.BlurFilter(0, 1, 3);
+        blurFilter.blur = 0;
+        background_layer.filters = [blurFilter];
+        game_layer.filters = [blurFilter];
 
         fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
         fpsText.x = 10;
@@ -646,6 +778,7 @@
         timer_end -= delta;
         fpsText.text = Math.round(ticker.FPS * 100) / 100;
         if (inGame) {
+          blurFilter.blur = 0;
           if (states.length > 0) {
             last_state = states[0]
             process_state(last_state, delta);
@@ -698,6 +831,7 @@
               break;
             case "Message_Sent":
               printToConsole(body.source.name + " sent message: " + body.string, "#ABC");
+              player_say(body.source, body.string);
               break;
             default:
               //console.log("Unknown event: " + e.name);
@@ -708,7 +842,7 @@
         draw_enemies(state.enemies, delta);
         draw_pickups(state.powerups, delta);
         draw_players(state.players, delta);
-        draw_core(state.core);
+        update_core(state.core, delta);
 
         //Effects
         draw_attacks(delta);
@@ -721,7 +855,7 @@
         draw_enemies(state.enemies, delta);
         draw_pickups(state.powerups, delta);
         draw_players(state.players, delta);
-        draw_core(state.core);
+        update_core(state.core, delta);
 
         //Effects
         draw_attacks(delta);
@@ -738,9 +872,10 @@
         } else {
           test = false;
         }
+        if (msg == "Game Over") {
+          clearup_core();
+        }
         //Blur
-        background_layer.filters = [blurFilter];
-        game_layer.filters = [blurFilter];
         waitingText.text = msg;
         waitingText.visible = true;
       }
@@ -754,7 +889,7 @@
           var a = attacks[i];
           a.timer = a.timer + delta;
           if (a.timer >= attack_fade) {
-            game_layer.removeChild(a.sprite);
+            particle_layer.removeChild(a.sprite);
             attacks.splice(i, 1);   
             i--;
           } else {
@@ -763,8 +898,29 @@
         }
       }
 
-      function draw_core(data) {
-        core.health.getChildAt(1).scale.x = data.health/data.healthMax;
+      function interpolate_rgb(from, to, alpha) {
+        var result = [];
+        for (i = 0; i < from.length; i++) {
+          result[i] = from[i] + (to[i] - from[i]) * alpha;
+        }
+        return result;
+      }
+
+      function update_core(data, delta) {
+        var param = data.health/data.healthMax;
+        var from = [0, 1, 1];
+        var to = [1, 0, 0];
+        var color = interpolate_rgb(from, to, 1 - param);
+        var color255 = color.map(function(x) {return x * 255;});
+
+        core.sprite.clear();
+        core.sprite.lineStyle(2, PIXI.utils.rgb2hex([1,1,1]), 1);
+        core.sprite.beginFill(PIXI.utils.rgb2hex(color));
+        core.sprite.drawCircle(0, 0, data.size);
+
+        core.position = data.pos;
+        core.health.getChildAt(1).scale.x = param;
+        core.emitter.update(delta);
       }
 
       //Create equilateral triangle facing DIR
@@ -775,10 +931,9 @@
         var height = radius * (1 +  Math.sin(Math.PI/6));
         
         shape.beginFill(color);
-        shape.drawPolygon([0, 0, base, 0, base/2, height]);
+        shape.drawPolygon([0, 0, base, 0, base/2, height, 0, 0]);
         shape.endFill();
 
-        shape.rotation = vector_to_rotation(dir);
         shape.x = pos.x;
         shape.y = pos.y;
         shape.pivot.x = 0.5 * base;
@@ -812,6 +967,13 @@
           update_entity(player, data, delta);
           player.ammo.text = data.ammo.toString();
           player.visible_area.position = data.pos;
+          if (player.message) {
+            player.message.timer -= delta;
+            if (player.message.timer <= 0) {
+              player.container.removeChild(player.message.container);
+              player.message = null;
+            }
+          }
         }
       } 
 
