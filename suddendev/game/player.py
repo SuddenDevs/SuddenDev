@@ -121,8 +121,14 @@ class Player(Entity):
             exec(script, self.scope)
             signal.alarm(0)
         except Exception:
+            # Format traceback
+            exp, val, tb = sys.exc_info()
+            listing = traceback.format_exception(exp, val, tb)
+
+            del listing[0]
+            del listing[0]
             # Set color to red to signify the bot is broken
-            self.game.events_add(Event(EventType.ERROR, traceback.format_exc()))
+            self.game.events_add(Event(EventType.ERROR, listing))
             self.color = Color3(255,0,0)
             return False
 
