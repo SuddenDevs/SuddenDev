@@ -32,6 +32,7 @@ class GameConfig:
     BASE_ENEMY_RANGE_VISIBLE = 200
     BASE_ENEMY_RANGE_ATTACKABLE = 30
     BASE_ENEMY_DAMAGE = 10
+    BASE_ENEMY_HEALTH = 100
 
     # Probability of an enemy spawning on each frame, if the enemy limit has
     # not been reached. The expected number of frames between enemy spawn is
@@ -40,6 +41,7 @@ class GameConfig:
 
     # Difficulty scaling
     # Increased by x = x + wave_number * scale
+    ENEMY_HEALTH_SCALE = 20
     ENEMY_SPEED_SCALE = 1
     ENEMY_DAMAGE_SCALE = 2
     ENEMY_RANGE_ATTACKABLE_SCALE = 1
@@ -47,6 +49,12 @@ class GameConfig:
     ENEMY_SPAWN_DELAY_SCALE = 0
     ENEMY_LIMIT_SCALE = 2
     ENEMY_SPAWN_PROBABILITY_SCALE = 0.1
+
+    BOSS_SIZE_SCALE = 3
+    BOSS_HEALTH_SCALE = 10
+    BOSS_DAMAGE_SCALE = 10
+    BOSS_STATS_SCALE = 10
+    BOSS_WAVE_MULTIPLES = 5
 
     # Player
     P_SPEED = 80
@@ -87,15 +95,26 @@ def update(player, delta):
         if wave <= 0:
             wave = 1
         
-        scale = wave - 1
+        if wave % self.BOSS_WAVE_MULTIPLES == 0:
+            boss_level = wave / self.BOSS_WAVE_MULTIPLES
+            boss_scale = boss_level * self.BOSS_STATS_SCALE
 
-        # Enemy
-        self.ENEMY_RANGE_VISIBLE = self.BASE_ENEMY_RANGE_VISIBLE + scale * self.ENEMY_RANGE_VISIBLE_SCALE
+            scale = boss_scale
+            self.ENEMY_LIMIT = boss_level
+            self.ENEMY_SIZE = self.E_SIZE * boss_level * self.BOSS_SIZE_SCALE
+            self.ENEMY_HEALTH = boss_level * self.BOSS_HEALTH_SCALE * self.BASE_ENEMY_HEALTH
+        else:
+            # Enemy
+            scale = wave - 1
+            self.ENEMY_LIMIT = self.BASE_ENEMY_LIMIT + scale * self.ENEMY_LIMIT_SCALE
+            self.ENEMY_SIZE = self.E_SIZE
+            self.ENEMY_HEALTH = self.BASE_ENEMY_HEALTH + scale * self.ENEMY_HEALTH_SCALE
+
+        self.ENEMY_RANGE_VISIBLE = self.BASE_ENEMY_RANGE_VISIBLE + scale * self.ENEMY_RANGE_VISIBLE_SCALE + self.ENEMY_SIZE
         self.ENEMY_SPEED = self.BASE_ENEMY_SPEED + scale * self.ENEMY_SPEED_SCALE
-        self.ENEMY_RANGE_ATTACKABLE = self.BASE_ENEMY_RANGE_ATTACKABLE + scale * self.ENEMY_RANGE_ATTACKABLE_SCALE
+        self.ENEMY_RANGE_ATTACKABLE = self.BASE_ENEMY_RANGE_ATTACKABLE + scale * self.ENEMY_RANGE_ATTACKABLE_SCALE + self.ENEMY_SIZE
         self.ENEMY_DAMAGE = self.BASE_ENEMY_DAMAGE + scale * self.ENEMY_DAMAGE_SCALE
         self.ENEMY_SPAWN_DELAY = self.BASE_ENEMY_SPAWN_DELAY + scale * self.ENEMY_SPAWN_DELAY_SCALE
-        self.ENEMY_LIMIT = self.BASE_ENEMY_LIMIT + scale * self.ENEMY_LIMIT_SCALE
         self.ENEMY_SPAWN_PROBABILITY = self.BASE_ENEMY_SPAWN_PROBABILITY + scale * self.ENEMY_SPAWN_PROBABILITY_SCALE
 
         # Cap probability at 1

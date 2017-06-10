@@ -92,7 +92,7 @@ class Player(Entity):
             'random' : random,
             'sys' : sys,
 
-            'say' : say,
+            'say' : partial(say, self),
             'say_also_to_self' : partial(say_also_to_self, self),
             'shoot' : partial(shoot, self),
             'move_to' : partial(move_to, self),
