@@ -87,10 +87,10 @@
                 to make your character move towards the powerup. This function just sets the velocity of your character to be towards the powerup.
 
                 also moves your bot towards the powerup. Similarly, you can use the<br><br>
-                <code>move_from(self, entity)</code>
-                <code>move_from_pos(self, pos)</code><br><br>
+                <code>move_from(entity)</code>
+                <code>move_from_pos(pos)</code><br><br>
                 which make your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
-                <code>move_to(self, powerup, 80)</code><br><br>
+                <code>move_to(powerup, 80)</code><br><br>
                 makes your character go towards the powerup with speed 80.<br><br>
                 
 
@@ -100,35 +100,32 @@
                 <code>enemies_attackable</code>, which contains all the enemy entities that your character can attack<br>
                 <code>powerups_visible</code>, which contrains all the powerups that your character can see<br><br>
 
-                You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. For this purpose, you can use this function:<br><br>
+                You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. You might want to make use of these functions:<br><br>
 
-                <code>get_nearest(self, entities)</code><br><br>
+                <code>get_nearest_enemy()</code><br>
+                <code>get_nearest_attackable_enemy()</code><br>
+                <code>get_nearest_powerup()</code><br>
 
-                which returns the closest entity from a given list. For example, <br><br>
+                You can also pass in a PowerupType to get_nearest_powerup to specify which powerup you're interested in, i.e.<br><br>
 
-                <code>get_nearest(self, enemies_visible)</code><br><br>
-
-                will return the nearest enemy that your character can see. If you'd prefer to iterate through the list yourself, you might find this function useful<br><br>
-
-                <code>distance_to(self, entity)</code><br><br>
-
-                which simply returns how far the given entity is from you.<br><br>
+                <code>get_nearest_powerup(PowerupType.AMMO_UP)</code><br>
+                <code>get_nearest_powerup(PowerupType.HEALTH_UP)</code><br><br>
 
                 With these functions you can actually already write a very simple AI! Here's a very basic example:
 
 <pre>
 def update(self, delta):
-    # Find the closest enemy, move towards it and shoot it
-    closest_enemy = get_nearest(self, enemies_visible)
-    move_to(self, closest_enemy)
-    shoot(self, closest_enemy)
+    # Find the nearest enemy, move towards it and shoot it
+    nearest_enemy = get_nearest_enemy()
+    move_to(nearest_enemy)
+    shoot(nearest_enemy)
 </pre>
                 
 And that's it! Now to make it smarter, you might want to try to pick up powerups, avoid enemies if your health is low or shoot only if your ammo is high.<br><br>
                 <b>Advanced</b><br><br>
 
                 In order to cooperate with your teammates, your bot can send 'messages', to their bots. To do this, call this function:<br><br>
-                <code>say(self, string, *body)</code><br><br>
+                <code>say(string, *body)</code><br><br>
                 This broadcasts a message to all other players' characters. In order to respond to these messages, in your script you should define the function<br><br>
                 <code>respond(self, message)</code><br><br>
                 which will be called when your bot receives a message. Using this mechanism, you can share information with other people's bots in the middle of the game, such as enemy positions and
@@ -155,16 +152,14 @@ def update(self, delta):
         say(self, 'Help', self)
     # Otherwise say we're ok.
     elif self.health >= self.healthMax / 2:
-        say(self, 'Ok', self)
+        say('Ok', self)
 
     # If someone needs help, go to them
     if target is not None:
-        move_to(self, target)
+        move_to(target)
 </pre>
 <br><br>
         In order to use messaging effectively, you'll need to coordinate with your teammates - agree on what the message strings look like and what the message body is. 
-
-                
 
                 
                 <br><br><br>For further information on what's available to you, check the Scripting Reference section below.
@@ -182,17 +177,7 @@ def update(self, delta):
           </div>
           <div id="collapseThree" class="panel-collapse collapse">
             <div class="panel-body">
-              Your code should define an <code>update(self, delta)</code> function, where <code>delta</code> refers to the time between frames.<br>
-              You can access the following attributes of your bot:<br>
-              <code>self.vel</code> - velocity of the bot<br>
-              You will probably want to modify this in order to move your bot. The velocity should be assigned to a vector as follows:<br>
-              <code>self.vel = Vector(x, y)</code><br>
-              The coordinate system starts at <code>(0,0)</code> at the top left corner, so for example<br>
-              <code>self.vel = Vector(10,0)</code> will make the bot move to the right with speed <code>10</code>, whereas
-              <code>self.vel = Vector(-1,-1)</code> will make the bot move down and left with speed <code>√2
-              </code>, i.e. the magnitude of the vector.
-              <br><br><br>
-
+                <b>Warning, this is all outdated</b><br>
               <b>Must define:</b><br>
               <code>update(self, delta)</code><br><br>
 
@@ -236,24 +221,22 @@ def update(self, delta):
               <code>message</code><br><br>
 
               <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
-              <b><code>shoot(self, enemy)</code></b><br>
-              <b><code>say(self, mtype=None, string=None, entity=None, vector=None, to_self=False)</code></b><br> 
-              <code>distance_to(self, target)</code><br>
-              <code>move_to_pos(self, pos, speed=None)</code><br>
-              <code>move_from_pos(self, pos, speed=None)</code><br>
-              <b><code>move_to(self, target, speed=None)</code></b><br>
-              <code>move_from(self, target, speed=None)</code><br>
-              <code>get_nearest(self, entities, with_distance=False)</code><br>
-              <code>get_farthest(self, entities, with_distance=False)</code><br><br>
+              <b><code>shoot(enemy)</code></b><br>
+              <b><code>get_nearest_enemy()</code></b><br>
+              <b><code>get_nearest_attackable_enemy()</code></b><br>
+              <b><code>get_nearest_powerup(powerup_type=None)</code></b><br>
+              <b><code>say(string, *body)</b><br>
+              <code>say_also_to_self(string, *body)<br>
+              <code>distance_to(target)</code><br>
+              <b><code>move_to(target, speed=None)</code></b><br>
+              <code>move_from(target, speed=None)</code><br>
+              <code>get_nearest(entities, with_distance=False)</code><br>
+              <code>get_farthest(entities, with_distance=False)</code><br><br>
 
               <b>Message:</b><br>
               <b><code>source</code></b><br>
               <code>to_self</code><br>
-              At least one of the following fields must be set:<br>
-              <code>mtype</code><br>
               <code>string</code><br>
-              <code>entity</code><br>
-              <code>vector</code><br><br>
 
               <b>Vectors:</b><br>
               Initialise as:<br>
@@ -266,14 +249,6 @@ def update(self, delta):
               <code>Normalize(vec)</code><br>
               <code>Dot(a, b)</code><br>
               <code>ProjectOnto(w, v)</code><br><br>
-
-              <b>Enums:</b><br>
-              MessageType<br>
-              <code>HELP = 'help'</code><br>
-              <code>OK = 'ok'</code><br>
-              <code>KILL = 'kill'</code><br>
-              <code>NEED_AMMO = 'need ammo'</code><br>
-              <code>LOW_HEALTH = 'low health'</code><br><br>
 
               PowerupType<br>
               <code>AMMO_UP</code><br>
