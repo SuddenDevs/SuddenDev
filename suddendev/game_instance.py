@@ -38,6 +38,10 @@ class GameInstance:
 
             if state_counter == gc.BATCHSIZE or not self.game.active:
                 #Client Update
-                yield batch, self.game.game_result
+                yield batch
                 batch = []
                 state_counter = 0
+
+    def was_cleared(self):
+        """Returns a boolean indicating whether the wave was cleared, after gameplay."""
+        return self.game.was_cleared()

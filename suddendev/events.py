@@ -5,7 +5,7 @@ import sqlalchemy
 from . import socketio, redis
 from .models import db, User
 from .game_instance import GameInstance
-from .tasks import play_game
+from .tasks import play_game, test_round
 from .rooms import (
     get_room_of_player,
     get_players_in_room,
@@ -96,14 +96,11 @@ def test(message):
         else:
             player_scripts.append(player['script'])
 
-    fsio.emit('message_room', 'Running a test for you...', room=flask.request.sid, namespace=NAMESPACE)
-
-    # TODO: specify test run in call
-    # TODO: Give choice for a wave
     wave = get_room_wave(game_id)
-    handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, flask.request.sid, wave=wave)
-    result = handle.get()
-    fsio.emit('message_result', 'Test complete!', room=flask.request.sid, namespace=NAMESPACE)
+    fsio.emit('message_room', 'Testing against wave ' + str(wave), room=flask.request.sid, namespace=NAMESPACE)
+    handle = test_round.delay(game_id, player_names, player_scripts, NAMESPACE, flask.request.sid, wave=wave)
+    cleared = handle.get()
+    fsio.emit('message_result', 'Test run successfully!', room=flask.request.sid, namespace=NAMESPACE)
 
 @socketio.on('play', namespace=NAMESPACE)
 def play(message):
@@ -151,13 +148,11 @@ def run_game_if_everyone_ready(game_id):
             player_scripts.append(player['script'])
 
         fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
-        # TODO: Give choice for a wave
         wave = get_room_wave(game_id)
-        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id, wave=wave)
-        result = handle.get()
-        if result:
-            set_room_wave(game_id, wave + 1)
-        fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)
+        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id, wave=1)
+        highest_wave = handle.get()
+        set_room_wave(game_id, highest_wave + 1)
+        fsio.emit('message_result', 'Run complete! You reached wave ' + str(highest_wave), room=game_id, namespace=NAMESPACE)
         reset_all_players(game_id)
 
 def update_players(game_id):

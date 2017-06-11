@@ -92,6 +92,9 @@ class Game:
             self.game_result = game_result
             self.events_add(Event(EventType.GAME_END, result))
 
+            # TODO: nicer way of seeing if the wave was cleared
+            self.cleared = 'Wave' in result
+
     def check_if_game_over(self):
         if len(self.enemies) == 0 and self.enemy_count >= self.gc.ENEMY_LIMIT:
             return 'Wave ' + str(self.wave) + ' cleared!', True
@@ -182,4 +185,7 @@ class Game:
                                 random.random()*self.map.height)
             cond = self.collides_with_walls(pos, size)
         return pos
+
+    def was_cleared(self):
+        return self.cleared
 

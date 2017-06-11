@@ -245,6 +245,7 @@ def get_room_wave(game_id):
         # TODO: release lock for game_id
         return
 
+    # TODO: release lock for game_id
     game_json = json.loads(game_json_string)
     return game_json['wave']
 
