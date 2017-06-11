@@ -21,6 +21,7 @@ GAME_JSON_TEMPLATE = {
     'created_by': None,         # the display name of the room creator
     'player_count' : 0,         # the number of players currently in the room
     'players': [],              # a list of PLAYER_JSON (see template below)
+    'wave' : 1,                 # current wave number
 }
 
 # These form part of a GAME_JSON in the 'players' list.
@@ -235,6 +236,31 @@ def get_room_state_json_string(game_id):
     game_json_string = redis.get(game_id)
     # TODO: release lock for game_id
     return game_json_string
+
+def get_room_wave(game_id):
+    # TODO: acquire lock for game_id
+    game_json_string = redis.get(game_id)
+
+    if game_json_string is None:
+        # TODO: release lock for game_id
+        return
+
+    game_json = json.loads(game_json_string)
+    return game_json['wave']
+
+def set_room_wave(game_id, wave):
+    # TODO: acquire lock for game_id
+    game_json_string = redis.get(game_id)
+
+    if game_json_string is None:
+        # TODO: release lock for game_id
+        return
+
+    game_json = json.loads(game_json_string)
+    game_json['wave'] = wave
+
+    redis.set(game_id, json.dumps(game_json))
+    # TODO: release lock for game_id
 
 def set_script(game_id, player_id, script):
     """

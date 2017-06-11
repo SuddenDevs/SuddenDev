@@ -38,6 +38,6 @@ class GameInstance:
 
             if state_counter == gc.BATCHSIZE or not self.game.active:
                 #Client Update
-                yield batch
+                yield batch, self.game.game_result
                 batch = []
                 state_counter = 0

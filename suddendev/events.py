@@ -17,6 +17,8 @@ from .rooms import (
     reset_all_players,
     get_name_of_player,
     remove_room,
+    get_room_wave,
+    set_room_wave,
 )
 
 NAMESPACE = '/game-session'
@@ -98,10 +100,9 @@ def test(message):
 
     # TODO: specify test run in call
     # TODO: Give choice for a wave
-    wave = 1
+    wave = get_room_wave(game_id)
     handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, flask.request.sid, wave=wave)
     result = handle.get()
-
     fsio.emit('message_result', 'Test complete!', room=flask.request.sid, namespace=NAMESPACE)
 
 @socketio.on('play', namespace=NAMESPACE)
@@ -151,9 +152,11 @@ def run_game_if_everyone_ready(game_id):
 
         fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
         # TODO: Give choice for a wave
-        wave = 1
+        wave = get_room_wave(game_id)
         handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id, wave=wave)
         result = handle.get()
+        if result:
+            set_room_wave(game_id, wave + 1)
         fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)
         reset_all_players(game_id)
 

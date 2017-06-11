@@ -38,6 +38,8 @@ class Game:
         self.time = 0
         self.active = True
 
+        self.game_result = None
+
         #Map
         self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
 
@@ -84,20 +86,21 @@ class Game:
         self.spawn_enemies()
 
         #Ending Conditions / Wave Conditions
-        result = self.check_if_game_over()
+        result, game_result = self.check_if_game_over()
         if result is not None:
             self.active = False
+            self.game_result = game_result
             self.events_add(Event(EventType.GAME_END, result))
 
     def check_if_game_over(self):
         if len(self.enemies) == 0 and self.enemy_count >= self.gc.ENEMY_LIMIT:
-            return 'Wave ' + str(self.wave) + ' cleared!'
+            return 'Wave ' + str(self.wave) + ' cleared!', True
         elif len(self.players) == 0 or self.core.health <= 0:
-            return 'Game Over'
+            return 'Game Over', False
         elif self.time >= self.gc.TIME_LIMIT:
-            return 'Time limit reached!'
+            return 'Time limit reached!', False
         else:
-            return None
+            return None, None
 
     def update_players(self, delta):
         #Update Players
