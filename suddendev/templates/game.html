@@ -17,7 +17,7 @@
       var WAITTEXT = "Press ready to begin!";
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
-      var TIME_AFTER_END = 5; //How long to continue animating after round
+      var TIME_AFTER_END = 3; //How long to continue animating after round
       var MSG_DISPLAY_TIME = 4;
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
@@ -38,7 +38,7 @@
       var stage = null;
       var renderer = null
       var fpsText = null;
-      var waitingText = null;
+      var mainText = null;
 
       //Layers
       var hud_layer = null;
@@ -57,7 +57,8 @@
       var last_state = null;
       var timer_end = 0;
 
-      var states = [];
+      var game_data = [];
+      var game_data_current = [];
 
       //Game parameters
       var attack_fade = 0.2;
@@ -73,7 +74,7 @@
             playerID = parseInt(data);
           });
           socket.on(EVENTS.RESULT, function(data) {
-            readyGame(data);
+            data_receive(data);
           });
           socket.on(EVENTS.UPDATE, function(data) {
             updateRoom(data);
@@ -99,17 +100,28 @@
         socket.emit(EVENTS.JOINED, {});
       }
 
-      //Function to start the game
-      function readyGame(data) {
+      //Handle new batch of game data
+      function data_receive(data) {
+        var data_new = JSON.parse(data).result;
+        var first = data_new[0];
+        var game_is_new = false;
 
-        var tempStates = JSON.parse(data).result;
-        for (i = 0; i < tempStates[0].events.length; i++) {
-          if (tempStates[0].events[i].name === "Game_Start") {
-            startGame(tempStates[0]);
+        //Check if this is a new game
+        for (i = 0; i < first.events.length; i++) {
+          if (first.events[i].name === "Game_Start") {
+            game_is_new = true;
             break;
           }
         }
-        states = states.concat(tempStates);
+        if (game_is_new) {
+            game_data.push(data_new); 
+            if (!inGame) {
+              game_start();
+            }
+        } else {
+          var top = game_data[game_data.length - 1];
+          Array.prototype.push.apply(top, data_new);
+        }
       }
 
       function startWaiting(state) {
@@ -130,11 +142,11 @@
           wordWrapWidth: 440
         });
 
-        waitingText = new PIXI.Text(WAITTEXT, style);
-        waitingText.x = 400;
-        waitingText.y = 200;
-        waitingText.anchor.x = 0.5;
-        hud_layer.addChild(waitingText);
+        mainText = new PIXI.Text(WAITTEXT, style);
+        mainText.x = 400;
+        mainText.y = 200;
+        mainText.anchor.x = 0.5;
+        hud_layer.addChild(mainText);
       }
 
       function draw_grid() {
@@ -157,19 +169,32 @@
         background_layer.addChildAt(grid, 0);
       }
 
-      function startGame(state) {
-        clearStates();
-        waitingText.visible = false;
-        for (i = 0; i < players.length; i++) {
-          create_player(state.players[i]);
-        }
+      function game_start() {
+        clear_current_game_data();
+
+        //Get the next game in the queue
+        game_data_current = game_data[0];
+
+        //Get the first state of this new game
+        var first = game_data_current[0];
+
+        mainText.visible = false;
         inGame = true;
-        create_core(state.core);
+
+        //Make Players
+        for (i = 0; i < players.length; i++) {
+          create_player(first.players[i]);
+        }
+
+        //Make the core
+        create_core(first.core);
+
         if (test) {
           toggleClasses("testBtn", ["inactive", "noEvents"], false);
           toggleClasses("readyBtn", ["inactive", "noEvents"], false);
         }
-        renderer.render(stage);
+
+        draw();
         ticker.start();
       }
 
@@ -686,8 +711,8 @@
         socket.emit(EVENTS.SUBMIT, scripts[0].script);
       }
 
-      function testCode() {
-        clearStates();
+      function game_test() {
+        game_terminate();
         socket.emit(EVENTS.TEST, editor.getValue());
         toggleClasses("testBtn", ["noEvents", "inactive"], true);
         toggleClasses("readyBtn", ["noEvents", "inactive"], true);
@@ -700,14 +725,14 @@
         }
       }
 
-      function clearStates() {
+      function clear_current_game_data() {
         timer = 0;
         timer_end = 0;
         playerDict = {};
         enemies = {};
         pickups = {};
         core = null;
-        states = [];
+        game_data_current = null;
         inGame = false;
         for (i = 0; i < game_layer.children.length; i++) {
           game_layer.getChildAt(i).removeChildren();
@@ -779,18 +804,21 @@
         fpsText.text = Math.round(ticker.FPS * 100) / 100;
         if (inGame) {
           blurFilter.blur = 0;
-          if (states.length > 0) {
-            last_state = states[0]
+          if (game_data_current.length > 0) {
+            last_state = game_data_current[0]
             process_state(last_state, delta);
-            states.splice(0, 1);
+            game_data_current.splice(0, 1);
           } else {
-            //Waiting for game data...
+            //Waiting for more data...
           }
         } else if (timer_end > 0) {
           blurFilter.blur = 2 * (1 - timer_end / TIME_AFTER_END);
           process_state_end(last_state, delta); 
         } else {
           ticker.stop();
+          if (game_data.length > 0) {
+            game_start();
+          }
         }
       }
 
@@ -818,7 +846,7 @@
               break;
             case "Game_End":
               // console.log('RIP game');
-              endGame(body);
+              game_end(body);
               break;
             case "Attack":
               create_attack(body[0].pos, body[1].pos);
@@ -863,7 +891,7 @@
         draw();
       }
 
-      function endGame(msg) {
+      function game_end(msg) {
         timer_end = TIME_AFTER_END;
         inGame = false;
         if (!test) {
@@ -875,9 +903,19 @@
         if (msg == "Game Over") {
           clearup_core();
         }
-        //Blur
-        waitingText.text = msg;
-        waitingText.visible = true;
+
+        mainText.text = msg;
+        mainText.visible = true;
+
+        game_data.splice(0, 1);
+
+        //Wait...
+      }
+
+      function game_terminate() {
+        ticker.stop();
+        clear_current_game_data();
+        game_data.splice(0,1);
       }
 
       function vector_to_rotation(dir) {
@@ -1059,7 +1097,7 @@
 	        <div class="btn-group pull-right">
                   <button class="controls btn btn-info" onclick="submitCode()">Save Code</button>
                   <button id="pauseBtn" class="controls btn btn-info" onclick="togglePause()">Pause</button>
-                  <button id="testBtn" class="controls btn btn-info" onclick="testCode()">Test Code</button>
+                  <button id="testBtn" class="controls btn btn-info" onclick="game_test()">Test Code</button>
                   <button id="readyBtn" class="controls btn btn-success" onclick="readyUp()">Ready</button>
                 </div>
 	        <div class="btn-group pull-left">
