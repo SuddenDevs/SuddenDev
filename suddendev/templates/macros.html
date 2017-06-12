@@ -4,7 +4,9 @@
     <div class="container">
       <div class="row align-items-center">
         <div class="col-md-1">
-          <img src="{{ url_for('static', filename='logo_64.png')}}">
+	  <a href="{{ url_for('.index') }}">
+            <img src="{{ url_for('static', filename='logo_64.png')}}">
+	  </a>
         </div>
         <div class="col">
           <h1 class="display-4">S U D D E N _ D E V</h1>
@@ -21,9 +23,9 @@
   <div class="card-block">
     <div class="container">
       <div class="row align-items-center">
-        <div class="col-md-1">
+	<a href="{{ url_for('.home') }}">
           <img src="{{ url_for('static', filename='logo_64.png')}}">
-        </div>
+	</a>
         <div class="col">
           <h1 class="display-4">S U D D E N _ D E V</h1>
         </div>
