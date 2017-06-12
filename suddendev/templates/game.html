@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% from 'macros.html' import suddendev_logged_in_header %}
+
 {% block head %}
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_game.css')}}">
   <script type="text/javascript" src="{{url_for('static', filename='src-min-noconflict/ace.js')}}"></script>
@@ -651,7 +653,7 @@
             if (!present) {
               scripts.splice(getScript(players[i].id), 1);
               players.splice(i, 1);
-              toggleClasses("tab" + (i), ["hidden"], false);
+              toggleClasses("tab" + (i), ["disabled"], false);
               i--;
             }
           }
@@ -675,8 +677,8 @@
         scripts.push({"script":player.script, "id":player.id, "name":player.name});
         var t = document.getElementById("tab" + (players.length - 1));
         t.innerHTML = player.name;
-        if (t.classList.contains("hidden")) {
-          t.classList.remove("hidden");
+        if (t.classList.contains("disabled")) {
+          t.classList.remove("disabled");
           if (players.length - 1 == 0) {
             editor.setValue(scripts[0].script);
           }
@@ -1036,8 +1038,10 @@
 
       function setEditorTab(tabi) {
         var tabs = document.getElementsByClassName("tabBtn");
+        tabs[currentTab].classList.toggle("disabled");
         tabs[currentTab].classList.toggle("active");
         tabs[tabi].classList.toggle("active");
+        tabs[currentTab].classList.toggle("disabled");
         scripts[currentTab].script = editor.getValue();
         editor.setValue(scripts[tabi].script);
         editor.setReadOnly(tabi != 0);
@@ -1081,54 +1085,62 @@
     </script>
 {% endblock %}
 {% block body %}
-  
-    <div id="title" class="title">
-      <img src="{{ url_for('static', filename='logo_64.png')}}">
-      <h1 id="heading" class="mainHeading">   S U D D E N _ D E V</h1>
-    </div>
-    <div class="container-fluid mainGrid">
-      <div class="row mainRow">
-        <div class="col mainCol gameCol">
-          <div id="gameDiv" class="game greyBorder">
-            <canvas id="gameCanvas" class="game" width="800px"
-                    height="600px"></canvas>
-            <div class="controls greyBorder">
-	      <div class="btn-toolbar">
-	        <div class="btn-group pull-right">
-                  <button class="controls btn btn-info" onclick="submitCode()">Save Code</button>
-                  <button id="pauseBtn" class="controls btn btn-info" onclick="togglePause()">Pause</button>
-                  <button id="testBtn" class="controls btn btn-info" onclick="game_test()">Test Code</button>
-                  <button id="readyBtn" class="controls btn btn-success" onclick="readyUp()">Ready</button>
-                </div>
-	        <div class="btn-group pull-left">
-                  <button class="controls btn btn-danger" onclick="leaveGame()">Leave Game</button>
+    {{ suddendev_logged_in_header(user.picture, user.name, user.email) }}
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col align-self-start">
+          <div class="card">
+            <div id="console" class="console card-block"></div>
+	  </div>
+	</div>
+        <div class="col-md-auto align-self-end greyBorder">
+          <div id="gameDiv">
+            <canvas id="gameCanvas" width="800px" height="600px"></canvas>
+	    <div class="row">
+              <div class="col">
+	        <div class="btn-toolbar justify-content-between">
+	          <div class="btn-group">
+                    <button class="btn btn-danger" onclick="leaveGame()">Leave Game</button>
+                  </div>
+	          <div class="btn-group">
+                    <button class="btn btn-info" onclick="submitCode()">Save Code</button>
+                    <button id="pauseBtn" class="btn btn-info" onclick="togglePause()">Pause</button>
+                    <button id="testBtn" class="btn btn-info" onclick="game_test()">Test Code</button>
+                    <button id="readyBtn" class="btn btn-success" onclick="readyUp()">Ready</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="col mainCol editCol">
-          <div class="greyBorder">
-            <div id="editor"></div>
-          </div>
-          <div class="controls">
-            <button id="tab0" class="controls tabBtn active hidden" onclick="setEditorTab(0)">Player1</button>
-            <button id="tab1" class="controls tabBtn hidden" onclick="setEditorTab(1)">Player2</button>
-            <button id="tab2" class="controls tabBtn hidden" onclick="setEditorTab(2)">Player3</button>
-            <button id="tab3" class="controls tabBtn hidden" onclick="setEditorTab(3)">Player4</button>
-	    <div class="btn-group pull-right">
-              <button class="controls btn btn-warning" onclick="revertCode()">Revert Changes</button>
-	      <a href="{{ url_for('.docs') }}" target="_blank"><button class="btn btn-info controls">Show me the docs!</button></a>
+        <div class="col align-self-end">
+	  <ul class="nav nav-tabs">
+	     <li class="nav-item tabBtn active" onClick="setEditorTab(0)">
+		<button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)">Player 1</button>
+             </li>
+	     <li class="nav-item">
+               <button id="tab1" class="nav-link tabBtn disabled" onclick="setEditorTab(1)">Player 2</button>
+             </li>
+	     <li class="nav-item">
+               <button id="tab2" class="nav-link tabBtn disabled" onclick="setEditorTab(2)">Player 3</button>
+             </li>
+	     <li class="nav-item">
+               <button id="tab3" class="nav-link tabBtn disabled" onclick="setEditorTab(3)">Player 4</button>
+             </li>
+          </ul>
+          <div id="editor"></div>
+	  <div class="row">
+            <div class="col">
+	      <div class="btn-toolbar justify-content-between greyBorder">
+	        <div class="btn-group">
+                  <button class="btn btn-warning" onclick="revertCode()">Revert Changes</button>
+	        </div>
+	        <div class="btn-group">
+	          <a href="{{ url_for('.docs') }}" target="_blank"><button class="btn btn-info">Show me the docs!</button></a>
+	        </div>
+	     </div>
 	   </div>
-          </div>
-        </div>
-      </div>
-      <div class="row detailRow">
-        <div class="container-fluid detailGrid greyBorder">
-          <div class="row inDetailRow">
-            <div class="col-sm detailCol">
-              <div id="console" class="console"></div>
-            </div>
           </div>
         </div>
       </div>
