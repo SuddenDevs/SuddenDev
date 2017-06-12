@@ -1057,7 +1057,7 @@
         editor.getSession().setUseWrapMode(true);
         editor.getSession().setTabSize(4);
         editor.getSession().setUseSoftTabs(true);
-        editor.setValue(`{{user.script}}`, 1);
+        editor.setValue(`{{user.script|safe}}`, 1);
       }
 
       //Prints to the on screen console
