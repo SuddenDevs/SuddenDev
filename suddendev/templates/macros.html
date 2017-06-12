@@ -1,9 +1,51 @@
 {% macro suddendev_header() %}
-  <div class="page-header">
-    <div>
-	    <img src="{{ url_for('static', filename='logo_64.png')}}">
-	    <h1 style="display:inline-block; white-space:pre">   S U D D E N _ D E V</h1>
+<div class="card">
+  <div class="card-block">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-1">
+          <img src="{{ url_for('static', filename='logo_64.png')}}">
+        </div>
+        <div class="col">
+          <h1 class="display-4">S U D D E N _ D E V</h1>
+        </div>
+      </div>
     </div>
-    	<p class="lead" style="white-space:pre">                 Strategize. Script. Survive.</p>
   </div>
+</div>
+<br>
+{% endmacro %}
+
+{% macro suddendev_logged_in_header(picture, name, email) %}
+<div class="card">
+  <div class="card-block">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-1">
+          <img src="{{ url_for('static', filename='logo_64.png')}}">
+        </div>
+        <div class="col">
+          <h1 class="display-4">S U D D E N _ D E V</h1>
+        </div>
+        <div class="col-md-1">
+          <img src="{{ picture }}" class="rounded-circle img-fluid">
+        </div>
+        <div class="col-md-3">
+	  <div class=row">
+	    <div class="col">
+              <h5>{{ name }}</h5>
+            </div>
+	    <div class="col">
+              <h5>{{ email }}</h5>
+            </div>
+	    <div class="col">
+              <a href="{{url_for('main.logout')}}">Log out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br>
 {% endmacro %}

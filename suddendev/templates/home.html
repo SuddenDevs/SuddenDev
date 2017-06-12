@@ -1,36 +1,10 @@
 {% extends "base.html" %}
-
-{% block head %}
-  <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_lobby.css')}}">
-{% endblock %}
+{% from 'macros.html' import suddendev_logged_in_header %}
 
 {% block body %}
 
-  <div class="container">
-    <div class="page-header">
-      <div>
-        <img src="{{ url_for('static', filename='logo_64.png')}}">
-        <h1 style="display:inline-block; white-space:pre">SUDDEN_DEV</h1>
-      </div>
-  
-  
-      <div class="container-fluid loginDetails">
-        <div class="row loginDetails">
-          <div class="col-sm loginCell displayPicCell">
-            <img class="loginDetails" src="{{user.picture}}">
-          </div>
-          <div class="col-sm loginCell">
-            <h3 class="loginDetails">{{ user.name }}<br>{{ user.email }}</h3>
-          </div>
-          <div class="col-sm loginCell buttonCell">
-            <a href="{{url_for('main.logout')}}">Log out</a>
-          </div>
-        </div>
-      </div>
+  {{ suddendev_logged_in_header(user.picture, user.name, user.email) }}
 
-    <p class="lead" style="white-space:pre">                 Strategize. Script. Survive.</p>
-    </div>
-  </div>
   <div class="container">
       <h2>Hey, {{ user.name.split(' ', 1)[0] }}!</h3>
       <br>
@@ -52,7 +26,9 @@
       </div>
       {% endif %}
 
-      <div class="well well-lg">You'll see all your stats here once we get around to implementing it...</div>
+      <br>
+      <h4>Trophies coming soon <small>watch this space!</small></h4>
+      <br>
 
       <a class="btn btn-lg btn-success" href="{{ url_for('.lobby') }}">Let's play!</a>
       <a class="btn btn-lg btn-info" href="{{ url_for('.docs') }}">Show me the docs</a>
