@@ -146,7 +146,7 @@ And that's it! Now to make it smarter, you might want to try to pick up powerups
                 <code>say('Hello World!')</code><br><br>
                 To send a message with the string 'Hello World!' and no body. Alternatively, you can send<br><br>
                 <code>say('Enemy Coordinates', Vector(0, 0), Vector(5, 2))</code><br><br>
-                The body of the message will be a list with two elements, <code>Vector(0, 0)</code> and <code>Vector(5, 2)</code>.<br>
+                The body of the message will be a list with two elements, <code>Vector(0, 0)</code> and <code>Vector(5, 2)</code>. For convenience, if you only pass in one argument as the body, the body will be that argument itself (instead of a list with one element). In any other case, the arguments will be packed into a list.<br>
 
                 
                 
@@ -229,27 +229,42 @@ def update(player, delta):
         stuff in <b>bold</b> can be modified.<br>
         <code>tag</code><br>
         <code>pos</code><br>
-        <b><code>vel</code></b><br>
+        <code>vel</code><br>
         <code>speed</code><br>
         <code>size</code><br>
         <code>healthMax</code><br>
         <code>health</code><br><br>
 
-        <code>ammo</code><br>
+        For players, can also access:<br>
         <code>name</code><br>
         <code>color</code><br>
+        <code>ammo</code><br>
         <code>speed</code><br>
+        <code>damage</code><br>
+
         <code>range_visible</code><br>
         <code>range_attackable</code><br>
-        <code>damage</code><br>
         <code>attack_delay</code><br>
-        <code>has_message</code><br>
-        <code>message</code><br><br>
+        <code>attack_timer</code><br><br>
+
+        For enemies, can also access:<br>
+
+        <code>enemy_type</code><br>
+        <code>is_boss</code><br>
+        <code>range_visible</code><br>
+        <code>range_attackable</code><br>
+        <code>attack_delay</code><br>
+        <code>attack_timer</code><br><br>
+
+        For powerups, can also access:<br>
+        <code>powerup_type</code><br>
+        <code>value</code><br><br>
 
         <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
+        <b><code>print(message)</code></b><br>
         <b><code>shoot(enemy)</code></b><br>
-        <b><code>get_nearest_enemy()</code></b><br>
-        <b><code>get_nearest_attackable_enemy()</code></b><br>
+        <b><code>get_nearest_enemy(enemy_type=None)</code></b><br>
+        <code>get_nearest_attackable_enemy(enemy_type=None)</code><br>
         <b><code>get_nearest_powerup(powerup_type=None)</code></b><br>
         <b><code>say(string, *body)</code></b><br>
         <code>say_also_to_self(string, *body)</code><br>
@@ -263,6 +278,7 @@ def update(player, delta):
         <b><code>source</code></b><br>
         <code>to_self</code><br>
         <code>string</code><br>
+        <code>body</code><br>
 
         <b>Vectors:</b><br>
         Initialise as:<br>
@@ -278,7 +294,12 @@ def update(player, delta):
 
         PowerupType<br>
         <code>AMMO_UP</code><br>
-        <code>HEALTH_UP</code><br>
+        <code>HEALTH_UP</code><br><br>
+
+        EnemyType<br>
+        <code>DEFAULT</code><br>
+        <code>CORE_KILLER</code><br>
+        <code>PLAYER_KILLER</code><br>
 	<br>
     </div>
         </div>
