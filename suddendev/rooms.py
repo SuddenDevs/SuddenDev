@@ -15,8 +15,7 @@ MAX_PLAYER_COUNT = 4
 # (and make updating the client easier) by using JSON strings.
 # These are associated with a game_id for each active (possibly full) room.
 GAME_JSON_TEMPLATE = {
-    'game_id' : None,           # the game_id of the room (included again for rendering)
-    'lobby_name' : None,        # the human-readable name of the room
+    'game_id' : None,           # the game_id of the room (included again for use by frontend)
     'time_created': None,       # the time the room was created
     'created_by': None,         # the display name of the room creator
     'player_count' : 0,         # the number of players currently in the room
@@ -57,8 +56,7 @@ def create_room(player_id, creator_display_name):
         return None, "Sorry, you can't create a game whilst you're still in one."
 
     def gen_random_string(n):
-        return ''.join(random.choice(
-            string.ascii_uppercase + string.digits) for _ in range(n))
+        return random.choice(LOBBY_ADJECTIVES) + " " + random.choice(LOBBY_NOUNS)
 
     # TODO: acquire lock for 'rooms'
     game_id = gen_random_string(10)
@@ -69,7 +67,6 @@ def create_room(player_id, creator_display_name):
 
     game_json = dict(GAME_JSON_TEMPLATE)
     game_json['game_id'] = game_id
-    game_json['lobby_name'] = random.choice(LOBBY_ADJECTIVES) + " " + random.choice(LOBBY_NOUNS) #TODO: ensure unique?
     game_json['time_created'] = str(datetime.datetime.now())
     game_json['created_by'] = creator_display_name
 

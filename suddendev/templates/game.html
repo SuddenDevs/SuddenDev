@@ -1154,65 +1154,75 @@
 {% block body %}
     {{ suddendev_logged_in_header(user.picture, user.name, user.email) }}
 
-    Your secret key is {{ game_id }}
+    Your secret key is <code>{{ game_id }}</code>
     <div class="container-fluid">
       <div class="row">
-        <div class="col align-self-start">
-          <div class="card">
-            <div id="console" class="console card-block"></div>
-	  </div>
-	</div>
-        <div class="col-md-auto align-self-end greyBorder">
-          <div id="gameDiv">
-            <canvas id="gameCanvas" width="800px" height="600px"></canvas>
-	    <div class="row">
-              <div class="col">
-	        <div class="btn-toolbar justify-content-between">
-	          <div class="btn-group">
-                    <button class="btn btn-danger" onclick="leaveGame()">Leave Game</button>
-                  </div>
-	          <div class="btn-group">
-                    <button class="btn btn-info" onclick="submitCode()">Save Code</button>
-                    <button id="pauseBtn" class="btn btn-info" onclick="togglePause()">Pause</button>
-                    <button id="testBtn" class="btn btn-info" onclick="game_test()">Test Code</button>
-                    <button id="readyBtn" class="btn btn-success" onclick="readyUp()">Ready</button>
-                  </div>
+        <div class="col">
+          <div class="row" style="height:50px">
+          </div>
+          <div class="row" style="height: 600px; width:100%; margin:0">
+            <div class="card" style="width:100% ">
+              <div id="console" class="console card-block"></div>
+    	      </div>
+          </div>
+  	    </div>
+        <div class="col">
+          <div class="row" style="height:50px">
+          </div>
+          <div class="row" style="margin:0">
+            <div id="gameDiv">
+              <canvas id="gameCanvas" width="800px" height="600px" style="display:block"></canvas>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="col">
+              <div class="btn-toolbar justify-content-between">
+                <div class="btn-group">
+                  <button class="btn btn-danger" onclick="leaveGame()">Leave Game</button>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-info" onclick="submitCode()">Save Code</button>
+                  <button id="pauseBtn" class="btn btn-info" onclick="togglePause()">Pause</button>
+                  <button id="testBtn" class="btn btn-info" onclick="game_test()">Test Code</button>
+                  <button id="readyBtn" class="btn btn-success" onclick="readyUp()">Ready</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="col align-self-end">
-	  <ul class="nav nav-tabs">
-	     <li class="nav-item tabBtn active" onClick="setEditorTab(0)">
-		<button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)">Player 1</button>
-             </li>
-	     <li class="nav-item">
-               <button id="tab1" class="nav-link tabBtn disabled" onclick="setEditorTab(1)">Player 2</button>
-             </li>
-	     <li class="nav-item">
-               <button id="tab2" class="nav-link tabBtn disabled" onclick="setEditorTab(2)">Player 3</button>
-             </li>
-	     <li class="nav-item">
-               <button id="tab3" class="nav-link tabBtn disabled" onclick="setEditorTab(3)">Player 4</button>
-             </li>
-          </ul>
-          <div id="editor"></div>
-	  <div class="row">
-            <div class="col">
-	      <div class="btn-toolbar justify-content-between greyBorder">
-	        <div class="btn-group">
-                  <button class="btn btn-warning" onclick="revertCode()">Revert Changes</button>
-	        </div>
-	        <div class="btn-group">
-	          <a href="{{ url_for('.docs') }}" target="_blank"><button class="btn btn-info">Show me the docs!</button></a>
-	        </div>
-	     </div>
-	   </div>
+        <div class="col">
+          <div class="row" style="height:50px;width:100%;margin:0">
+            <ul class="nav nav-tabs" style="position:absolute;">
+               <li class="nav-item tabBtn active" onClick="setEditorTab(0)">
+                  <button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)">Player 1</button>
+                </li>
+                <li class="nav-item">
+                  <button id="tab1" class="nav-link tabBtn disabled" onclick="setEditorTab(1)">Player 2</button>
+                </li>
+                <li class="nav-item">
+                  <button id="tab2" class="nav-link tabBtn disabled" onclick="setEditorTab(2)">Player 3</button>
+                </li>
+                <li class="nav-item">
+                  <button id="tab3" class="nav-link tabBtn disabled" onclick="setEditorTab(3)">Player 4</button>
+                </li>
+            </ul>
+          </div>
+          <div class="row" style="height:600px">
+            <div id="editor" style="width: 100%"></div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="btn-toolbar justify-content-between greyBorder">
+              <div class="btn-group">
+                <button class="btn btn-warning" onclick="revertCode()">Revert Changes</button>
+              </div>
+              <div class="btn-group">
+                <a href="{{ url_for('.docs') }}" target="_blank"><button class="btn btn-info">Show me the docs!</button></a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <script>initCanvas();initSocket();initEditor();</script>
+  <script>initCanvas();initSocket();initEditor();</script>
 {% endblock %}
   
