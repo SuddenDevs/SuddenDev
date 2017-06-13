@@ -21,6 +21,7 @@
       var HEALTHBARWIDTH = 24;
       var TIME_AFTER_END = 3; //How long to continue animating after round
       var MSG_DISPLAY_TIME = 4;
+      var TAB_NAME_CHAR_LIMIT = 16;
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
@@ -38,6 +39,7 @@
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var stage = null;
+      var textStyle = null;
       var renderer = null
       var fpsText = null;
       var mainText = null;
@@ -132,11 +134,11 @@
           fontWeight: 'bold',
           fill: ['#ffffff'], // gradient
           align: 'center',
-          //stroke: '#4a1850',
           strokeThickness: 5,
           dropShadow: true,
           dropShadowColor: '#000000',
           dropShadowBlur: 10,
+          dropShadowAlpha: 0.5,
           dropShadowAngle: Math.PI / 6,
           dropShadowDistance: 1,
           wordWrap: true,
@@ -172,12 +174,16 @@
 
       function game_start() {
         clear_current_game_data();
+        fade.visible = false;
+        resetPause();
 
         //Get the next game in the queue
         game_data_current = game_data[0];
 
         //Get the first state of this new game
         var first = game_data_current[0];
+
+        waveText.text = "Wave " + first.wave;
 
         mainText.visible = false;
         inGame = true;
@@ -397,7 +403,6 @@
         sprite.lineStyle(1, 0x0, 1);
 
         var text = 'Ammo';
-        console.log(data.type);
         if (data.type == 'health') {
           text = 'Health';
           sprite.beginFill(PIXI.utils.rgb2hex([1,1,1]));
@@ -629,13 +634,6 @@
         );
         core.container.visible = false;
         emitter.playOnceAndDestroy();
-
-        var sprite = new PIXI.Graphics();
-        sprite.beginFill(PIXI.utils.rgb2hex([1, 0, 0]));
-        sprite.drawRect(0, 0, renderer.width, renderer.height);
-        sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-        entity_layer.addChild(sprite);
-        core.explosion = sprite;
       }
 
       function find_entity(tag) {
@@ -710,7 +708,7 @@
         players.push(player);
         scripts.push({"script":player.script, "id":player.id, "name":player.name});
         var t = document.getElementById("tab" + (players.length - 1));
-        t.innerHTML = player.name;
+        t.innerHTML = player.name.substring(0, TAB_NAME_CHAR_LIMIT);
         if (t.classList.contains("disabled")) {
           t.classList.remove("disabled");
           if (players.length - 1 == 0) {
@@ -817,10 +815,40 @@
         stage.addChild(game_layer);
         stage.addChild(hud_layer);
 
-        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
+        textStyle = new PIXI.TextStyle({
+          fontFamily: 'Arial',
+          fontSize: 36,
+          //fontWeight: 'bold',
+          fill: ['#ffffff'], // gradient
+          align: 'center',
+          strokeThickness: 2,
+          dropShadow: true,
+          dropShadowColor: '#000000',
+          dropShadowBlur: 2,
+          dropShadowAlpha: 0.8,
+          dropShadowAngle: Math.PI / 6,
+          dropShadowDistance: 0,
+        });
+        
+        textStyle.fontSize = 20;
+        fpsText = new PIXI.Text("", textStyle);
         fpsText.x = 10;
         fpsText.y = 10;
         hud_layer.addChild(fpsText);
+
+        waveText = new PIXI.Text("Wave 1", textStyle);
+        waveText.anchor.x = 1;
+        waveText.x = renderer.width - 10;
+        waveText.y =  10;
+        hud_layer.addChild(waveText);
+
+        fade = new PIXI.Graphics();
+        fade.beginFill(PIXI.utils.rgb2hex([1, 1, 1]));
+        fade.drawRect(0, 0, renderer.width, renderer.height);
+        fade.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+        hud_layer.addChildAt(fade, 0);
+        fade.alpha = 0;
+        fade.visible = false;
         
         draw_grid();
 
@@ -832,7 +860,7 @@
         delta = ticker.elapsedMS/1000;
         timer += delta;
         timer_end -= delta;
-        fpsText.text = Math.round(ticker.FPS * 100) / 100;
+        fpsText.text = (Math.round(ticker.FPS * 100) / 100).toString() + " FPS";
         if (inGame) {
           if (game_data_current.length > 0) {
             last_state = game_data_current[0]
@@ -843,7 +871,7 @@
           }
         } else if (timer_end > 0) {
           var param = Math.min(timer_end / TIME_AFTER_END, 1);
-          core.explosion.alpha = 0.5 * (1 - param);
+          fade.alpha = 0.5 * (1 - param);
           process_state_end(last_state, delta); 
         } else {
           ticker.stop();
@@ -931,8 +959,13 @@
         } else {
           test = false;
         }
+        fade.visible = true;
+        fade.alpha = 0;
         if (msg == "Game Over") {
           clearup_core();
+          fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+        } else {
+          fade.tint = PIXI.utils.rgb2hex([0, 1, 0]);
         }
 
         mainText.text = msg;
@@ -1053,12 +1086,25 @@
         }
       }
 
+      function resetPause() {
+        var b = document.getElementById("pauseBtn");
+        b.innerHTML = "Pause";
+        b.classList.remove("active");
+      }
+
       //Pause game, update pause button
       function togglePause() {
-        if (ticker.started && inGame) {
-          ticker.stop();
-        } else {
-          ticker.start();
+        var on = false;
+        if (inGame) {
+          if (ticker.started) {
+            ticker.stop();
+            mainText.visible = true;
+            mainText.text = "Paused";
+            draw();
+          } else {
+            ticker.start();
+            mainText.visible = false;
+          }
         }
         var b = document.getElementById("pauseBtn");
         b.innerHTML = (b.innerHTML === "Pause") ? "Unpause" : "Pause";

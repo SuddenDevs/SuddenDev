@@ -6,8 +6,8 @@ from .enemy_type import EnemyType
 import sys
 
 # Prints a message to the console.
-def user_print(self, string):
-    if self is None or string is None:
+def user_print(self, message):
+    if self is None or message is None:
         return
 
     self.game.events_add(Event(EventType.PRINT, str(string)))
