@@ -2,41 +2,50 @@
 {% from 'macros.html' import suddendev_header %}
 {% block body %}
 
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>
+    hljs.initHighlightingOnLoad();
+    </script>
+
   {{ suddendev_header() }}
-  <div class="container">
+  <div class="container"> <h2>A co-op survival game where your code plays for you.</h2><br>
+  <div id="toc" class="card m-3">
+      <div class="card-header card-inverse card-success" style="color:#ffffff">
+        <h4> Table of Contents </h4>
+      </div>
+  <div class="card-block">
+      <ul>
+          <li><a href="#getting-started">Getting Started</a><br></li>
+          <li><a href="#gameplay-basics">Gameplay Basics</a><br></li>
+          <li><a href="#scripting-basics">Scripting Basics</a><br></li>
+          <li><a href="#scripting-reference">Scripting Reference</a><br></li>
+      </ul>
+  </div>
+  </div>
 
-      <h2>A co-op survival game where your code plays for you.</h2>
-      <br>
+  <div id="getting-started" class="card m-3">
+      <div class="card-header card-inverse card-success" style="color:#ffffff">
+        <h4> Getting Started </h4>
+      </div>
 
-        <div class="card card-info">
-            <div class="card-header" data-toggle="collapse" href="#collapseZero">
-              <h4 class="card-title">
-                Getting Started
-              </h4>
-            </div>
-          <div id="collapseZero" class="card-collapse collapse show">
-            <div class="card-block">
+      <div class="card-block">
 	      <ol>
-		<li>Protect the blue circle</li>
-		<li>For each wave, at least one player needs to survive</li>
-                <li>Don't die and don't run out of ammo</li>
+            <li>Protect the <b>core</b> (the blue circle)</li>
+            <li>For each wave, at least one player needs to survive</li>
+            <li>Don't die and don't run out of ammo</li>
 	      </ol>
 
 	      <p>Keep this page open for reference.</p>
 	      <p>Head to your <a href={{ url_for('.home') }}>home</a>, create a game, invite friends and try to survive as many waves as possible.</p>
 	    </div>
           </div>
-        </div>
-	<br>
-
-        <div class="card card-info">
-            <div class="card-header" data-toggle="collapse" href="#collapseOne">
-              <h4 class="card-title">
-                Gameplay Basics
-              </h4>
-            </div>
-          <div id="collapseOne" class="card-collapse collapse">
-            <div class="card-block">
+    </div>
+    <div id="gameplay-basics" class="card m-3">
+      <div class="card-header card-inverse card-success" style="color:#ffffff">
+    <h4> Gameplay Basics </h4>
+    </div>
+      <div class="card-block">
 	      <p>You control a <b>fierce</b> little triangle. It can:</p>
 	      <ol>
 		<li>Move (obviously)</li>
@@ -51,89 +60,112 @@
 
 	      <p>You'll need as much help as possible (up to 3 team-mates), and some clever strategies to succeed.
 	      Give it your best shot, and have fun!</p>
-	    </div>
           </div>
-        </div>
-	<br>
+    </div>
+    <div id="scripting-basics" class="card m-3">
+      <div class="card-header card-inverse card-success" style="color:#ffffff">
+    <h4> Scripting Basics </h4>
+    </div>
+      <div class="card-block">
+            This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
+            You'll be writing in <b>Python</b>, a popular scripting language. There are plenty of resources online, as well as examples below, to help you get started.<br><br>
 
-        <div class="card card-info">
-            <div class="card-header" data-toggle="collapse" href="#collapseTwo">
-              <h4 class="card-title">
-                Scripting Basics
-              </h4>
-            </div>
-          <div id="collapseTwo" class="card-collapse collapse">
-            <div class="card-block">
-                This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
-                You'll be writing in <b>Python</b>, a popular scripting language. There are plenty of resources online, as well as examples below, to help you get started.<br><br>
+            <b> The Basics </b><br>
+            In your script, you only need to define one function:<br><br>
+            <code><b>update(player, delta)</b></code>
+            <br><br>
+            This function will be called 30 times per second when the game is running. What you write in it will determine how your triangle behaves.
+            The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
-                <b> The Basics </b><br>
-                In your script, you only need to define one function:<br>
-                <code><b>update(player, delta)</b></code>
-                <br><br>
-                This function will be called 30 times per second when the game is running. What you write in it will determine how your triangle behaves.
-                The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
+            We've provided some built-in functions to help you get started:<br><br>
+            <b><code>move_to(position)</code></b><br>
+            <b><code>shoot(entity)</code></b><br>
+            <br>
+            Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a powerup that you want to grab, call<br><br>
 
-                We've provided some built-in functions to help you get started:
-                <b><code>move_to(position)</code></b><br>
-                <b><code>shoot(entity)</code></b><br>
-                <br>
-                Everything in the game is an 'Entity' - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a powerup that you want to grab, call<br><br>
+            <code>move_to(somePowerup.pos)</code> to move to its position, or you can pass in the object reference itself<br>
+            <code>move_to(somePowerup)</code>, to achieve the same thing.<br><br>
 
-                <code>move_to(somePowerup.pos)</code><br><br>
+            to make your character move towards the powerup. This function just sets the velocity of your character to be towards the powerup.
 
-                to make your character move towards the powerup. This function just sets the velocity of your character to be towards the powerup.
+            also moves your bot towards the powerup. Similarly, you can use the<br><br>
+            <code>move_from(entity)</code><br>
+            <code>move_from_pos(pos)</code><br><br>
+            which make your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
+            <code>move_to(powerup, 80)</code><br><br>
+            makes your character go towards the powerup with speed 80.<br><br>
+            
+            <b>How do you get hold of these entities?</b><br><br>
+            You have access to these lists, which you can freely use in your code:<br>
+            <code>enemies_visible</code>, which contains all the enemy entities that your character can see<br>
+            <code>enemies_attackable</code>, which contains all the enemy entities that your character can attack<br>
+            <code>powerups_visible</code>, which contrains all the powerups that your character can see<br><br>
 
-                also moves your bot towards the powerup. Similarly, you can use the<br><br>
-                <code>move_from(entity)</code>
-                <code>move_from_pos(pos)</code><br><br>
-                which make your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
-                <code>move_to(powerup, 80)</code><br><br>
-                makes your character go towards the powerup with speed 80.<br><br>
-                
+            You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. You might want to make use of these functions:<br><br>
 
-                <b>How do you get hold of these entities?</b><br><br>
-                You have access to these lists, which you can freely use in your code:<br>
-                <code>enemies_visible</code>, which contains all the enemy entities that your character can see<br>
-                <code>enemies_attackable</code>, which contains all the enemy entities that your character can attack<br>
-                <code>powerups_visible</code>, which contrains all the powerups that your character can see<br><br>
+            <code>get_nearest_enemy()</code><br>
+            <code>get_nearest_attackable_enemy()</code><br>
+            <code>get_nearest_powerup()</code><br><br>
 
-                You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. You might want to make use of these functions:<br><br>
+            You can also pass in a <code>PowerupType</code> to <code>get_nearest_powerup()</code> to specify which powerup you're interested in, i.e.<br><br>
 
-                <code>get_nearest_enemy()</code><br>
-                <code>get_nearest_attackable_enemy()</code><br>
-                <code>get_nearest_powerup()</code><br>
+            <code>get_nearest_powerup(PowerupType.AMMO_UP)</code><br>
+            <code>get_nearest_powerup(PowerupType.HEALTH_UP)</code><br><br>
 
-                You can also pass in a PowerupType to get_nearest_powerup to specify which powerup you're interested in, i.e.<br><br>
+            Your own character is also an entity and you can also access its attributes. The character is passed in as the first argument in your <code>update</code> function, so if your function starts with<br><br>
+            <code>update(player, delta)</code><br><br>
+            then you can access your own entity as <code>player</code>. Here are some attributes you might find useful:<br><br>
+            <code>health</code><br>
+            <code>ammo</code><br>
+            <code>pos</code><br>
+            <code>range_visible</code><br>
+            <code>range_attackable</code><br><br>
+            You would then access these for example as<br><br>
+            <code>player.ammo</code><br><br>
+            For a full list of attributes, check out the scripting reference below.<br><br>
 
-                <code>get_nearest_powerup(PowerupType.AMMO_UP)</code><br>
-                <code>get_nearest_powerup(PowerupType.HEALTH_UP)</code><br><br>
-
-                With these functions you can actually already write a very simple AI! Here's a very basic example:
-
-<pre>
-def update(self, delta):
+            With these functions you can actually already write a very simple AI! Here's a very basic example:<br><br>
+            <div class="card card-outline-primary">
+<pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+def update(player, delta):
     # Find the nearest enemy, move towards it and shoot it
     nearest_enemy = get_nearest_enemy()
     move_to(nearest_enemy)
-    shoot(nearest_enemy)
-</pre>
+    shoot(nearest_enemy)</code></pre></div><br>
                 
 And that's it! Now to make it smarter, you might want to try to pick up powerups, avoid enemies if your health is low or shoot only if your ammo is high.<br><br>
                 <b>Advanced</b><br><br>
+                You might find it useful to print messages to the console. This is achieved by calling<br><br>
+                <b><code>print(message)</code></b><br><br>
 
                 In order to cooperate with your teammates, your bot can send 'messages', to their bots. To do this, call this function:<br><br>
-                <code>say(string, *body)</code><br><br>
-                This broadcasts a message to all other players' characters. In order to respond to these messages, in your script you should define the function<br><br>
-                <code>respond(self, message)</code><br><br>
-                which will be called when your bot receives a message. Using this mechanism, you can share information with other people's bots in the middle of the game, such as enemy positions and
+                <b><code>say(string, *body)</code></b><br><br>
+                This broadcasts a message to all other players' characters. This function accepts a string and any number of other arguments that will be sent along with the message. For example, you can write:<br><br>
+                <code>say('Hello World!')</code><br><br>
+                To send a message with the string 'Hello World!' and no body. Alternatively, you can send<br><br>
+                <code>say('Enemy Coordinates', Vector(0, 0), Vector(5, 2))</code><br><br>
+                The body of the message will be a list with two elements, <code>Vector(0, 0)</code> and <code>Vector(5, 2)</code>.<br>
+
+                
+                
+                In order to respond to these messages, in your script you should define the function<br><br>
+                <b><code>respond(player, message)</code></b><br><br>
+                which will be called when your bot receives a message. The message is an object with the following attributes:<br><br>
+                <code>source</code>, the character who sent this message<br>
+                <code>string</code>, the string of the message<br>
+                <code>body</code>, the body of the message<br><br>
+                
+                Using this mechanism, you can share information with other people's bots in the middle of the game, such as enemy positions and
                 coordinate your actions. This will prove invaluable when trying to clear more difficult waves.<br>
             Here's an example with messaging.<br><br>
-<pre>
+            <div class="card card-outline-primary">
+<pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem">
 target = None
 
 # Response function for received messages.
-def respond(self, message):
+def respond(player, message):
+    # Need to specify that we're talking about the global variable 'target' and
+    # not trying to declare a local one
     global target
     # If someone is asking for help, assume that the message's body contains
     # their entity and set that as a target.
@@ -144,117 +176,109 @@ def respond(self, message):
         if target == message.body:
             target = None
 
-def update(self, delta):
+def update(player, delta):
     # If our health is below 50%, call for help
-    if self.health < self.healthMax / 2:
-        say(self, 'Help', self)
+    if player.health < player.healthMax / 2:
+        say('Help', player)
     # Otherwise say we're ok.
-    elif self.health >= self.healthMax / 2:
-        say('Ok', self)
+    elif player.health >= player.healthMax / 2:
+        say('Ok', player)
 
     # If someone needs help, go to them
     if target is not None:
         move_to(target)
-</pre>
+</code></pre></div>
 <br><br>
         In order to use messaging effectively, you'll need to coordinate with your teammates - agree on what the message strings look like and what the message body is. 
-
-                
                 <br><br><br>For further information on what's available to you, check the Scripting Reference section below.
-
-	    </div>
           </div>
+    </div>
+
+  <div id="scripting-reference" class="card m-3" style="margin: 1.5rem">
+      <div class="card-header card-inverse card-success" style="color:#ffffff">
+        <h4> Scripting Reference </h4>
         </div>
+      <div class="card-block">
+        <b>Warning, this is all outdated</b><br>
+        <b>Must define:</b><br>
+        <code>update(player, delta)</code><br><br>
+
+        <b>Can define:</b><br>
+        <code>respond(player, message)</code><br><br>
+
+        <b>Can access as libraries</b><br>
+        <code>math</code><br>
+        <code>random</code><br>
+        <code>sys</code><br>
+        <code>__builtins__</code> (which is a super long list of built in keywords)<br><br>
+
+        <b>Can access as lists:</b><br>
+        <code>enemies_visible</code><br>
+        <code>enemies_attackable</code><br>
+        <code>powerups_visible</code><br><br>
+
+        <b>Can access</b><br>
+        <code>core</code><br><br>
+
+        <b>Can access as attributes (prepend with <code>player.</code>):</b><br>
+        (can also access most of these things for enemies and stuff)<br>
+        stuff in <b>bold</b> can be modified.<br>
+        <code>tag</code><br>
+        <code>pos</code><br>
+        <b><code>vel</code></b><br>
+        <code>speed</code><br>
+        <code>size</code><br>
+        <code>healthMax</code><br>
+        <code>health</code><br><br>
+
+        <code>ammo</code><br>
+        <code>name</code><br>
+        <code>color</code><br>
+        <code>speed</code><br>
+        <code>range_visible</code><br>
+        <code>range_attackable</code><br>
+        <code>damage</code><br>
+        <code>attack_delay</code><br>
+        <code>has_message</code><br>
+        <code>message</code><br><br>
+
+        <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
+        <b><code>shoot(enemy)</code></b><br>
+        <b><code>get_nearest_enemy()</code></b><br>
+        <b><code>get_nearest_attackable_enemy()</code></b><br>
+        <b><code>get_nearest_powerup(powerup_type=None)</code></b><br>
+        <b><code>say(string, *body)</b><br>
+        <code>say_also_to_self(string, *body)<br>
+        <code>distance_to(target)</code><br>
+        <b><code>move_to(target, speed=None)</code></b><br>
+        <code>move_from(target, speed=None)</code><br>
+        <code>get_nearest(entities, with_distance=False)</code><br>
+        <code>get_farthest(entities, with_distance=False)</code><br><br>
+
+        <b>Message:</b><br>
+        <b><code>source</code></b><br>
+        <code>to_self</code><br>
+        <code>string</code><br>
+
+        <b>Vectors:</b><br>
+        Initialise as:<br>
+        <code>Vector(x, y)</code><br><br>
+        Vector functions:<br>
+        <code>DistanceSqrd(point1, point2)</code><br>
+        <code>Distance(point1, point2)</code><br>
+        <code>LengthSqrd(vec)</code><br>
+        <code>Length(vec)</code><br>
+        <code>Normalize(vec)</code><br>
+        <code>Dot(a, b)</code><br>
+        <code>ProjectOnto(w, v)</code><br><br>
+
+        PowerupType<br>
+        <code>AMMO_UP</code><br>
+        <code>HEALTH_UP</code><br>
 	<br>
-
-        <div class="card card-info">
-            <div class="card-header" data-toggle="collapse" href="#collapseThree">
-              <h4 class="card-title">
-		Scripting Reference
-              </h4>
-            </div>
-          <div id="collapseThree" class="card-collapse collapse show">
-            <div class="card-block">
-                <b>Warning, this is all outdated</b><br>
-              <b>Must define:</b><br>
-              <code>update(self, delta)</code><br><br>
-
-              <b>Can define:</b><br>
-              <code>respond(self, message)</code><br><br>
-
-              <b>Can access as libraries</b><br>
-              <code>math</code><br>
-              <code>random</code><br>
-              <code>sys</code><br>
-              <code>__builtins__</code> (which is a super long list of built in keywords)<br><br>
-
-              <b>Can access as lists:</b><br>
-              <code>enemies_visible</code><br>
-              <code>enemies_attackable</code><br>
-              <code>powerups_visible</code><br><br>
-
-              <b>Can access</b><br>
-              <code>core</code><br><br>
-
-              <b>Can access as attributes (prepend with <code>self.</code>):</b><br>
-              (can also access most of these things for enemies and stuff)<br>
-              stuff in <b>bold</b> can be modified.<br>
-              <code>tag</code><br>
-              <code>pos</code><br>
-              <b><code>vel</code></b><br>
-              <code>speed</code><br>
-              <code>size</code><br>
-              <code>healthMax</code><br>
-              <code>health</code><br><br>
-
-              <code>ammo</code><br>
-              <code>name</code><br>
-              <code>color</code><br>
-              <code>speed</code><br>
-              <code>range_visible</code><br>
-              <code>range_attackable</code><br>
-              <code>damage</code><br>
-              <code>attack_delay</code><br>
-              <code>has_message</code><br>
-              <code>message</code><br><br>
-
-              <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
-              <b><code>shoot(enemy)</code></b><br>
-              <b><code>get_nearest_enemy()</code></b><br>
-              <b><code>get_nearest_attackable_enemy()</code></b><br>
-              <b><code>get_nearest_powerup(powerup_type=None)</code></b><br>
-              <b><code>say(string, *body)</b><br>
-              <code>say_also_to_self(string, *body)<br>
-              <code>distance_to(target)</code><br>
-              <b><code>move_to(target, speed=None)</code></b><br>
-              <code>move_from(target, speed=None)</code><br>
-              <code>get_nearest(entities, with_distance=False)</code><br>
-              <code>get_farthest(entities, with_distance=False)</code><br><br>
-
-              <b>Message:</b><br>
-              <b><code>source</code></b><br>
-              <code>to_self</code><br>
-              <code>string</code><br>
-
-              <b>Vectors:</b><br>
-              Initialise as:<br>
-              <code>Vector(x, y)</code><br><br>
-              Vector functions:<br>
-              <code>DistanceSqrd(point1, point2)</code><br>
-              <code>Distance(point1, point2)</code><br>
-              <code>LengthSqrd(vec)</code><br>
-              <code>Length(vec)</code><br>
-              <code>Normalize(vec)</code><br>
-              <code>Dot(a, b)</code><br>
-              <code>ProjectOnto(w, v)</code><br><br>
-
-              PowerupType<br>
-              <code>AMMO_UP</code><br>
-              <code>HEALTH_UP</code><br>
-	    </div>
-          </div>
+    </div>
         </div>
-	<br>
+        </div>
 
 	<center>
         <a class="btn btn-lg btn-success" href="{{ url_for('.home') }}">Let's play!</a>
