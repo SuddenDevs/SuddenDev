@@ -70,12 +70,22 @@ class GameConfig:
     P_DEFAULT_SCRIPT = """
 # Default script
 # Check the documentation to read more about how to script your bot!
+timer = 0
+timer_message = 3
+messages = ["Howdy, noobs.", "I can't read.", "How are you?",
+            "Script me, please.", "I wish I could script.", "Get away from my baby!",
+            "How dare you!", "I just wanted a hug.", "Take me to your leader.",
+            ":)", ":("]
 
 def update(player, delta):
     # Find the nearest enemy, move towards it and shoot it
-    nearest_enemy = get_nearest_enemy()
-    move_to(nearest_enemy)
-    shoot(nearest_enemy)
+    global timer
+    global timer_message
+    timer += delta
+    if timer >= timer_message:
+        timer_message = random.random() * 2 + 3
+        timer = 0
+        say(messages[random.randrange(len(messages))])
 """
 
     # Entity
