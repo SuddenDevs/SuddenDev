@@ -158,14 +158,18 @@ def run_game_if_everyone_ready(game_id):
             player_id = player['id']
             user = User.query.get(player_id)
 
-            if wave >= 5:
+            if highest_wave >= 5:
                 user.wave5_trophy = True
-            if wave >= 10:
+                db.session.commit()
+            if highest_wave >= 10:
                 user.wave10_trophy = True
-            if wave >= 15:
+                db.session.commit()
+            if highest_wave >= 15:
                 user.wave15_trophy = True
-            if wave >= 20:
+                db.session.commit()
+            if highest_wave >= 20:
                 user.wave20_trophy = True
+                db.session.commit()
 
         reset_all_players(game_id)
 
