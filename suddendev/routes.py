@@ -94,7 +94,7 @@ def game_page():
         flask.flash('Invalid game id!')
         return flask.redirect(flask.url_for('.lobby'))
 
-    return flask.render_template('game.html', user=flask_login.current_user)
+    return flask.render_template('game.html', game_id=game_id, user=flask_login.current_user)
 
 @main.route('/docs', methods=['GET'])
 def docs():
@@ -139,9 +139,42 @@ def lobby():
     return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
 
 
-@main.route('/home', methods=['GET'])
+@main.route('/home', methods=['GET', 'POST'])
 @flask_login.login_required
 def home():
     """Post-login page."""
-    # TODO: workout if noob or not - need DB field
-    return flask.render_template('home.html', user=flask_login.current_user, noob=True)
+
+    if flask.request.method == 'POST':
+        rooms = get_all_open_rooms()
+
+        name = "anon"
+        if flask.request.form['name'] != "":
+            name = flask.request.form['name']
+
+        player_id = flask_login.current_user.id
+
+        game_id = ""
+        if flask.request.form['submit'] == 'create':
+            game_id, error_message = create_room(player_id, name)
+
+            if game_id is None:
+                flask.flash(error_message)
+                return flask.render_template('home.html', user=flask_login.current_user)
+
+        else:
+            game_id = flask.request.form['secret-key']
+
+        added, error_message = add_player_to_room(game_id, player_id, name)
+
+        if not added:
+            flask.flash(error_message)
+            return flask.render_template('home.html', user=flask_login.current_user)
+        else:
+            # notify all players that a new one has joined
+            update_players(game_id)
+
+        return flask.redirect(flask.url_for('.game_page'))
+
+    else:
+        # TODO: workout if noob or not - need DB field
+        return flask.render_template('home.html', user=flask_login.current_user, noob=True)
