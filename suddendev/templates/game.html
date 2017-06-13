@@ -173,6 +173,7 @@
 
       function game_start() {
         clear_current_game_data();
+        fade.visible = false;
 
         //Get the next game in the queue
         game_data_current = game_data[0];
@@ -632,14 +633,6 @@
         );
         core.container.visible = false;
         emitter.playOnceAndDestroy();
-
-        var sprite = new PIXI.Graphics();
-        sprite.beginFill(PIXI.utils.rgb2hex([1, 0, 0]));
-        sprite.drawRect(0, 0, renderer.width, renderer.height);
-        sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
-        entity_layer.addChild(sprite);
-        sprite.alpha = 0;
-        core.explosion = sprite;
       }
 
       function find_entity(tag) {
@@ -847,6 +840,14 @@
         waveText.x = renderer.width - 10;
         waveText.y =  10;
         hud_layer.addChild(waveText);
+
+        fade = new PIXI.Graphics();
+        fade.beginFill(PIXI.utils.rgb2hex([1, 1, 1]));
+        fade.drawRect(0, 0, renderer.width, renderer.height);
+        fade.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+        hud_layer.addChildAt(fade, 0);
+        fade.alpha = 0;
+        fade.visible = false;
         
         draw_grid();
 
@@ -869,7 +870,7 @@
           }
         } else if (timer_end > 0) {
           var param = Math.min(timer_end / TIME_AFTER_END, 1);
-          core.explosion.alpha = 0.5 * (1 - param);
+          fade.alpha = 0.5 * (1 - param);
           process_state_end(last_state, delta); 
         } else {
           ticker.stop();
@@ -957,8 +958,13 @@
         } else {
           test = false;
         }
+        fade.visible = true;
+        fade.alpha = 0;
         if (msg == "Game Over") {
           clearup_core();
+          fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+        } else {
+          fade.tint = PIXI.utils.rgb2hex([0, 1, 0]);
         }
 
         mainText.text = msg;
@@ -1077,6 +1083,12 @@
           var p = pickups[list[i].tag];
           p.sprite.rotation = (timer * 5) % 20;
         }
+      }
+
+      function resetPause() {
+        var b = document.getElementById("pauseBtn");
+        b.innerHTML = "Pause";
+        b.classList.remove("active");
       }
 
       //Pause game, update pause button
