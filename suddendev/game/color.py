@@ -7,9 +7,9 @@ class Color3:
         self.b = b
 
 def random_color3():
-    r = random.randint(0, 255)
-    g = random.randint(0, 255)
-    b = random.randint(0, 255)
+    r = random.randint(100, 255)
+    g = random.randint(100, 255)
+    b = random.randint(100, 255)
     return Color3(r, g, b)
 
 class Color4(Color3):

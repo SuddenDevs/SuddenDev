@@ -1,6 +1,6 @@
 from .entity import Entity
 from .vector import Vector
-from .powerup import PowerupType
+from .pickup import PickupType
 from .sandbox import builtins
 from .color import Color3
 from .event import Event, EventType
@@ -65,8 +65,8 @@ class Player(Entity):
                 in_range.append(p)
         return in_range                
 
-    def powerups_visible(self):
-        return self.get_in_range(self.game.powerups, self.range_visible)
+    def pickups_visible(self):
+        return self.get_in_range(self.game.pickups, self.range_visible)
 
     def enemies_visible(self):
         return self.get_in_range(self.game.enemies, self.range_visible)
@@ -81,7 +81,7 @@ class Player(Entity):
         self.scope = {
             'math' : math,
             'Vector' : Vector,
-            'PowerupType' : PowerupType,
+            'PickupType' : PickupType,
             'EnemyType' : EnemyType,
             'core' : game.core,
             'random' : random,
@@ -95,7 +95,7 @@ class Player(Entity):
             'get_nearest' : partial(get_nearest, self),
             'get_nearest_enemy' : partial(get_nearest_enemy, self),
             'get_nearest_attackable_enemy' : partial(get_nearest_attackable_enemy, self),
-            'get_nearest_powerup' : partial(get_nearest_powerup, self),
+            'get_nearest_pickup' : partial(get_nearest_pickup, self),
             'get_farthest' : partial(get_farthest, self),
             'distance_to' : partial(distance_to, self),
             'print' : partial(user_print, self),
@@ -176,7 +176,7 @@ class Player(Entity):
     def update_game_state_info(self):
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
-        self.scope['powerups_visible'] = self.powerups_visible()
+        self.scope['pickups_visible'] = self.pickups_visible()
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)

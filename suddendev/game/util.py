@@ -86,6 +86,8 @@ def distance_to(self, target):
 # If speed is not given, defaults to self.speed.
 def move_to(self, target, speed=None):
     if self is None or target is None:
+        self.vel = Vector(0, 0)
+        #user_print(self, '\'None\' type passed to move_to')
         return
 
     if isinstance(target, Entity):
@@ -141,15 +143,15 @@ def get_nearest_attackable_enemy(self, EnemyType=None):
                 valid.append(e)
         return get_nearest(self, valid)
 
-# Gets nearest powerup of the given type, or of any type if none is given.
-def get_nearest_powerup(self, powerup_type=None):
-    if powerup_type is None:
-        return get_nearest(self, self.powerups_visible())
+# Gets nearest pickup of the given type, or of any type if none is given.
+def get_nearest_pickup(self, pickup_type=None):
+    if pickup_type is None:
+        return get_nearest(self, self.pickups_visible())
     else:
-        powerups = self.powerups_visible()
+        pickups = self.pickups_visible()
         valid = []
-        for p in powerups:
-            if p.powerup_type == powerup_type:
+        for p in pickups:
+            if p.pickup_type == pickup_type:
                 valid.append(p)
         return get_nearest(self, valid)
 

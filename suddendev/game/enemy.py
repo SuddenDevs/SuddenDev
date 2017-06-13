@@ -10,8 +10,7 @@ class Enemy(Entity):
     def __init__(self, game, enemy_type=EnemyType.DEFAULT):
         super().__init__()
         self.game = game
-        self.pos = Vector(random.random() * self.game.map.width,
-                            random.random() * self.game.map.height)
+        self.pos = Vector(0,0)
         self.speed = self.game.gc.ENEMY_SPEED
 
         self.range_visible = self.game.gc.ENEMY_RANGE_VISIBLE
@@ -46,9 +45,9 @@ class Enemy(Entity):
         if len(self.game.players) == 0:
             return super().update(delta)
 
-        for p in self.game.players:
-            if distance_to(self, p) <= self.range_visible:
-                players.append(p)
+        # for p in self.game.players:
+            # if distance_to(self, p) <= self.range_visible:
+                # players.append(p)
 
         if len(players) == 0:
             if distance_to(self, self.game.core) > self.range_attackable:

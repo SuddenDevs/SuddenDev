@@ -29,6 +29,7 @@ class GameConfig:
 
     BASE_ENEMY_SPEED = 30
     BASE_ENEMY_SPAWN_DELAY = 1
+    BASE_ENEMY_LIMIT = 10
     BASE_ENEMY_RANGE_VISIBLE = 200
     BASE_ENEMY_RANGE_ATTACKABLE = 30
     BASE_ENEMY_DAMAGE = 10
@@ -85,7 +86,7 @@ def update(player, delta):
     E_HEALTHMAX = 100
 
     # Powerups
-    POW_SIZE = 10
+    POW_SIZE = 14
     POW_AMMO_UP_VALUE = 10
     POW_HEALTH_UP_VALUE = 50 
 

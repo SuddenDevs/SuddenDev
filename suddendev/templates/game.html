@@ -46,7 +46,6 @@
       var hud_layer = null;
       var game_layer = null;
       var background_layer = null;
-      var blurFilter = null;
 
       //Game state
       var ticker = null;
@@ -394,23 +393,47 @@
         var sprite = new PIXI.Graphics();
         var size = data.size;
 
-        sprite.beginFill(PIXI.utils.rgb2hex([1, 0, 1]));
-        sprite.drawRect(0, 0, size, size);
-        sprite.x = -size/2;
-        sprite.y = -size/2;
+        var color = PIXI.utils.rgb2hex([0.3, 0.7, 0.1]);
+        sprite.lineStyle(1, 0x0, 1);
+
+        var text = 'Ammo';
+        console.log(data.type);
+        if (data.type == 'health') {
+          text = 'Health';
+          sprite.beginFill(PIXI.utils.rgb2hex([1,1,1]));
+          sprite.drawRect(0, 0, size, size);
+          sprite.lineStyle(0);
+          sprite.beginFill(PIXI.utils.rgb2hex([0.8, 0, 0]));
+          sprite.drawRect(size/3, 0, size/3, size);
+          sprite.drawRect(0, size/3, size, size/3);
+        } else {
+          sprite.beginFill(color);
+          sprite.drawRect(0, 0, size, size);
+        }
         sprite.pivot.x = size/2;
         sprite.pivot.y = size/2;
+
         container.addChild(sprite);
 
         var label = new PIXI.Text(data.value.toString(),
                                               { fontFamily:"Arial",
                                                 fontSize:"12",
-                                                fill: "black",
+                                                fill: color,
                                                 align: "center" });
-        label.anchor.y = 1;
+        label.anchor.y = 0;
         label.anchor.x = 0.5;
-        label.y = -size/2 - 2;
-        container.addChild(label);
+        label.y = size;
+        //container.addChild(label);
+
+        var title = new PIXI.Text(text,
+                                        { fontFamily:"Arial",
+                                          fontSize:"14",
+                                          fill: color,
+                                          align: "center" });
+        title.anchor.y = 1;
+        title.anchor.x = 0.5;
+        title.y = -size;
+        //container.addChild(title);
 
         container.position = data.pos;
         entity_layer.addChildAt(container, 0);
@@ -470,6 +493,10 @@
                 particle_layer,
                 [p.sprite.generateCanvasTexture()],
                 {
+                        color: {
+                          start: "0xffffff",
+                          end: "0xffffff"
+                        },
                         alpha: {
                                 start: 1,
                                 end: 0.9
@@ -602,6 +629,13 @@
         );
         core.container.visible = false;
         emitter.playOnceAndDestroy();
+
+        var sprite = new PIXI.Graphics();
+        sprite.beginFill(PIXI.utils.rgb2hex([1, 0, 0]));
+        sprite.drawRect(0, 0, renderer.width, renderer.height);
+        sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+        entity_layer.addChild(sprite);
+        core.explosion = sprite;
       }
 
       function find_entity(tag) {
@@ -783,11 +817,6 @@
         stage.addChild(game_layer);
         stage.addChild(hud_layer);
 
-        blurFilter = new PIXI.filters.BlurFilter(0, 1, 3);
-        blurFilter.blur = 0;
-        background_layer.filters = [blurFilter];
-        game_layer.filters = [blurFilter];
-
         fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
         fpsText.x = 10;
         fpsText.y = 10;
@@ -805,7 +834,6 @@
         timer_end -= delta;
         fpsText.text = Math.round(ticker.FPS * 100) / 100;
         if (inGame) {
-          blurFilter.blur = 0;
           if (game_data_current.length > 0) {
             last_state = game_data_current[0]
             process_state(last_state, delta);
@@ -814,7 +842,8 @@
             //Waiting for more data...
           }
         } else if (timer_end > 0) {
-          blurFilter.blur = 2 * (1 - timer_end / TIME_AFTER_END);
+          var param = Math.min(timer_end / TIME_AFTER_END, 1);
+          core.explosion.alpha = 0.5 * (1 - param);
           process_state_end(last_state, delta); 
         } else {
           ticker.stop();
@@ -870,7 +899,7 @@
 
         //Updates
         draw_enemies(state.enemies, delta);
-        draw_pickups(state.powerups, delta);
+        draw_pickups(state.pickups, delta);
         draw_players(state.players, delta);
         update_core(state.core, delta);
 
@@ -883,7 +912,7 @@
       function process_state_end(state, delta) {
         //Updates
         draw_enemies(state.enemies, delta);
-        draw_pickups(state.powerups, delta);
+        draw_pickups(state.pickups, delta);
         draw_players(state.players, delta);
         update_core(state.core, delta);
 

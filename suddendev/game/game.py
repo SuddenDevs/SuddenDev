@@ -4,8 +4,8 @@ from .vector import Vector
 from .color import Color3, random_color3
 from .player import Player
 from .enemy import Enemy
+from .pickup import Pickup, PickupType
 from .enemy_type import EnemyType
-from .powerup import Powerup, PowerupType
 from .wall import Wall
 from .core import Core
 from .event import Event, EventType
@@ -13,6 +13,23 @@ from .game_config import GameConfig
 
 import time
 import random
+import math
+
+
+def random_pos_edge(size, width, height):
+    n = random.getrandbits(2)
+    pos = Vector(0, 0)
+    r = random.random()
+    if n == 0:
+        pos = Vector(-size, r * height)
+    elif n == 1:
+        pos = Vector(width + size, r * height)
+    elif n == 2:
+        pos = Vector(r * width, -size)
+    else:
+        pos = Vector(r * width, height + size)
+    return pos
+
 
 class Map:
     def __init__(self, width, height):
@@ -25,15 +42,15 @@ class Game:
         self.walls = []
         self.events = []
         self.enemies = []
-        self.powerups = []
+        self.pickups = []
 
         self.wave = wave
         self.gc = GameConfig(wave)
 
         self.enemy_spawn_timer = self.gc.ENEMY_SPAWN_DELAY
 
-        self.powerup_spawn_timer = self.gc.POW_SPAWN_DELAY
-        self.powerup_count = 0
+        self.pickup_spawn_timer = self.gc.POW_SPAWN_DELAY
+        self.pickup_count = 0
 
         self.time = 0
         self.active = True
@@ -61,8 +78,12 @@ class Game:
             name = player_names[i]
             script = scripts[i]
 
+            angle = i * 2 * math.pi / player_count - math.pi/2
             player = Player(name, random_color3(), self, script)
             player.pos = self.get_random_spawn(player.size)
+            player.pos = self.core.pos\
+                         + Vector(math.cos(angle), math.sin(angle))\
+                         * (self.core.size + player.size)
             self.players.append(player)
 
     def events_add(self, event):
@@ -76,13 +97,13 @@ class Game:
         #Timekeeping
         self.time += delta
         self.enemy_spawn_timer -= delta
-        self.powerup_spawn_timer -= delta
+        self.pickup_spawn_timer -= delta
 
         # Update entities
         self.update_players(delta)
         self.update_enemies(delta)
 
-        self.spawn_powerups()
+        self.spawn_pickups()
         self.spawn_enemies()
 
         #Ending Conditions / Wave Conditions
@@ -116,12 +137,12 @@ class Game:
             if not self.collides_with_walls(pos, p.size):
                 p.pos = pos
 
-            # Pickup powerups
-            for pu in self.powerups:
+            # Pickup pickups
+            for pu in self.pickups:
                 if pu.intersects(p):
                     self.events_add(Event(EventType.POWERUP_USED, pu))
                     pu.pickup(p)
-                    self.powerups.remove(pu)
+                    self.pickups.remove(pu)
 
     def update_enemies(self, delta):
         #Update Enemies
@@ -134,18 +155,18 @@ class Game:
                 if not self.collides_with_walls(pos, e.size):
                     e.pos = pos
 
-    def spawn_powerups(self):
-        # powerupTypes = [PowerupType.AMMO_UP, PowerupType.HEALTH_UP]
-        powerupTypes = [powerup for _, powerup in PowerupType.__members__.items()]
+    def spawn_pickups(self):
+        # pickupTypes = [PickupType.AMMO_UP, PickupType.HEALTH_UP]
+        pickupTypes = [pickup for _, pickup in PickupType.__members__.items()]
 
-        #Powerup Spawning
-        if (self.powerup_spawn_timer <= 0
-            and self.powerup_count < self.gc.POW_LIMIT
+        #Pickup Spawning
+        if (self.pickup_spawn_timer <= 0
+            and self.pickup_count < self.gc.POW_LIMIT
             and random.random() < self.gc.POW_SPAWN_PROBABILITY):
 
-            pu = Powerup(self.get_random_spawn(self.gc.POW_SIZE), random.choice(powerupTypes))
-            self.powerups.append(pu)
-            self.powerup_count += 1
+            pu = Pickup(self.get_random_spawn(self.gc.POW_SIZE), random.choice(pickupTypes))
+            self.pickups.append(pu)
+            self.pickup_count += 1
             self.events_add(Event(EventType.POWERUP_SPAWN, pu))
 
     def spawn_enemies(self):
@@ -160,6 +181,8 @@ class Game:
             enemy_type=random.choice(self.gc.enemy_types)
             self.gc.enemy_types.remove(enemy_type)
             enemy = Enemy(self, enemy_type=enemy_type)
+            enemy.pos = random_pos_edge(enemy.size,
+                                        self.map.width, self.map.height)
             self.enemies.append(enemy)
             self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
 
