@@ -38,6 +38,7 @@
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var stage = null;
+      var textStyle = null;
       var renderer = null
       var fpsText = null;
       var mainText = null;
@@ -132,11 +133,11 @@
           fontWeight: 'bold',
           fill: ['#ffffff'], // gradient
           align: 'center',
-          //stroke: '#4a1850',
           strokeThickness: 5,
           dropShadow: true,
           dropShadowColor: '#000000',
           dropShadowBlur: 10,
+          dropShadowAlpha: 0.5,
           dropShadowAngle: Math.PI / 6,
           dropShadowDistance: 1,
           wordWrap: true,
@@ -178,6 +179,8 @@
 
         //Get the first state of this new game
         var first = game_data_current[0];
+
+        waveText.text = "Wave " + first.wave;
 
         mainText.visible = false;
         inGame = true;
@@ -635,6 +638,7 @@
         sprite.drawRect(0, 0, renderer.width, renderer.height);
         sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY;
         entity_layer.addChild(sprite);
+        sprite.alpha = 0;
         core.explosion = sprite;
       }
 
@@ -817,10 +821,32 @@
         stage.addChild(game_layer);
         stage.addChild(hud_layer);
 
-        fpsText = new PIXI.Text("", {fontFamily: "Arial", fontSize: 20, fill: "black"});
+        textStyle = new PIXI.TextStyle({
+          fontFamily: 'Arial',
+          fontSize: 36,
+          //fontWeight: 'bold',
+          fill: ['#ffffff'], // gradient
+          align: 'center',
+          strokeThickness: 2,
+          dropShadow: true,
+          dropShadowColor: '#000000',
+          dropShadowBlur: 2,
+          dropShadowAlpha: 0.8,
+          dropShadowAngle: Math.PI / 6,
+          dropShadowDistance: 0,
+        });
+        
+        textStyle.fontSize = 20;
+        fpsText = new PIXI.Text("", textStyle);
         fpsText.x = 10;
         fpsText.y = 10;
         hud_layer.addChild(fpsText);
+
+        waveText = new PIXI.Text("Wave 1", textStyle);
+        waveText.anchor.x = 1;
+        waveText.x = renderer.width - 10;
+        waveText.y =  10;
+        hud_layer.addChild(waveText);
         
         draw_grid();
 
@@ -832,7 +858,7 @@
         delta = ticker.elapsedMS/1000;
         timer += delta;
         timer_end -= delta;
-        fpsText.text = Math.round(ticker.FPS * 100) / 100;
+        fpsText.text = (Math.round(ticker.FPS * 100) / 100).toString() + " FPS";
         if (inGame) {
           if (game_data_current.length > 0) {
             last_state = game_data_current[0]
