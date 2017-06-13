@@ -9,8 +9,7 @@ class Enemy(Entity):
     def __init__(self, game):
         super().__init__()
         self.game = game
-        self.pos = Vector(random.random() * self.game.map.width,
-                            random.random() * self.game.map.height)
+        self.pos = Vector(0,0)
         self.speed = self.game.gc.ENEMY_SPEED
 
         self.range_visible = self.game.gc.ENEMY_RANGE_VISIBLE

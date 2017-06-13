@@ -12,6 +12,23 @@ from .game_config import GameConfig
 
 import time
 import random
+import math
+
+
+def random_pos_edge(size, width, height):
+    n = random.getrandbits(2)
+    pos = Vector(0, 0)
+    r = random.random()
+    if n == 0:
+        pos = Vector(-size, r * height)
+    elif n == 1:
+        pos = Vector(width + size, r * height)
+    elif n == 2:
+        pos = Vector(r * width, -size)
+    else:
+        pos = Vector(r * width, height + size)
+    return pos
+
 
 class Map:
     def __init__(self, width, height):
@@ -61,8 +78,12 @@ class Game:
             name = player_names[i]
             script = scripts[i]
 
+            angle = i * 2 * math.pi / player_count - math.pi/2
             player = Player(name, random_color3(), self, script)
             player.pos = self.get_random_spawn(player.size)
+            player.pos = self.core.pos\
+                         + Vector(math.cos(angle), math.sin(angle))\
+                         * (self.core.size + player.size)
             self.players.append(player)
 
     def events_add(self, event):
@@ -156,6 +177,8 @@ class Game:
 
             #Spawn Enemy
             enemy = Enemy(self)
+            enemy.pos = random_pos_edge(enemy.size,
+                                        self.map.width, self.map.height)
             self.enemies.append(enemy)
             self.enemy_count += 1
             self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
