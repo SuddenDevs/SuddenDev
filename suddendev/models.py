@@ -15,3 +15,7 @@ class User(db.Model, UserMixin):
     script = db.Column(db.String, default=gc.P_DEFAULT_SCRIPT)
     active = db.Column(db.Boolean, default=False)
     tokens = db.Column(db.Text)
+    wave5_trophy = db.Column(db.Boolean, default=False)
+    wave10_trophy = db.Column(db.Boolean, default=False)
+    wave15_trophy = db.Column(db.Boolean, default=False)
+    wave20_trophy = db.Column(db.Boolean, default=False)
