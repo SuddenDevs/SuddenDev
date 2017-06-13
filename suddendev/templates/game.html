@@ -21,6 +21,7 @@
       var HEALTHBARWIDTH = 24;
       var TIME_AFTER_END = 3; //How long to continue animating after round
       var MSG_DISPLAY_TIME = 4;
+      var TAB_NAME_CHAR_LIMIT = 16;
       var EVENTS = {"CONNECT":'connect',"PLAYERID":'player_id',
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
@@ -707,7 +708,7 @@
         players.push(player);
         scripts.push({"script":player.script, "id":player.id, "name":player.name});
         var t = document.getElementById("tab" + (players.length - 1));
-        t.innerHTML = player.name;
+        t.innerHTML = player.name.substring(0, TAB_NAME_CHAR_LIMIT);
         if (t.classList.contains("disabled")) {
           t.classList.remove("disabled");
           if (players.length - 1 == 0) {
