@@ -135,7 +135,7 @@ def add_player_to_room(game_id, player_id, name):
     """
 
     if not room_exists(game_id):
-        return False, "Sorry, something seems to have gone wrong, please try another room."
+        return False, "Sorry, there doesn't seem to be a room with that key. Spelling?"
 
     # TODO: acquire player_id lock
     if redis.get(player_id) is not None:

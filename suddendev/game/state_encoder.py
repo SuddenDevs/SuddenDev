@@ -72,6 +72,7 @@ class StateEncoder(json.JSONEncoder):
         for e in enemies:
             json = self.serializeEntity(e)
             json['range_attackable'] = e.range_attackable
+            json['enemy_type'] = e.enemy_type.value
             result.append(json)
         return result
 

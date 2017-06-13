@@ -3,13 +3,12 @@
   <div class="card-block">
     <div class="container">
       <div class="row align-items-center">
-        <div class="col-md-1">
-	  <a href="{{ url_for('.index') }}">
-            <img src="{{ url_for('static', filename='logo_64.png')}}">
-	  </a>
-        </div>
         <div class="col">
-          <h1 class="display-4">S U D D E N _ D E V</h1>
+	  <center>
+	    <a href="{{ url_for('.index') }}">
+              <img style="max-width:50%; max-height:50%;" src="{{ url_for('static', filename='logo.png')}}">
+	    </a>
+	  </center>
         </div>
       </div>
     </div>
@@ -23,16 +22,15 @@
   <div class="card-block">
     <div class="container">
       <div class="row align-items-center">
-	<a href="{{ url_for('.home') }}">
-          <img src="{{ url_for('static', filename='logo_64.png')}}">
-	</a>
         <div class="col">
-          <h1 class="display-4">S U D D E N _ D E V</h1>
+	  <a href="{{ url_for('.home') }}">
+            <img style="max-width:50%; max-height:50%;" src="{{ url_for('static', filename='logo.png')}}">
+	  </a>
         </div>
         <div class="col-md-1">
           <img src="{{ picture }}" class="rounded-circle img-fluid">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
 	  <div class=row">
 	    <div class="col">
               <h5>{{ name }}</h5>

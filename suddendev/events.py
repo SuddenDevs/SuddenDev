@@ -31,7 +31,7 @@ def joined(message):
     game_id = get_room_of_player(player_id)
     if game_id is None:
         flask.flash("sorry something isn't quite right... try joining another game")
-        return flask.redirect(flask.url_for('.main.lobby'))
+        return flask.redirect(flask.url_for('.main.home'))
 
 
     # subscribe client to room broadcasts
@@ -66,7 +66,7 @@ def submit_code(message):
 
     if game_id is None:
         flask.flash("sorry something isn't quite right... try joining another game")
-        return flask.redirect(flask.url_for('.main.lobby'))
+        return flask.redirect(flask.url_for('.main.home'))
 
     set_script(game_id, player_id, message)
     update_players(game_id)
@@ -152,7 +152,7 @@ def run_game_if_everyone_ready(game_id):
         handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id, wave=1)
         highest_wave = handle.get()
         set_room_wave(game_id, highest_wave + 1)
-        fsio.emit('message_result', 'Run complete! You reached wave ' + str(highest_wave), room=game_id, namespace=NAMESPACE)
+        fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)
         reset_all_players(game_id)
 
 def update_players(game_id):

@@ -2,6 +2,7 @@ from .vector import Vector
 from .entity import Entity
 from .message import Message
 from .event import Event, EventType
+from .enemy_type import EnemyType
 import sys
 
 # Prints a message to the console.
@@ -86,7 +87,7 @@ def distance_to(self, target):
 def move_to(self, target, speed=None):
     if self is None or target is None:
         self.vel = Vector(0, 0)
-        user_print(self, '\'None\' type passed to move_to')
+        #user_print(self, '\'None\' type passed to move_to')
         return
 
     if isinstance(target, Entity):
@@ -119,12 +120,28 @@ def move_from(self, target, speed=None):
     self.vel = Vector.Normalize(self.pos - target) * speed
 
 # Gets nearest enemy within visible range.
-def get_nearest_enemy(self):
-    return get_nearest(self, self.enemies_visible())
+def get_nearest_enemy(self, enemy_type=None):
+    if enemy_type is None:
+        return get_nearest(self, self.enemies_visible())
+    else:
+        enemies = self.enemies_visible()
+        valid = []
+        for e in enemies:
+            if e.enemy_type == enemy_type:
+                valid.append(e)
+        return get_nearest(self, valid)
 
 # Gets nearest enemy within attackable range.
-def get_nearest_attackable_enemy(self):
-    return get_nearest(self, self.enemies_attackable())
+def get_nearest_attackable_enemy(self, EnemyType=None):
+    if enemy_type is None:
+        return get_nearest(self, self.enemies_attackable())
+    else:
+        enemies = self.enemies_attackable()
+        valid = []
+        for e in enemies:
+            if e.enemy_type == enemy_type:
+                valid.append(e)
+        return get_nearest(self, valid)
 
 # Gets nearest pickup of the given type, or of any type if none is given.
 def get_nearest_pickup(self, pickup_type=None):

@@ -778,7 +778,7 @@
       //Function to leave the game
       function leaveGame() {
         submitCode();
-        window.location.href = "{{ url_for('main.lobby') }}";
+        window.location.href = "{{ url_for('main.home') }}";
       }
 
       //Ready up
@@ -1116,6 +1116,7 @@
 {% block body %}
     {{ suddendev_logged_in_header(user.picture, user.name, user.email) }}
 
+    Your secret key is {{ game_id }}
     <div class="container-fluid">
       <div class="row">
         <div class="col align-self-start">

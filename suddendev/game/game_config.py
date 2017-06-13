@@ -1,4 +1,5 @@
 from .vector import Vector
+from .enemy_type import EnemyType
 
 class GameConfig:
     # Game steps per second
@@ -47,8 +48,11 @@ class GameConfig:
     ENEMY_RANGE_ATTACKABLE_SCALE = 1
     ENEMY_RANGE_VISIBLE_SCALE = 10
     ENEMY_SPAWN_DELAY_SCALE = 0
-    ENEMY_LIMIT_SCALE = 2
     ENEMY_SPAWN_PROBABILITY_SCALE = 0.1
+
+    # How many enemies of each type should be spawned each wave
+    BASE_ENEMY_TYPE_LIMIT = 2
+    ENEMY_TYPE_LIMIT_SCALE = 1
 
     BOSS_SIZE_SCALE = 3
     BOSS_HEALTH_SCALE = 10
@@ -100,13 +104,13 @@ def update(player, delta):
             boss_scale = boss_level * self.BOSS_STATS_SCALE
 
             scale = boss_scale
-            self.ENEMY_LIMIT = boss_level
+            self.ENEMY_TYPE_LIMIT = boss_level
             self.ENEMY_SIZE = self.E_SIZE * boss_level * self.BOSS_SIZE_SCALE
             self.ENEMY_HEALTH = boss_level * self.BOSS_HEALTH_SCALE * self.BASE_ENEMY_HEALTH
         else:
             # Enemy
             scale = wave - 1
-            self.ENEMY_LIMIT = self.BASE_ENEMY_LIMIT + scale * self.ENEMY_LIMIT_SCALE
+            self.ENEMY_TYPE_LIMIT = self.BASE_ENEMY_TYPE_LIMIT + scale * self.ENEMY_TYPE_LIMIT_SCALE
             self.ENEMY_SIZE = self.E_SIZE
             self.ENEMY_HEALTH = self.BASE_ENEMY_HEALTH + scale * self.ENEMY_HEALTH_SCALE
 
@@ -117,6 +121,21 @@ def update(player, delta):
         self.ENEMY_SPAWN_DELAY = self.BASE_ENEMY_SPAWN_DELAY + scale * self.ENEMY_SPAWN_DELAY_SCALE
         self.ENEMY_SPAWN_PROBABILITY = self.BASE_ENEMY_SPAWN_PROBABILITY + scale * self.ENEMY_SPAWN_PROBABILITY_SCALE
 
+        self.set_spawn_enemies(wave)
+
         # Cap probability at 1
         if self.ENEMY_SPAWN_PROBABILITY >= 1:
             self.ENEMY_SPAWN_PROBABILITY = 1
+
+    def set_spawn_enemies(self, wave):
+        self.enemy_types = []
+        if wave % self.BOSS_WAVE_MULTIPLES == 0:
+            boss_level = wave / self.BOSS_WAVE_MULTIPLES
+            self.ENEMY_TYPE_LIMIT = boss_level
+
+        for i in range(self.ENEMY_TYPE_LIMIT):
+            if wave % self.BOSS_WAVE_MULTIPLES == 0:
+                self.enemy_types.append(EnemyType.BOSS)
+            else:
+                self.enemy_types.append(EnemyType.CORE_KILLER)
+                self.enemy_types.append(EnemyType.PLAYER_KILLER)
