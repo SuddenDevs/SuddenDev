@@ -63,8 +63,6 @@ LOBBY_NOUNS = [
     'Oval',
     'Rhombus',
     'Semicircle',
-    'Two-Dimensional Cube',
-    'Two-Dimensional Sphere',
     'Ellipse',
     'Hexagon',
     'Heptagon',
