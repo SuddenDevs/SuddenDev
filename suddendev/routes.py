@@ -21,7 +21,7 @@ from .rooms import (
 def index():
     """Landing page."""
 
-    # if user is logged in, go straight to lobby, otherwise go to OAuth
+    # if user is logged in, go straight to home, otherwise go to OAuth
     if flask_login.current_user is not None and flask_login.current_user.is_authenticated:
         auth_url = flask.url_for('.home')
     else:
@@ -91,53 +91,14 @@ def game_page():
     game_id = get_room_of_player(player_id)
 
     if game_id is None:
-        flask.flash('Invalid game id!')
-        return flask.redirect(flask.url_for('.lobby'))
+        flask.flash('Something went wrong... Try another game.')
+        return flask.redirect(flask.url_for('.home'))
 
     return flask.render_template('game.html', game_id=game_id, user=flask_login.current_user)
 
 @main.route('/docs', methods=['GET'])
 def docs():
     return flask.render_template('docs.html')
-
-@main.route('/lobby', methods=['GET', 'POST'])
-@flask_login.login_required
-def lobby():
-    """Point for users to browse and join existing games."""
-
-    rooms = get_all_open_rooms()
-    if flask.request.method == 'POST':
-
-        name = 'anon'
-        if flask.request.form['name'] != "":
-            name = flask.request.form['name']
-
-        player_id = flask_login.current_user.id
-
-        game_id = ""
-        if flask.request.form['submit'] == 'create':
-            game_id, error_message = create_room(player_id, name)
-
-            if game_id is None:
-                flask.flash(error_message)
-                return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
-
-        else:
-            game_id = flask.request.form['submit']
-
-        added, error_message = add_player_to_room(game_id, player_id, name)
-
-        if not added:
-            flask.flash(error_message)
-            return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
-        else:
-            # notify all players that a new one has joined
-            update_players(game_id)
-
-        return flask.redirect(flask.url_for('.game_page'))
-
-    return flask.render_template('lobby.html', rooms=rooms, user=flask_login.current_user)
-
 
 @main.route('/home', methods=['GET', 'POST'])
 @flask_login.login_required
