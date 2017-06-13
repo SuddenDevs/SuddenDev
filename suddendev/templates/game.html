@@ -174,6 +174,7 @@
       function game_start() {
         clear_current_game_data();
         fade.visible = false;
+        resetPause();
 
         //Get the next game in the queue
         game_data_current = game_data[0];
@@ -401,7 +402,6 @@
         sprite.lineStyle(1, 0x0, 1);
 
         var text = 'Ammo';
-        console.log(data.type);
         if (data.type == 'health') {
           text = 'Health';
           sprite.beginFill(PIXI.utils.rgb2hex([1,1,1]));
@@ -1093,10 +1093,17 @@
 
       //Pause game, update pause button
       function togglePause() {
-        if (ticker.started && inGame) {
-          ticker.stop();
-        } else {
-          ticker.start();
+        var on = false;
+        if (inGame) {
+          if (ticker.started) {
+            ticker.stop();
+            mainText.visible = true;
+            mainText.text = "Paused";
+            draw();
+          } else {
+            ticker.start();
+            mainText.visible = false;
+          }
         }
         var b = document.getElementById("pauseBtn");
         b.innerHTML = (b.innerHTML === "Pause") ? "Unpause" : "Pause";
