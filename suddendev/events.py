@@ -31,7 +31,7 @@ def joined(message):
     game_id = get_room_of_player(player_id)
     if game_id is None:
         flask.flash("sorry something isn't quite right... try joining another game")
-        return flask.redirect(flask.url_for('.main.lobby'))
+        return flask.redirect(flask.url_for('.main.home'))
 
 
     # subscribe client to room broadcasts
@@ -66,7 +66,7 @@ def submit_code(message):
 
     if game_id is None:
         flask.flash("sorry something isn't quite right... try joining another game")
-        return flask.redirect(flask.url_for('.main.lobby'))
+        return flask.redirect(flask.url_for('.main.home'))
 
     set_script(game_id, player_id, message)
     update_players(game_id)
