@@ -132,7 +132,7 @@ def get_nearest_enemy(self, enemy_type=None):
         return get_nearest(self, valid)
 
 # Gets nearest enemy within attackable range.
-def get_nearest_attackable_enemy(self, EnemyType=None):
+def get_nearest_attackable_enemy(self, enemy_type=None):
     if enemy_type is None:
         return get_nearest(self, self.enemies_attackable())
     else:
