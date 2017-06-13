@@ -17,7 +17,7 @@ class StateEncoder(json.JSONEncoder):
         return { 
                 'wave': state.wave,
                 'enemies': self.serializeEnemies(state.enemies),
-                'powerups': self.serializePowerups(state.powerups),
+                'pickups': self.serializePickups(state.pickups),
                 'walls': self.serializeWalls(state.walls),
                 'players': self.serializePlayers(state.players),
                 'core': self.serializeCore(state.core),
@@ -65,7 +65,7 @@ class StateEncoder(json.JSONEncoder):
         return "0x{0:02x}{1:02x}{2:02x}".format(clamp(color.r), clamp(color.g), clamp(color.b))
 
     #TODO
-    #Duplication, will extend if enemies or powerups start to differ
+    #Duplication, will extend if enemies or pickups start to differ
 
     def serializeEnemies(self, enemies):
         result = []
@@ -75,19 +75,19 @@ class StateEncoder(json.JSONEncoder):
             result.append(json)
         return result
 
-    def serializePowerups(self, powerups):
+    def serializePickups(self, pickups):
         result = []
-        for p in powerups:
-            result.append(self.serializePowerup(p))
+        for p in pickups:
+            result.append(self.serializePickup(p))
         return result
 
     def serializeCore(self, core):
         return self.serializeEntity(core)
 
-    def serializePowerup(self, powerup):
-        json = self.serializeEntity(powerup)
-        json['type'] = powerup.powerup_type.value
-        json['value'] = powerup.value
+    def serializePickup(self, pickup):
+        json = self.serializeEntity(pickup)
+        json['type'] = pickup.pickup_type.value
+        json['value'] = pickup.value
         return json
 
     def serializeMessage(self, message):
@@ -112,7 +112,7 @@ class StateEncoder(json.JSONEncoder):
             elif e.event_type == EventType.PLAYER_DEATH:
                 body = self.serializePlayer(e.body[0]);
             elif e.event_type == EventType.POWERUP_SPAWN or e.event_type == EventType.POWERUP_USED:
-                body = self.serializePowerup(e.body[0]);
+                body = self.serializePickup(e.body[0]);
             elif e.event_type == EventType.GAME_END or e.event_type == EventType.PRINT or e.event_type == EventType.ERROR:
                 body = e.body[0]
             elif e.event_type == EventType.ATTACK:
