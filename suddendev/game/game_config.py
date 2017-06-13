@@ -143,7 +143,7 @@ def update(player, delta):
             boss_level = wave / self.BOSS_WAVE_MULTIPLES
             self.ENEMY_TYPE_LIMIT = boss_level
 
-        for i in range(self.ENEMY_TYPE_LIMIT):
+        for i in range(int(self.ENEMY_TYPE_LIMIT)):
             if wave % self.BOSS_WAVE_MULTIPLES == 0:
                 self.enemy_types.append(EnemyType.BOSS)
             else:
