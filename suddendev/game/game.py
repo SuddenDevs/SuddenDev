@@ -4,6 +4,7 @@ from .vector import Vector
 from .color import Color3, random_color3
 from .player import Player
 from .enemy import Enemy
+from .enemy_type import EnemyType
 from .powerup import Powerup, PowerupType
 from .wall import Wall
 from .core import Core
@@ -30,7 +31,6 @@ class Game:
         self.gc = GameConfig(wave)
 
         self.enemy_spawn_timer = self.gc.ENEMY_SPAWN_DELAY
-        self.enemy_count = 0
 
         self.powerup_spawn_timer = self.gc.POW_SPAWN_DELAY
         self.powerup_count = 0
@@ -96,7 +96,7 @@ class Game:
             self.cleared = 'Wave' in result
 
     def check_if_game_over(self):
-        if len(self.enemies) == 0 and self.enemy_count >= self.gc.ENEMY_LIMIT:
+        if len(self.enemies) == 0 and not self.gc.enemy_types:
             return 'Wave ' + str(self.wave) + ' cleared!', True
         elif len(self.players) == 0 or self.core.health <= 0:
             return 'Game Over', False
@@ -151,13 +151,16 @@ class Game:
     def spawn_enemies(self):
         #Enemy Spawning
         if (self.enemy_spawn_timer <= 0
-            and self.enemy_count < self.gc.ENEMY_LIMIT
+            and self.gc.enemy_types
             and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
 
-            #Spawn Enemy
-            enemy = Enemy(self)
+            # Spawn Enemy
+            # TODO: make this better
+            # Only spawn core killers and player killers for now
+            enemy_type=random.choice(self.gc.enemy_types)
+            self.gc.enemy_types.remove(enemy_type)
+            enemy = Enemy(self, enemy_type=enemy_type)
             self.enemies.append(enemy)
-            self.enemy_count += 1
             self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
 
     def clamp_pos(self, pos):

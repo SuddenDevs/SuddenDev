@@ -5,8 +5,8 @@ from .sandbox import builtins
 from .color import Color3
 from .event import Event, EventType
 from .util import *
-from .message import Message
 from .game_config import GameConfig as gc
+from .enemy_type import EnemyType
 
 from functools import partial
 
@@ -33,9 +33,6 @@ class Player(Entity):
         self.attack_delay = self.game.gc.P_ATTACK_DELAY
         self.attack_timer = 0
 
-        self.has_message = False
-        self.message = None
-
         # Register the handler for timing out user scripts
         signal.signal(signal.SIGALRM, timeout_handler)
 
@@ -61,9 +58,6 @@ class Player(Entity):
         self.dummy.attack_timer = self.attack_timer
         self.dummy.ammo = self.ammo
 
-        self.has_message = False
-        self.message = None
-
     def get_in_range(self, entities, dist):
         in_range = []
         for p in entities:
@@ -88,6 +82,7 @@ class Player(Entity):
             'math' : math,
             'Vector' : Vector,
             'PowerupType' : PowerupType,
+            'EnemyType' : EnemyType,
             'core' : game.core,
             'random' : random,
             'sys' : sys,

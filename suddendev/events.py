@@ -152,7 +152,7 @@ def run_game_if_everyone_ready(game_id):
         handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id, wave=1)
         highest_wave = handle.get()
         set_room_wave(game_id, highest_wave + 1)
-        fsio.emit('message_result', 'Run complete! You reached wave ' + str(highest_wave), room=game_id, namespace=NAMESPACE)
+        fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)
         reset_all_players(game_id)
 
 def update_players(game_id):
