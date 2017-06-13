@@ -9,7 +9,10 @@
     </script>
 
   {{ suddendev_header() }}
-  <div class="container"> <h2>A co-op survival game where your code plays for you.</h2><br>
+  <div class="container">
+    <center>
+      <h2>A co-op survival game where your code plays for you.</h2><br>
+    </center>
   <div id="toc" class="card m-3">
       <div class="card-header card-inverse card-success" style="color:#ffffff">
         <h4> Table of Contents </h4>
@@ -18,7 +21,7 @@
       <ul>
           <li><a href="#getting-started">Getting Started</a><br></li>
           <li><a href="#gameplay-basics">Gameplay Basics</a><br></li>
-          <li><a href="#scripting-basics">Scripting Basics</a><br></li>
+          <li><a href="#scripting-basics">Scripting Tutorial</a><br></li>
           <li><a href="#scripting-reference">Scripting Reference</a><br></li>
       </ul>
   </div>
@@ -63,7 +66,7 @@
     </div>
     <div id="scripting-basics" class="card m-3">
       <div class="card-header card-inverse card-success" style="color:#ffffff">
-    <h4> Scripting Basics </h4>
+    <h4> Scripting Tutorial </h4>
     </div>
       <div class="card-block">
             This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
@@ -246,8 +249,8 @@ def update(player, delta):
         <b><code>get_nearest_enemy()</code></b><br>
         <b><code>get_nearest_attackable_enemy()</code></b><br>
         <b><code>get_nearest_powerup(powerup_type=None)</code></b><br>
-        <b><code>say(string, *body)</b><br>
-        <code>say_also_to_self(string, *body)<br>
+	<b><code>say(string, *body)</code></b><br>
+	<code>say_also_to_self(string, *body)</code><br>
         <code>distance_to(target)</code><br>
         <b><code>move_to(target, speed=None)</code></b><br>
         <code>move_from(target, speed=None)</code><br>
