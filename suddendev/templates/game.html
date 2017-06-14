@@ -110,7 +110,7 @@
         var game_is_new = false;
 
         //Check if this is a new game
-        for (i = 0; i < first.events.length; i++) {
+        for (var i = 0; i < first.events.length; i++) {
           if (first.events[i].name === "Game_Start") {
             game_is_new = true;
             break;
@@ -160,12 +160,12 @@
         var grid = new PIXI.Graphics();
         grid.lineStyle(1, "black", 0.1);
         //Vertical
-        for (i = 0; i < across; i++) {
+        for (var i = 0; i < across; i++) {
           grid.moveTo(i * cell_size, 0);
           grid.lineTo(i * cell_size, renderer.height);
         }
         //Horizontal
-        for (i = 0; i < across; i++) {
+        for (var i = 0; i < across; i++) {
           grid.moveTo(0, i * cell_size);
           grid.lineTo(renderer.width, i * cell_size);
         }
@@ -190,7 +190,7 @@
         inGame = true;
 
         //Make Players
-        for (i = 0; i < players.length; i++) {
+        for (var i = 0; i < players.length; i++) {
           create_player(first.players[i]);
         }
 
@@ -695,7 +695,7 @@
 
         var i;
         //Check if player has joined
-        for (i = 0; i < room.players.length; i++) {
+        for (var i = 0; i < room.players.length; i++) {
           if (room.players[i].id == playerID) {
             tryAddPlayer(room.players[i]);
             break;
@@ -703,7 +703,7 @@
         }
 
         //Check if players have joined
-        for (j = 0; j < room.players.length; j++) {
+        for (var j = 0; j < room.players.length; j++) {
           tryAddPlayer(room.players[j]);
           if (room.players[j].id != playerID) {
             var s = getScript(room.players[j].id);
@@ -719,10 +719,10 @@
 
         //Check if players have left
         if (players.length > room.players.length) {
-          for (i = 0; i < players.length; i++) {
+          for (var i = 0; i < players.length; i++) {
             var present = false;
 
-            for (j = 0; j < room.players.length; j++) {
+            for (var j = 0; j < room.players.length; j++) {
               if (players[i].id == room.players[j].id) {
                 present = true;
               }
@@ -732,7 +732,7 @@
               players.splice(i, 1);
 
               var tabs = document.getElementsByClassName("tabBtn");
-              for (k = 1; k < MAXPLAYERS; k++) {
+              for (var k = 1; k < MAXPLAYERS; k++) {
                 if (k >= players.length) {
                   tabs[k].innerHTML = "";
                   tabs[k].classList.add("hidden");
@@ -751,7 +751,7 @@
       }
 
       function getScript(id) {
-        for (i = 0; i < players.length; i++) {
+        for (var i = 0; i < players.length; i++) {
           if (players[i].id == id) {
             return i;
           }
@@ -773,7 +773,7 @@
 
       //Function to tell if a player id is already present in the room
       function havePlayer(id) {
-        for (i = 0; i < players.length; i++) {
+        for (var i = 0; i < players.length; i++) {
           if (players[i].id == id) {
             return true;
           }
@@ -821,7 +821,7 @@
         core = null;
         game_data_current = null;
         inGame = false;
-        for (i = 0; i < game_layer.children.length; i++) {
+        for (var i = 0; i < game_layer.children.length; i++) {
           game_layer.getChildAt(i).removeChildren();
         }
       }
@@ -941,7 +941,7 @@
         //Create & delete entities
 
         var events = state.events;
-        for (i = 0; i < events.length; i++) {
+        for (var i = 0; i < events.length; i++) {
           var e = events[i];
           var body = e.body;
           switch (e.name) {
@@ -1064,7 +1064,7 @@
       }
 
       function draw_attacks(delta) {
-        for (i = 0; i < attacks.length; i++) {
+        for (var i = 0; i < attacks.length; i++) {
           var a = attacks[i];
           a.timer = a.timer + delta;
           if (a.timer >= attack_fade) {
@@ -1079,7 +1079,7 @@
 
       function interpolate_rgb(from, to, alpha) {
         var result = [];
-        for (i = 0; i < from.length; i++) {
+        for (var i = 0; i < from.length; i++) {
           result[i] = from[i] + (to[i] - from[i]) * alpha;
         }
         return result;
@@ -1133,14 +1133,14 @@
 
       // Draw every object in a list the same color
       function draw_enemies(list, delta) {
-        for (i = 0; i < list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
           update_entity(enemies[list[i].tag], list[i], delta);
         }
       }
 
       // Draw every player and update name locations
       function draw_players(list, delta) {
-        for (i = 0; i < list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
           var data = list[i];
           var player = playerDict[data.tag];
           update_entity(player, data, delta);
@@ -1158,7 +1158,7 @@
       } 
 
       function draw_pickups(list, delta) {
-        for (i = 0; i < list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
           var p = pickups[list[i].tag];
           p.sprite.rotation = (timer * 5) % 20;
         }
@@ -1227,7 +1227,7 @@
 
       function toggleClasses(id, classes, add) {
         var e = document.getElementById(id).classList;
-        for (i = 0; i < classes.length; i++) {
+        for (var i = 0; i < classes.length; i++) {
           if (add) {
             e.add(classes[i]);
           } else {
