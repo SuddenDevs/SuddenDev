@@ -4,6 +4,8 @@ from .message import Message
 from .event import Event, EventType
 from .enemy_type import EnemyType
 import sys
+import signal
+import traceback
 
 # Prints a message to the console.
 def user_print(self, message):
