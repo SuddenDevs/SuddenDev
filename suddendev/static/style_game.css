@@ -4,44 +4,6 @@
   border-color: #ccc;  
 }
 
-.mainHeading{
-  display: inline-block;
-  white-space: pre;
-}
-
-.detailGrid{
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: row;
-  align-content: stretch;
-  min-height: 100px;
-  padding: 0;
-  max-width: 100%;
-}
-
-.detailRow{
-  display: flex;
-  order: 1;
-  flex: 1 1 auto;
-  padding: 12.5px;
-  align-content: stretch;
-}
-
-.inDetailRow{
-  display: flex;
-  order: 0;
-  flex: 1 1 auto;
-  align-content: stretch;
-  margin: 0;
-}
-
-.detailCol{
-  display: flex;
-  flex: 1 1 auto;
-  align-content: stretch;
-  text-align: center; 
-}
-
 div.console{
   overflow-y: auto;
   overflow-x: hidden;
@@ -57,62 +19,7 @@ span.console{
   word-wrap: break-word;
 }
 
-.mainCol{
-  margin: 12.5px;
-}
-.gameCol{
-  width: 800px;
-  order: 1;
-  flex: 0 0 auto;
-}
-
-.editCol{
-  order: 2;
-  min-width: 500px;
-  flex: 1 1 auto;
-}
-
-div.game {
-  display: inline-block;
-  margin: 0 auto;
-}
-
-div.controls{
-  overflow: hidden;
-  border-top:none;
-  background-color: #f1f1f1;
-}
-
-button.controls{
-    background-color: inherit;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-}
-
-button.controls.active{
-  background-color: #ccc;
-}
-
-button.controls:hover{
-  background-color: #ddd;
-}
-
 .hidden{
   pointer-events: none;
   background-color: transparent;
-}
-
-button.controls.noEvents{
-  pointer-events: none;
-}
-
-button.controls.inactive{
-  background-color: #fff;
-}
-
-button.controls:active{
-  background-color: #bbb;
 }

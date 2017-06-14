@@ -722,7 +722,7 @@
             players[s].script = room.players[j].script;
             players[s].name = room.players[j].name;
             if (currentTab == s) {
-              editor.setValue(players[s].script);
+              editor.setValue(players[s].script, -1);
             }
           }
         }
@@ -820,7 +820,7 @@
 
       function revertCode() {
         if (currentTab == 0){
-          editor.setValue(players[0].script);
+          editor.setValue(players[0].script, -1);
         }
       }
 
@@ -1209,7 +1209,7 @@
           players[0].script = editor.getValue();
         }
         currentTab = tabi;
-        editor.setValue(players[tabi].script);
+        editor.setValue(players[tabi].script, -1);
         editor.setReadOnly(tabi != 0);
         editor.focus();
       }
@@ -1222,7 +1222,7 @@
         editor.getSession().setUseWrapMode(true);
         editor.getSession().setTabSize(4);
         editor.getSession().setUseSoftTabs(true);
-        editor.setValue(`{{user.script|safe}}`, 1);
+        editor.setValue(`{{user.script|safe}}`, -1);
       }
 
       //Prints to the on screen console
@@ -1267,13 +1267,12 @@
             <div class="col">
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
-                  <button class="btn btn-danger" onclick="leaveGame()">Leave Game</button>
+                  <button class="btn btn-outline-danger" onclick="leaveGame()">Leave Game</button>
                 </div>
                 <div class="btn-group">
-                  <button class="btn btn-info" onclick="submitCode()">Save Code</button>
-                  <button id="pauseBtn" class="btn btn-info" onclick="togglePause()">Pause</button>
-                  <button id="testBtn" class="btn btn-info" onclick="game_test()">Test Code</button>
-                  <button id="readyBtn" class="btn btn-success" onclick="readyUp()">Ready</button>
+                  <button id="pauseBtn" class="btn btn-outline-info" onclick="togglePause()">Pause</button>
+                  <button id="testBtn" class="btn btn-outline-info" onclick="game_test()">Test Code</button>
+                  <button id="readyBtn" class="btn btn-outline-success" onclick="readyUp()">Ready</button>
                 </div>
               </div>
             </div>
@@ -1304,13 +1303,16 @@
               </div>
             </div>
           </div>
-          <div class="row" style="margin-top:10px">
-            <div class="btn-toolbar justify-content-between">
-              <div class="btn-group">
-                <button class="btn btn-warning" onclick="revertCode()">Revert Changes</button>
-              </div>
-              <div class="btn-group">
-                <a href="{{ url_for('.docs') }}" target="_blank"><button class="btn btn-info">Show me the docs!</button></a>
+          <div class="row" style="width: 100%; margin-top: 10px">
+            <div class="col" style="padding: 0">
+              <div class="btn-toolbar justify-content-between">
+                <div class="btn-group">
+                  <button class="btn btn-outline-warning" onclick="revertCode()">Revert Changes</button>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-outline-info" onclick="submitCode()">Save Code</button>
+                  <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button"><b>Show me the docs!</b></a>
+                </div>
               </div>
             </div>
           </div>
