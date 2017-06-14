@@ -130,6 +130,7 @@ class Game:
             if p.health <= 0:
                 self.players.remove(p)
                 self.events_add(Event(EventType.PLAYER_DEATH, p))
+                break
 
             pos = self.clamp_pos(p.update(delta))
             if not self.collides_with_walls(pos, p.size):
