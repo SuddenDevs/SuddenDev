@@ -17,3 +17,9 @@ class EventType(Enum):
     PRINT = 'Print'
     ERROR = 'Error'
     ATTACK = 'Attack'
+
+class GameOverType(Enum):
+    LOSE_PLAYERS = 'Lose_Players'
+    LOSE_CORE = 'Lose_Core'
+    LOSE_TIMEOUT = 'Lose_Timeout'
+    WIN = 'Win'

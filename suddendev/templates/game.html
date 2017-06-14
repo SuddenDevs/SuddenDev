@@ -62,6 +62,7 @@
 
       var game_data = [];
       var game_data_current = [];
+      var wave_current = null;
 
       //Game parameters
       var attack_fade = 0.2;
@@ -183,6 +184,7 @@
         //Get the first state of this new game
         var first = game_data_current[0];
 
+        wave_current = first.wave;
         waveText.text = "Wave " + first.wave;
 
         mainText.visible = false;
@@ -1005,7 +1007,7 @@
         draw();
       }
 
-      function game_end(msg) {
+      function game_end(result) {
         timer_end = TIME_AFTER_END;
         inGame = false;
         if (!test) {
@@ -1016,14 +1018,35 @@
         }
         fade.visible = true;
         fade.alpha = 0;
-        if (msg == "Game Over") {
-          clearup_core();
-          fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
-        } else {
-          fade.tint = PIXI.utils.rgb2hex([0, 1, 0]);
+        var text
+        switch (result) {
+          case "Lose_Core":
+            text = "Core Destroyed"; 
+            clearup_core();
+            fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+            break;
+          case "Lose_Players":
+            if (players.length > 1) {
+              text = "Everyone Died"
+            } else {
+              text = "You Died"
+            }
+            fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+            break;
+          case "Lose_Timeout":
+            text = "Time up!"
+            fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+            break;
+          case "Win":
+            text = "Wave " + wave_current + " complete!"
+            fade.tint = PIXI.utils.rgb2hex([0, 1, 0]);
+            break;
+          default:
+            text = "What happened?"
+            console.log("Unknown ending: " + result);
         }
 
-        mainText.text = msg;
+        mainText.text = text;
         mainText.visible = true;
 
         game_data.splice(0, 1);

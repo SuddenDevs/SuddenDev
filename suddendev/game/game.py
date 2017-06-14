@@ -8,13 +8,12 @@ from .pickup import Pickup, PickupType
 from .enemy_type import EnemyType
 from .wall import Wall
 from .core import Core
-from .event import Event, EventType
+from .event import Event, EventType, GameOverType
 from .game_config import GameConfig
 
 import time
 import random
 import math
-
 
 def random_pos_edge(size, width, height):
     n = random.getrandbits(2)
@@ -54,8 +53,6 @@ class Game:
 
         self.time = 0
         self.active = True
-
-        self.game_result = None
 
         #Map
         self.map = Map(self.gc.MAP_WIDTH, self.gc.MAP_HEIGHT)
@@ -107,24 +104,25 @@ class Game:
         self.spawn_enemies()
 
         #Ending Conditions / Wave Conditions
-        result, game_result = self.check_if_game_over()
+        result = self.check_if_game_over()
         if result is not None:
             self.active = False
-            self.game_result = game_result
             self.events_add(Event(EventType.GAME_END, result))
 
             # TODO: nicer way of seeing if the wave was cleared
-            self.cleared = 'Wave' in result
+            self.cleared = result == GameOverType.WIN
 
     def check_if_game_over(self):
         if len(self.enemies) == 0 and not self.gc.enemy_types:
-            return 'Wave ' + str(self.wave) + ' cleared!', True
-        elif len(self.players) == 0 or self.core.health <= 0:
-            return 'Game Over', False
+            return GameOverType.WIN
+        elif self.core.health <= 0:
+            return GameOverType.LOSE_CORE
+        elif len(self.players) == 0:
+            return GameOverType.LOSE_PLAYERS
         elif self.time >= self.gc.TIME_LIMIT:
-            return 'Time limit reached!', False
+            return GameOverType.LOSE_TIMEOUT
         else:
-            return None, None
+            return None
 
     def update_players(self, delta):
         #Update Players
@@ -214,4 +212,3 @@ class Game:
 
     def was_cleared(self):
         return self.cleared
-

@@ -114,7 +114,9 @@ class StateEncoder(json.JSONEncoder):
                 body = self.serializePlayer(e.body[0]);
             elif e.event_type == EventType.PICKUP_SPAWN or e.event_type == EventType.PICKUP_USED:
                 body = self.serializePickup(e.body[0]);
-            elif e.event_type == EventType.GAME_END or e.event_type == EventType.PRINT or e.event_type == EventType.ERROR:
+            elif e.event_type == EventType.GAME_END:
+                body = e.body[0].value
+            elif e.event_type == EventType.PRINT or e.event_type == EventType.ERROR:
                 body = e.body[0]
             elif e.event_type == EventType.ATTACK:
                 body = [
