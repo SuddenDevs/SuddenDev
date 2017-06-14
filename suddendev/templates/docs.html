@@ -15,7 +15,7 @@
       <h2>A co-op survival game where your code plays for you.</h2><br>
     </center>
   <div id="toc" class="card m-3">
-      <div class="card-header card-inverse card-success" style="color:#ffffff">
+      <div class="card-header card-inverse card-success">
         <h4> Table of Contents </h4>
       </div>
   <div class="card-block">
@@ -31,7 +31,7 @@
   </div>
 
   <div id="getting-started" class="card m-3">
-      <div class="card-header card-inverse card-success" style="color:#ffffff">
+      <div class="card-header card-inverse card-success">
         <h4> Getting Started </h4>
       </div>
 
@@ -47,7 +47,7 @@
 	    </div>
           </div>
     <div id="gameplay-basics" class="card m-3">
-      <div class="card-header card-inverse card-success" style="color:#ffffff">
+      <div class="card-header card-inverse card-success">
     <h4> Gameplay Basics </h4>
     </div>
       <div class="card-block">
@@ -68,7 +68,7 @@
           </div>
     </div>
     <div id="scripting-basics" class="card m-3">
-      <div class="card-header card-inverse card-success" style="color:#ffffff">
+      <div class="card-header card-inverse card-success">
     <h4> Scripting Tutorial </h4>
     </div>
       <div class="card-block">
@@ -76,27 +76,24 @@
             You'll be writing in <b>Python</b>, a popular scripting language. There are plenty of resources online, as well as examples below, to help you get started.<br><br>
 
             <h4> The Basics </h4><br>
-            In your script, you only need to define one function:<br><br>
+            In your script, you only need to define one function:<br>
             <div class="card card-outline-danger">
-            <pre><code class="python code-block"> 
-def update(player, delta):
+            <pre><code class="python code-block">def update(player, delta):
   #insert behaviour here</code></pre></div>
             <br>
             This function will be called 30 times per second when the game is running. What you write in it will determine how your triangle behaves.
             The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
-            To move around, you can set the <code>vel</code> property of your player. For example, move to the right:
+            To move around, you can set the <code>vel</code> property of your player. For example, move to the right:<br>
             <div class="card card-outline-danger">
-            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
-def update(player, delta):
-  player.vel = Vector(10, 0)
-            </code></pre></div>
+            <pre><code class="python code-block">def update(player, delta):
+  player.vel = Vector(10, 0)</code></pre></div>
             <br>
-            The unit of distance in this game is the pixel, so a speed of 10 means 10 pixels per second. We've provided some built-in functions to help you with handling vectors, distances, and movement.
+            The unit of distance in this game is the pixel, so a speed of 10 means 10 pixels per second. We've provided some built-in functions to help you with handling vectors, distance calculations, and movement.
             
             <div class="card card-outline-danger">
-            <pre><code class="python code-block"> 
-move_to(position)
+            <pre><code class="python code-block">move_to(pos) #set velocity to move at full speed towards 'pos'
+distance_to(pos) #returns the distance from your player to 'pos'
 shoot(entity)</code></pre></div>
             <br>
             Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a pickup that you want to grab, call<br><br>
@@ -169,7 +166,7 @@ And that's it! Now to make it smarter, you might want to try to pick up pickups,
 </div>
 
 <div id="tips-and-tricks" class="card m-3" style="margin: 1.5rem">
-    <div class="card-header card-inverse card-success" style="color:#ffffff">
+    <div class="card-header card-inverse card-success">
     <h4> Tips and Tricks </h4>
         </div>
       <div class="card-block">
@@ -245,7 +242,7 @@ Similarly, you can access the <code>attack_delay</code> and <code>attack_timer</
     </div>
 
   <div id="scripting-reference" class="card m-3" style="margin: 1.5rem">
-      <div class="card-header card-inverse card-success" style="color:#ffffff">
+      <div class="card-header card-inverse card-success">
         <h4> Scripting Reference </h4>
         </div>
         <div class="card-block">

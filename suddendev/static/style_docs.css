@@ -1,12 +1,18 @@
 .code-main {
     font-size: 20px;
-    background-color: #ffffff;
 }
 
 .code-block {
-    background-color:#ffffff;
-    font-size:18px; 
-    padding-left:3rem;
+    font-size: 18px; 
+    padding-left: 1rem;
+}
+
+.card-inverse, .card-success {
+  color: #ffffff;
+}
+
+.python {
+  background-color:#ffffff;
 }
 
 .clink {
