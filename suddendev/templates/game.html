@@ -33,9 +33,8 @@
       var inGame = false;
       var test = false;
       var currentTab = 0;
-      var players = [];
       var playerID = {{user.id}};
-      var scripts = [];
+      var players = [];
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var stage = null;
@@ -720,8 +719,11 @@
           tryAddPlayer(room.players[j]);
           if (room.players[j].id != playerID) {
             var s = getScript(room.players[j].id);
-            scripts[s].script = room.players[j].script;
-            scripts[s].name = room.players[j].name;
+            players[s].script = room.players[j].script;
+            players[s].name = room.players[j].name;
+            if (currentTab == s) {
+              editor.setValue(players[s].script);
+            }
           }
         }
 
@@ -731,15 +733,29 @@
         if (players.length > room.players.length) {
           for (i = 0; i < players.length; i++) {
             var present = false;
+
             for (j = 0; j < room.players.length; j++) {
               if (players[i].id == room.players[j].id) {
                 present = true;
               }
             }
+            
             if (!present) {
-              scripts.splice(getScript(players[i].id), 1);
               players.splice(i, 1);
-              toggleClasses("tab" + (i), ["disabled"], false);
+
+              var tabs = document.getElementsByClassName("tabBtn");
+              for (k = 1; k < MAXPLAYERS; k++) {
+                if (k >= players.length) {
+                  tabs[k].innerHTML = "";
+                  tabs[k].classList.add("hidden");
+                  if (k == currentTab) {
+                    setEditorTab(0);
+                  }
+                } else {
+                  tabs[k].innerHTML = players[k].name;
+                }
+              }
+
               i--;
             }
           }
@@ -747,11 +763,12 @@
       }
 
       function getScript(id) {
-        for (i = 0; i < scripts.length; i++) {
-          if (scripts[i].id == id) {
-            return i
+        for (i = 0; i < players.length; i++) {
+          if (players[i].id == id) {
+            return i;
           }
         }
+        return -1;
       }
 
       //If a player isn't already stored then store their details
@@ -759,13 +776,10 @@
         if (havePlayer(player.id)) {
           return false;
         }
-        players.push(player);
-        scripts.push({"script":player.script, "id":player.id, "name":player.name});
+        players.push({"script":player.script, "id":player.id, "name":player.name});
         var t = document.getElementById("tab" + (players.length - 1));
         t.innerHTML = player.name.substring(0, TAB_NAME_CHAR_LIMIT);
-        if (t.classList.contains("hidden")) {
-          t.classList.remove("hidden");
-        }
+        t.classList.remove("hidden");
         return true;
       }
 
@@ -790,10 +804,10 @@
       }
 
       function submitCode() {
-        if (editor.getValue() !== scripts[0].script && currentTab == 0) {
-          scripts[0].script = editor.getValue();
+        if (editor.getValue() !== players[0].script && currentTab == 0) {
+          players[0].script = editor.getValue();
         }
-        socket.emit(EVENTS.SUBMIT, scripts[0].script);
+        socket.emit(EVENTS.SUBMIT, players[0].script);
       }
 
       function game_test() {
@@ -806,7 +820,7 @@
 
       function revertCode() {
         if (currentTab == 0){
-          editor.setValue(scripts[0].script);
+          editor.setValue(players[0].script);
         }
       }
 
@@ -1191,10 +1205,10 @@
         var newt = document.getElementById("tab" + tabi);
         newt.classList.add("active");
         if (oldt === "tab0") {
-          scripts[0].script = editor.getValue();
+          players[0].script = editor.getValue();
         }
         currentTab = tabi;
-        editor.setValue(scripts[tabi].script);
+        editor.setValue(players[tabi].script);
         editor.setReadOnly(tabi != 0);
         editor.focus();
       }
@@ -1268,16 +1282,16 @@
           <div class="row" style="height:50px;width:100%">
             <ul id="edit-tab" class="nav nav-tabs" style="width: 100%">
                <li class="nav-item active" onClick="setEditorTab(0)">
-                  <button id="tab0" class="nav-link active" onClick="setEditorTab(0)">Player 1</button>
+                  <button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)">Player 1</button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab1" class="nav-link hidden" onclick="setEditorTab(1)"></button>
+                  <button id="tab1" class="nav-link tabBtn hidden" onclick="setEditorTab(1)"></button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab2" class="nav-link hidden" onclick="setEditorTab(2)"></button>
+                  <button id="tab2" class="nav-link tabBtn hidden" onclick="setEditorTab(2)"></button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab3" class="nav-link hidden" onclick="setEditorTab(3)"></button>
+                  <button id="tab3" class="nav-link tabBtn hidden" onclick="setEditorTab(3)"></button>
                 </li>
             </ul>
           </div>
