@@ -1216,20 +1216,11 @@
 {% block body %}
     {{ suddendev_logged_in_header(user.picture, user.name, user.email) }}
 
-    Your secret key is <code>{{ game_id }}</code>
     <div class="container-fluid">
       <div class="row">
-        <div class="col">
-          <div class="row" style="height:50px">
-          </div>
-          <div class="row" style="height: 600px; width:100%; margin:0">
-            <div class="card" style="width:100% ">
-              <div id="console" class="console card-block"></div>
-    	      </div>
-          </div>
-  	    </div>
-        <div class="col">
-          <div class="row" style="height:50px">
+        <div class="col" style="flex: 0 0 auto; width: 800px; padding: 0; margin: 15px">
+          <div class="row" style="height:50px; margin:0">
+            <span>Your secret key is <code style="display:inline-block">{{ game_id }}</code></span>
           </div>
           <div class="row" style="margin:0">
             <div id="gameDiv">
@@ -1252,28 +1243,38 @@
             </div>
           </div>
         </div>
-        <div class="col">
+        <div class="col" style="padding: 0; margin: 15px">
           <div class="row" style="height:50px;width:100%;margin:0">
-            <ul class="nav nav-tabs" style="position:absolute;">
-               <li class="nav-item tabBtn active" onClick="setEditorTab(0)">
-                  <button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)">Player 1</button>
+            <ul id="edit-tab" class="nav nav-tabs" style="position:absolute;">
+               <li class="nav-item active" onClick="setEditorTab(0)">
+                  <button id="tab0" class="nav-link active" onClick="setEditorTab(0)">Player 1</button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab1" class="nav-link tabBtn disabled" onclick="setEditorTab(1)">Player 2</button>
+                  <button id="tab1" class="nav-link noEvents" onclick="setEditorTab(1)">Player 2</button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab2" class="nav-link tabBtn disabled" onclick="setEditorTab(2)">Player 3</button>
+                  <button id="tab2" class="nav-link noEvents" onclick="setEditorTab(2)">Player 3</button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab3" class="nav-link tabBtn disabled" onclick="setEditorTab(3)">Player 4</button>
+                  <button id="tab3" class="nav-link noEvents" onclick="setEditorTab(3)">Player 4</button>
                 </li>
             </ul>
+            <script>
+              $(function() {
+                $("#edit-tab a:last").tab("show")
+              })
+            </script>
           </div>
-          <div class="row" style="height:600px">
-            <div id="editor" style="width: 100%"></div>
+          <div class="row" style="height:600px; width: 100%; display: flex; flex-direction: column; align-content: stretch">
+            <div id="editor" class="greyBorder" style="width: 100%; flex: 7 1 auto; box-sizing: border-box;"></div>
+            <div style="display: flex; align-content: stretch; flex-direction: column; padding-top: 15px; width: 100%; flex: 3 1 auto; box-sizing: border-box;">
+              <div class="card" style="flex: 1 1 auto">
+                <div id="console" class="console card-block"></div>
+              </div>
+            </div>
           </div>
           <div class="row" style="margin-top:10px">
-            <div class="btn-toolbar justify-content-between greyBorder">
+            <div class="btn-toolbar justify-content-between">
               <div class="btn-group">
                 <button class="btn btn-warning" onclick="revertCode()">Revert Changes</button>
               </div>

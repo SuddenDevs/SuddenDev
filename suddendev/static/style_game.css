@@ -115,9 +115,3 @@ button.controls.inactive{
 button.controls:active{
   background-color: #bbb;
 }
-
-@media screen {
-  #editor {
-    height: 600px;
-  }
-}

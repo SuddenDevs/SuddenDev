@@ -83,36 +83,36 @@
             <b><code>move_to(position)</code></b><br>
             <b><code>shoot(entity)</code></b><br>
             <br>
-            Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a powerup that you want to grab, call<br><br>
+            Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a pickup that you want to grab, call<br><br>
 
-            <code>move_to(somePowerup.pos)</code> to move to its position, or you can pass in the object reference itself<br>
-            <code>move_to(somePowerup)</code>, to achieve the same thing.<br><br>
+            <code>move_to(somePickup.pos)</code> to move to its position, or you can pass in the object reference itself<br>
+            <code>move_to(somePickup)</code>, to achieve the same thing.<br><br>
 
-            to make your character move towards the powerup. This function just sets the velocity of your character to be towards the powerup.
+            to make your character move towards the pickup. This function just sets the velocity of your character to be towards the pickup.
 
-            also moves your bot towards the powerup. Similarly, you can use the<br><br>
+            also moves your bot towards the pickup. Similarly, you can use the<br><br>
             <code>move_from(entity)</code><br>
             <code>move_from_pos(pos)</code><br><br>
             which make your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
-            <code>move_to(powerup, 80)</code><br><br>
-            makes your character go towards the powerup with speed 80.<br><br>
+            <code>move_to(pickup, 80)</code><br><br>
+            makes your character go towards the pickup with speed 80.<br><br>
             
             <b>How do you get hold of these entities?</b><br><br>
             You have access to these lists, which you can freely use in your code:<br>
             <code>enemies_visible</code>, which contains all the enemy entities that your character can see<br>
             <code>enemies_attackable</code>, which contains all the enemy entities that your character can attack<br>
-            <code>powerups_visible</code>, which contrains all the powerups that your character can see<br><br>
+            <code>pickups_visible</code>, which contrains all the pickups that your character can see<br><br>
 
             You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. You might want to make use of these functions:<br><br>
 
             <code>get_nearest_enemy()</code><br>
             <code>get_nearest_attackable_enemy()</code><br>
-            <code>get_nearest_powerup()</code><br><br>
+            <code>get_nearest_pickup()</code><br><br>
 
-            You can also pass in a <code>PowerupType</code> to <code>get_nearest_powerup()</code> to specify which powerup you're interested in, i.e.<br><br>
+            You can also pass in a <code>PickupType</code> to <code>get_nearest_pickup()</code> to specify which pickup you're interested in, i.e.<br><br>
 
-            <code>get_nearest_powerup(PowerupType.AMMO_UP)</code><br>
-            <code>get_nearest_powerup(PowerupType.HEALTH_UP)</code><br><br>
+            <code>get_nearest_pickup(PickupType.AMMO_UP)</code><br>
+            <code>get_nearest_pickup(PickupType.HEALTH_UP)</code><br><br>
 
             Your own character is also an entity and you can also access its attributes. The character is passed in as the first argument in your <code>update</code> function, so if your function starts with<br><br>
             <code>update(player, delta)</code><br><br>
@@ -135,7 +135,7 @@ def update(player, delta):
     move_to(nearest_enemy)
     shoot(nearest_enemy)</code></pre></div><br>
                 
-And that's it! Now to make it smarter, you might want to try to pick up powerups, avoid enemies if your health is low or shoot only if your ammo is high.<br><br>
+And that's it! Now to make it smarter, you might want to try to pick up pickups, avoid enemies if your health is low or shoot only if your ammo is high.<br><br>
                 <b>Advanced</b><br><br>
                 You might find it useful to print messages to the console. This is achieved by calling<br><br>
                 <b><code>print(message)</code></b><br><br>
@@ -219,7 +219,7 @@ def update(player, delta):
         <b>Can access as lists:</b><br>
         <code>enemies_visible</code><br>
         <code>enemies_attackable</code><br>
-        <code>powerups_visible</code><br><br>
+        <code>pickups_visible</code><br><br>
 
         <b>Can access</b><br>
         <code>core</code><br><br>
@@ -256,8 +256,8 @@ def update(player, delta):
         <code>attack_delay</code><br>
         <code>attack_timer</code><br><br>
 
-        For powerups, can also access:<br>
-        <code>powerup_type</code><br>
+        For pickups, can also access:<br>
+        <code>pickup_type</code><br>
         <code>value</code><br><br>
 
         <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
@@ -265,7 +265,7 @@ def update(player, delta):
         <b><code>shoot(enemy)</code></b><br>
         <b><code>get_nearest_enemy(enemy_type=None)</code></b><br>
         <code>get_nearest_attackable_enemy(enemy_type=None)</code><br>
-        <b><code>get_nearest_powerup(powerup_type=None)</code></b><br>
+        <b><code>get_nearest_pickup(pickup_type=None)</code></b><br>
         <b><code>say(string, *body)</code></b><br>
         <code>say_also_to_self(string, *body)</code><br>
         <code>distance_to(target)</code><br>
@@ -292,7 +292,7 @@ def update(player, delta):
         <code>Dot(a, b)</code><br>
         <code>ProjectOnto(w, v)</code><br><br>
 
-        PowerupType<br>
+        PickupType<br>
         <code>AMMO_UP</code><br>
         <code>HEALTH_UP</code><br><br>
 

@@ -7,26 +7,111 @@
   <div class="container">
       <h2>Hey, {{ user.name.split(' ', 1)[0] }}!</h3>
       <br>
-      {% if noob %}
-      <div class="alert alert-success">
-	<strong>Looks like you're new here, so let's get you up to speed!</strong>
-	<p>The documentation is your survival companion.<br>
-        But who wants to read that, eh? Open the docs in a tab, for reference, and follow these simple steps:</p>
-	<br>
-	<b>
-	  <ol>
-	    <li>Create a game and play around with the default script</li>
-	    <br>
-	    <li>Invite friends to join your team</li>
-	    <br>
-	    <li>Use messages to craft advanced strategies</li>
-	   </ol>
-	</b>
-      </div>
+      {% if not user.wave5_trophy %}
+        <div class="alert alert-success">
+          <strong>Looks like you're new here, so let's get you up to speed!</strong>
+          <p>The documentation is your survival companion.<br>
+          But who wants to read that, eh? Open the docs in a tab, for reference, and follow these simple steps:</p>
+          <br>
+          <b>
+            <ol>
+              <li>Create a game and play around with the default script</li>
+              <br>
+              <li>Invite friends to join your team</li>
+              <br>
+              <li>Use messages to craft advanced strategies</li>
+             </ol>
+          </b>
+        </div>
+      {% else %}
+        <div class="alert alert-success">
+          <strong>Not bad!</strong>
+          <p>You're on your way to mastery! Few things you should check out to get there:</p>
+          <br>
+          <b>
+            <ol>
+	      <li>Read up on <a href="{{ url_for('.docs') }}">messaging</a></li>
+              <br>
+	      <li>Grab some other people, 3 ideally</li>
+              <br>
+              <li>Write some super-cool strategies</li>
+             </ol>
+          </b>
+        </div>
       {% endif %}
 
-      <br>
-      <h4>Trophies coming soon <small>watch this space!</small></h4>
+
+      <div class="card-deck">
+        <div class="card">
+          <center>
+            {% if user.wave5_trophy %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy1.png') }}" alt-text="Trophy sillhouette" style="width:100px; height:100px">
+            {% else %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy0.png') }}" alt-text="Trophy sillhouette" style="width:100px; height:100px">
+            {% endif %} 
+          </center>
+          <div class="card-block">
+            <h4 class="card-title">Order of the Pentagon</h4>
+            {% if user.wave5_trophy %}
+              <p class="card-text">You have earned this by clearing wave 5.</p>
+            {% else %}
+              <p class="card-text">You must clear wave 5 to earn this honour.</p>
+            {% endif %} 
+          </div>
+        </div>
+        <div class="card">
+          <center>
+            {% if user.wave10_trophy %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy2.png') }}" alt-text="trophy sillhouette" style="width:100px; height:100px">
+            {% else %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy0.png') }}" alt-text="trophy sillhouette" style="width:100px; height:100px">
+            {% endif %} 
+          </center>
+          <div class="card-block">
+            <h4 class="card-title">Geometric Gladiator</h4>
+            {% if user.wave10_trophy %}
+              <p class="card-text">you have earned this by clearing wave 10.</p>
+            {% else %}
+              <p class="card-text">you must clear wave 10 to earn this honour.</p>
+            {% endif %} 
+          </div>
+        </div>
+        <div class="card">
+          <center>
+            {% if user.wave15_trophy %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy3.png') }}" alt-text="trophy sillhouette" style="width:100px; height:100px">
+            {% else %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy0.png') }}" alt-text="trophy sillhouette" style="width:100px; height:100px">
+            {% endif %} 
+          </center>
+          <div class="card-block">
+            <h4 class="card-title">Master of the Polygon</h4>
+            {% if user.wave15_trophy %}
+              <p class="card-text">you have earned this by clearing wave 15.</p>
+            {% else %}
+              <p class="card-text">you must clear wave 15 to earn this honour.</p>
+            {% endif %} 
+          </div>
+        </div>
+        <div class="card">
+          <center>
+            {% if user.wave20_trophy %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy4.png') }}" alt-text="trophy sillhouette" style="width:100px; height:100px">
+            {% else %}
+              <img class="card-img-top" src="{{ url_for('static', filename='trophies/trophy0.png') }}" alt-text="trophy sillhouette" style="width:100px; height:100px">
+            {% endif %} 
+          </center>
+          <div class="card-block">
+            <h4 class="card-title">Two-Dimensional God</h4>
+            {% if user.wave20_trophy %}
+              <p class="card-text">you have earned this by clearing wave 20.</p>
+            {% else %}
+              <p class="card-text">you must clear wave 20 to earn this honour.</p>
+            {% endif %} 
+          </div>
+        </div>
+      </div>
+
       <br>
 
       <div class="btn-toolbar justify-content-between" role="toolbar">

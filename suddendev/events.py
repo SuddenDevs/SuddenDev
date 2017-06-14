@@ -153,6 +153,24 @@ def run_game_if_everyone_ready(game_id):
         highest_wave = handle.get()
         set_room_wave(game_id, highest_wave + 1)
         fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)
+
+        for player in player_jsons:
+            player_id = player['id']
+            user = User.query.get(player_id)
+
+            if highest_wave >= 5:
+                user.wave5_trophy = True
+                db.session.commit()
+            if highest_wave >= 10:
+                user.wave10_trophy = True
+                db.session.commit()
+            if highest_wave >= 15:
+                user.wave15_trophy = True
+                db.session.commit()
+            if highest_wave >= 20:
+                user.wave20_trophy = True
+                db.session.commit()
+
         reset_all_players(game_id)
 
 def update_players(game_id):
