@@ -22,7 +22,7 @@
       <ul>
           <li><a href="#getting-started">Getting Started</a><br></li>
           <li><a href="#gameplay-basics">Gameplay Basics</a><br></li>
-          <li><a href="#scripting-basics">Scripting Tutorial</a><br></li>
+          <li><a href="#scripting-tutorial">Scripting Tutorial</a><br></li>
           <li><a href="#tips-and-tricks">Tips and Tricks</a><br></li>
           <li><a href="#scripting-reference">Scripting Reference</a><br></li>
 
@@ -36,64 +36,100 @@
       </div>
 
       <div class="card-block">
-	      <ol>
-            <li>Protect the <b>core</b> (the blue circle)</li>
-            <li>For each wave, at least one player needs to survive</li>
-            <li>Don't die and don't run out of ammo</li>
-	      </ol>
+            <p>This is a game about scripting with friends in a world of feisty triangles.
+            </p>
+
+            <h5> Objective </h5>
+            <p>Protect your <b>core</b> against waves of menacing, shadowy triangles. Don't let them destroy it, don't die, and don't run out of ammo.
+            </p>
 
 	      <p>Keep this page open for reference.</p>
-	      <p>Head to your <a href={{ url_for('.home') }}>home</a>, create a game, invite friends and try to survive as many waves as possible.</p>
-	    </div>
-          </div>
-    <div id="gameplay-basics" class="card m-3">
-      <div class="card-header card-inverse card-success">
-    <h4> Gameplay Basics </h4>
-    </div>
-      <div class="card-block">
-	      <p>You control a <b>fierce</b> little triangle. It can:</p>
+	      <p>Head to your <a href={{ url_for('.home') }}>home page</a>, create a game, invite some friends and try to survive for as long as possible.</p>
+            <h5> Basic Mechanics </h5>
+	      <p>You control a single little triangle that can:</p>
 	      <ol>
-		<li>Move (obviously)</li>
+		<li>Move around</li>
 		<li>See what's nearby</li>
 		<li>Attack enemy triangles</li>
 		<li>Message other little triangles (your team)</li>
 	      </ol>
-	      <p>Your triangle has finite health and ammo, but can replenish both by grabbing pickups.</p>
-	      <p>You can form a team of triangles to defend the circle from incoming waves.</p>
-	      <p>At the end of each wave, you are reborn with full health, ready to fight again.
-	      The ultimate aim is to clear as many waves as possible. Each wave is harder than the last. </p>
-
-	      <p>You'll need as much help as possible (up to 3 team-mates), and some clever strategies to succeed.
-	      Give it your best shot, and have fun!</p>
+	      <p>Your triangle has limited health and ammunition, but both can be replenished by grabbing pickups.</p>
+              <p>At the end of each wave, you'll be reborn, ready to fight again.
+	      The aim is to clear as many waves as possible, but each wave is harder than the last.</p>
+	      <p>If you want to do well, you'll need a team!</p>
+	    </div>
           </div>
-    </div>
-    <div id="scripting-basics" class="card m-3">
+    <div id="scripting-tutorial" class="card m-3">
       <div class="card-header card-inverse card-success">
     <h4> Scripting Tutorial </h4>
     </div>
       <div class="card-block">
             This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
-            You'll be writing in <b>Python</b>, a popular scripting language. There are plenty of resources online, as well as examples below, to help you get started.<br><br>
+            The language is <b>Python</b>, which has ample learning resources elsewhere on the internet, so we're going to focus here on the specifics of <b>sudden_dev</b>.<br><br>
 
-            <h4> The Basics </h4><br>
+            <h4> The Update Function </h4>
             In your script, you only need to define one function:<br>
             <div class="card card-outline-danger">
             <pre><code class="python code-block">def update(player, delta):
   #insert behaviour here</code></pre></div>
             <br>
-            This function will be called 30 times per second when the game is running. What you write in it will determine how your triangle behaves.
+            <p>Without this function, a boring, default script will run instead.
+            This function will be called 30 times per second by the game whilst it is running. What you write in it will determine how your triangle behaves.
+            </p>
+            <p>
             The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
-            To move around, you can set the <code>vel</code> property of your player. For example, move to the right:<br>
+            <h4> Movement </h4>
+            To move around, you can set the <code>vel</code> (velocity) property of your player. For example, to move always to the right:<br>
             <div class="card card-outline-danger">
             <pre><code class="python code-block">def update(player, delta):
-  player.vel = Vector(10, 0)</code></pre></div>
+  player.vel = Vector(20, 0)</code></pre></div>
+            <img src="{{url_for('static', filename='tut/tut_move_right.gif')}}">
             <br>
-            The unit of distance in this game is the pixel, so a speed of 10 means 10 pixels per second. We've provided some built-in functions to help you with handling vectors, distance calculations, and movement.
-            
+            <p>
+            The unit of distance in this game is the pixel, so a speed of 20 means 20 pixels per second. We've provided some convenience functions to help you with handling vectors, distance calculations, and movement.
+            For example, move towards the core:
+            </p>
             <div class="card card-outline-danger">
-            <pre><code class="python code-block">move_to(pos) #set velocity to move at full speed towards 'pos'
-distance_to(pos) #returns the distance from your player to 'pos'
+            <pre><code class="python code-block">def update(player, delta):
+  move_to(core.pos) #set velocity to move at full speed towards 'core.pos'</code></pre></div>
+            <br>
+            <p>
+            Or move away from the nearest enemy:
+            </p>
+            <div class="card card-outline-danger">
+            <pre><code class="python code-block">def update(player, delta):
+  move_from(get_nearest_enemy().pos)</code></pre></div>
+            <img src="{{url_for('static', filename='tut/tut_move_from.gif')}}">
+            <br>
+            <p>
+            You can calculate the distance to something with <code>distance_to(some_vector)</code>, or use the more general <code>Vector</code> library to achieve the same calculation: 
+            </p>
+            <div class="card card-outline-danger">
+            <pre><code class="python code-block">dist_to = Vector.Length(player.pos - something.pos)</code></pre></div><br>
+            <p> The full helper interface is documented below in the Reference section.</p>
+
+            <h4>Sight</h4>
+            <p>
+            There are 4 basic entities in the world:
+            </p>
+            <ul>
+            <li> Other players </li>
+            <li> Enemies </li>
+            <li> Pickups </li>
+            <li> The core </li>
+            </ul>
+            You can always 'see' the core and other players, but you can only see pickups and enemies if they are within <code>player.range_visible</code>.
+            </p>
+            <p>
+            The outer circle around your triangle marks this visible range:
+            </p>
+            <img src="{{url_for('static', filename='tut/tut_visible_range.png')}}">
+            <br>
+
+            <p>We provide a list of enemies and pickups, namely <code>enemies_visible</code> and <code>pickups_visible</code> to operate on. It's up to you what to do with them! Should you avoid, move towards, attack, or tell other players what you see through messsages?
+            </p>
+            <h5>Combat</h5>
 shoot(entity)</code></pre></div>
             <br>
             Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a pickup that you want to grab, call<br><br>

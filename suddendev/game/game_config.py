@@ -64,7 +64,7 @@ class GameConfig:
 
     # Player
     P_SPEED = 80
-    P_RANGE_VISIBLE = 300
+    P_RANGE_VISIBLE = 200
     P_RANGE_ATTACKABLE = 80
     P_AMMO = 10
     P_DAMAGE = 75
