@@ -22,7 +22,9 @@
           <li><a href="#getting-started">Getting Started</a><br></li>
           <li><a href="#gameplay-basics">Gameplay Basics</a><br></li>
           <li><a href="#scripting-basics">Scripting Tutorial</a><br></li>
+          <li><a href="#tips-and-tricks">Tips and Tricks</a><br></li>
           <li><a href="#scripting-reference">Scripting Reference</a><br></li>
+
       </ul>
   </div>
   </div>
@@ -72,16 +74,20 @@
             This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
             You'll be writing in <b>Python</b>, a popular scripting language. There are plenty of resources online, as well as examples below, to help you get started.<br><br>
 
-            <b> The Basics </b><br>
+            <h4> The Basics </h4><br>
             In your script, you only need to define one function:<br><br>
-            <code><b>update(player, delta)</b></code>
-            <br><br>
+            <div class="card card-outline-danger">
+            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+update(player, delta)</code></pre></div>
+            <br>
             This function will be called 30 times per second when the game is running. What you write in it will determine how your triangle behaves.
             The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
             We've provided some built-in functions to help you get started:<br><br>
-            <b><code>move_to(position)</code></b><br>
-            <b><code>shoot(entity)</code></b><br>
+            <div class="card card-outline-danger">
+            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+move_to(position)
+shoot(entity)</code></pre></div>
             <br>
             Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a pickup that you want to grab, call<br><br>
 
@@ -90,14 +96,15 @@
 
             to make your character move towards the pickup. This function just sets the velocity of your character to be towards the pickup.
 
-            also moves your bot towards the pickup. Similarly, you can use the<br><br>
-            <code>move_from(entity)</code><br>
-            <code>move_from_pos(pos)</code><br><br>
-            which make your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
+            also moves your bot towards the pickup. Similarly, you can use<br><br>
+            <div class="card card-outline-danger">
+            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+move_from(entity)</code></pre></div><br>
+            which makes your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
             <code>move_to(pickup, 80)</code><br><br>
             makes your character go towards the pickup with speed 80.<br><br>
             
-            <b>How do you get hold of these entities?</b><br><br>
+            <h4>How do you get hold of these entities?</h4><br>
             You have access to these lists, which you can freely use in your code:<br>
             <code>enemies_visible</code>, which contains all the enemy entities that your character can see<br>
             <code>enemies_attackable</code>, which contains all the enemy entities that your character can attack<br>
@@ -105,14 +112,25 @@
 
             You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. You might want to make use of these functions:<br><br>
 
-            <code>get_nearest_enemy()</code><br>
-            <code>get_nearest_attackable_enemy()</code><br>
-            <code>get_nearest_pickup()</code><br><br>
-
+            <div class="card card-outline-danger">
+            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+get_nearest_enemy()
+get_nearest_attackable_enemy()
+get_nearest_pickup()</code></pre></div><br> 
             You can also pass in a <code>PickupType</code> to <code>get_nearest_pickup()</code> to specify which pickup you're interested in, i.e.<br><br>
 
-            <code>get_nearest_pickup(PickupType.AMMO_UP)</code><br>
-            <code>get_nearest_pickup(PickupType.HEALTH_UP)</code><br><br>
+            <div class="card card-outline-info">
+            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+get_nearest_pickup(PickupType.AMMO_UP)
+get_nearest_pickup(PickupType.HEALTH_UP)</code></pre></div><br>
+
+            Similarly, <code>get_nearest_enemy()</code> and <code>get_nearest_attackable_enemy()</code> accept an <code>EnemyType</code> as a parameter, i.e. call<br><br>
+
+<div class="card card-outline-info">
+<pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+get_nearest_enemy(EnemyType.CORE_KILLER)</code></pre></div><br>
+
+            to get the nearest visible enemy of type <code>CORE_KILLER</code>. For a full list of <code>EnemyType</code>s, check the <a href="#scripting-reference">Scripting Reference</a> below.<br><br>
 
             Your own character is also an entity and you can also access its attributes. The character is passed in as the first argument in your <code>update</code> function, so if your function starts with<br><br>
             <code>update(player, delta)</code><br><br>
@@ -136,22 +154,38 @@ def update(player, delta):
     shoot(nearest_enemy)</code></pre></div><br>
                 
 And that's it! Now to make it smarter, you might want to try to pick up pickups, avoid enemies if your health is low or shoot only if your ammo is high.<br><br>
-                <b>Advanced</b><br><br>
-                You might find it useful to print messages to the console. This is achieved by calling<br><br>
-                <b><code>print(message)</code></b><br><br>
 
+        </div>
+</div>
+
+<div id="tips-and-tricks" class="card m-3" style="margin: 1.5rem">
+    <div class="card-header card-inverse card-success" style="color:#ffffff">
+    <h4> Tips and Tricks </h4>
+        </div>
+      <div class="card-block">
+                <h4>Printing to console</h4><br>
+                You might find it useful to print messages to the console. This is achieved by calling<br><br>
+                <div class="card card-outline-danger">
+                <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+print(message)</code></pre></div><br>
+
+                <h4>Messages</h4><br>
                 In order to cooperate with your teammates, your bot can send 'messages', to their bots. To do this, call this function:<br><br>
-                <b><code>say(string, *body)</code></b><br><br>
+                <div class="card card-outline-danger">
+                <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+say(string, *body)</code></pre></div><br>
                 This broadcasts a message to all other players' characters. This function accepts a string and any number of other arguments that will be sent along with the message. For example, you can write:<br><br>
                 <code>say('Hello World!')</code><br><br>
                 To send a message with the string 'Hello World!' and no body. Alternatively, you can send<br><br>
                 <code>say('Enemy Coordinates', Vector(0, 0), Vector(5, 2))</code><br><br>
-                The body of the message will be a list with two elements, <code>Vector(0, 0)</code> and <code>Vector(5, 2)</code>. For convenience, if you only pass in one argument as the body, the body will be that argument itself (instead of a list with one element). In any other case, the arguments will be packed into a list.<br>
+                The body of the message will be a list with two elements, <code>Vector(0, 0)</code> and <code>Vector(5, 2)</code>. For convenience, if you only pass in one argument as the body, the body will be that argument itself (instead of a list with one element). In any other case, the arguments will be packed into a list.<br><br>
 
                 
                 
-                In order to respond to these messages, in your script you should define the function<br><br>
-                <b><code>respond(player, message)</code></b><br><br>
+                In order to respond to these messages, in your script you <b>should</b> define the function<br><br>
+                <div class="card card-outline-danger">
+                <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+respond(player, message)</code></pre></div><br>
                 which will be called when your bot receives a message. The message is an object with the following attributes:<br><br>
                 <code>source</code>, the character who sent this message<br>
                 <code>string</code>, the string of the message<br>
@@ -191,9 +225,13 @@ def update(player, delta):
         move_to(target)
 </code></pre></div>
 <br><br>
-        In order to use messaging effectively, you'll need to coordinate with your teammates - agree on what the message strings look like and what the message body is. 
-                <br><br><br>For further information on what's available to you, check the Scripting Reference section below.
-          </div>
+In order to use messaging effectively, you'll need to coordinate with your teammates - agree on what the message strings look like and what the message body is. <br><br>
+
+        <h4>Attack delay and timer</h4><br>
+    Your character can't shoot all the time. There is a minimum delay between every shot - by default this is 10 frames. You can access this as the attribute <code>attack_delay</code>. After your character shoots, the attribute <code>attack_timer</code> is set to the value of <code>attack_delay</code> and then every frame this timer counts down towards zero. When <code>attack_timer</code> hits zero, your character is ready to shoot again.<br><br>
+In other words, while your character's <code>attack_timer</code> is above zero, calling <code>shoot()</code> does nothing - be careful since this is when your character is completely vulnerable!
+Similarly, you can access the <code>attack_delay</code> and <code>attack_timer</code> attributes of your enemies - can you use that information to your advantage?
+    </div>
     </div>
 
   <div id="scripting-reference" class="card m-3" style="margin: 1.5rem">
