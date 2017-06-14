@@ -158,18 +158,22 @@ def run_game_if_everyone_ready(game_id):
             player_id = player['id']
             user = User.query.get(player_id)
 
-            if highest_wave >= 5:
+            if highest_wave >= 5 and not user.wave5_trophy:
                 user.wave5_trophy = True
                 db.session.commit()
-            if highest_wave >= 10:
+                fsio.emit('message_trophy', player['name'] + ' has earnt the Wave 5 trophy!' , room=game_id, namespace=NAMESPACE)
+            if highest_wave >= 10 and not user.wave10_trophy:
                 user.wave10_trophy = True
                 db.session.commit()
-            if highest_wave >= 15:
+                fsio.emit('message_trophy', player['name'] + ' has earnt the Wave 10 trophy!' , room=game_id, namespace=NAMESPACE)
+            if highest_wave >= 15 and not user.wave15_trophy:
                 user.wave15_trophy = True
                 db.session.commit()
-            if highest_wave >= 20:
+                fsio.emit('message_trophy', player['name'] + ' has earnt the Wave 15 trophy!' , room=game_id, namespace=NAMESPACE)
+            if highest_wave >= 20 and not user.wave20_trophy:
                 user.wave20_trophy = True
                 db.session.commit()
+                fsio.emit('message_trophy', player['name'] + ' has earnt the Wave 20 trophy!' , room=game_id, namespace=NAMESPACE)
 
         reset_all_players(game_id)
 
