@@ -55,13 +55,13 @@ def create_room(player_id, creator_display_name):
     if redis.get(player_id) is not None:
         return None, "Sorry, you can't create a game whilst you're still in one."
 
-    def gen_random_string(n):
+    def gen_random_string():
         return random.choice(LOBBY_ADJECTIVES) + " " + random.choice(LOBBY_NOUNS)
 
     # TODO: acquire lock for 'rooms'
-    game_id = gen_random_string(10)
+    game_id = gen_random_string()
     while redis.sismember('rooms', game_id):
-        game_id = gen_random_string(10)
+        game_id = gen_random_string()
     redis.sadd('rooms', game_id)
     # TODO: release lock for 'rooms'
 
@@ -130,6 +130,10 @@ def add_player_to_room(game_id, player_id, name):
     In either case, get_all_open_rooms() should be called and the view
     updated.
     """
+    # Format the game_id
+    # Remove duplicate whitespace
+    # Capitalise every word
+    game_id = ' '.join(game_id.split()).title()
 
     if not room_exists(game_id):
         return False, "Sorry, there doesn't seem to be a room with that key. Spelling?"
