@@ -294,7 +294,7 @@
         particle_layer.addChildAt(attack_area, 0);
         attack_area.position = data.pos;
         attack_area.alpha = 0.15;
-        attack_area.blendMode = PIXI.BLEND_MODES.EXCLUSION;
+        //attack_area.blendMode = PIXI.BLEND_MODES.EXCLUSION;
 
         var visible_area = new PIXI.Graphics();
         visible_area.beginFill(data.color);
@@ -302,7 +302,7 @@
         particle_layer.addChildAt(visible_area, 0);
         visible_area.position = data.pos;
         visible_area.alpha = 0.15;
-        visible_area.blendMode = PIXI.BLEND_MODES.LIGHTEN;
+        //visible_area.blendMode = PIXI.BLEND_MODES.LIGHTEN;
 
         //Glow
         player.container.filters = [new PIXI.filters.GlowFilter(6, 0.8, 0, data.color, 1)];
@@ -960,6 +960,7 @@
               create_enemy(body);
               break;
             case "Enemy_Death":
+              console.log("Removing enemy " + body.tag);
               clearup_enemy(body.tag);
               break;
             case "Player_Death":
@@ -1007,9 +1008,9 @@
 
       function process_state_end(state, delta) {
         //Updates
-        draw_enemies(state.enemies, delta);
-        draw_pickups(state.pickups, delta);
-        draw_players(state.players, delta);
+        //draw_enemies(state.enemies, delta);
+        //draw_pickups(state.pickups, delta);
+        //draw_players(state.players, delta);
         update_core(state.core, delta);
 
         //Effects
