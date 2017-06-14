@@ -142,7 +142,7 @@ def update(player, delta):
         self.ENEMY_SPAWN_DELAY = self.BASE_ENEMY_SPAWN_DELAY + scale * self.ENEMY_SPAWN_DELAY_SCALE
         self.ENEMY_SPAWN_PROBABILITY = self.BASE_ENEMY_SPAWN_PROBABILITY + scale * self.ENEMY_SPAWN_PROBABILITY_SCALE
 
-        self.POW_LIMIT = self.BASE_POW_LIMIT + scale * POW_LIMIT_SCALE
+        self.POW_LIMIT = self.BASE_POW_LIMIT + scale * self.POW_LIMIT_SCALE
 
         self.set_spawn_enemies(wave)
 
