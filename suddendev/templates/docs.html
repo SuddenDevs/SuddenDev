@@ -3,6 +3,7 @@
 {% block body %}
 
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_docs.css')}}">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
     <script>
     hljs.initHighlightingOnLoad();
@@ -77,7 +78,7 @@
             <h4> The Basics </h4><br>
             In your script, you only need to define one function:<br><br>
             <div class="card card-outline-danger">
-            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:2rem">
+            <pre><code class="python code-block"> 
 def update(player, delta):
   #insert behaviour here</code></pre></div>
             <br>
@@ -94,7 +95,7 @@ def update(player, delta):
             The unit of distance in this game is the pixel, so a speed of 10 means 10 pixels per second. We've provided some built-in functions to help you with handling vectors, distances, and movement.
             
             <div class="card card-outline-danger">
-            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+            <pre><code class="python code-block"> 
 move_to(position)
 shoot(entity)</code></pre></div>
             <br>
@@ -107,7 +108,7 @@ shoot(entity)</code></pre></div>
 
             also moves your bot towards the pickup. Similarly, you can use<br><br>
             <div class="card card-outline-danger">
-            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+            <pre><code class="python code-block"> 
 move_from(entity)</code></pre></div><br>
             which makes your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
             <code>move_to(pickup, 80)</code><br><br>
@@ -122,21 +123,21 @@ move_from(entity)</code></pre></div><br>
             You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. You might want to make use of these functions:<br><br>
 
             <div class="card card-outline-danger">
-            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+            <pre><code class="python code-block"> 
 get_nearest_enemy()
 get_nearest_attackable_enemy()
 get_nearest_pickup()</code></pre></div><br> 
             You can also pass in a <code>PickupType</code> to <code>get_nearest_pickup()</code> to specify which pickup you're interested in, i.e.<br><br>
 
             <div class="card card-outline-info">
-            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+            <pre><code class="python code-block"> 
 get_nearest_pickup(PickupType.AMMO_UP)
 get_nearest_pickup(PickupType.HEALTH_UP)</code></pre></div><br>
 
             Similarly, <code>get_nearest_enemy()</code> and <code>get_nearest_attackable_enemy()</code> accept an <code>EnemyType</code> as a parameter, i.e. call<br><br>
 
 <div class="card card-outline-info">
-<pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+<pre><code class="python code-block"> 
 get_nearest_enemy(EnemyType.CORE_KILLER)</code></pre></div><br>
 
             to get the nearest visible enemy of type <code>CORE_KILLER</code>. For a full list of <code>EnemyType</code>s, check the <a href="#scripting-reference">Scripting Reference</a> below.<br><br>
@@ -151,11 +152,11 @@ get_nearest_enemy(EnemyType.CORE_KILLER)</code></pre></div><br>
             <code>range_attackable</code><br><br>
             You would then access these for example as<br><br>
             <code>player.ammo</code><br><br>
-            For a full list of attributes, check out the scripting reference below.<br><br>
+            For a full list of attributes, check out the <a href="#scripting-reference">Scripting Reference</a> below.<br><br>
 
             With these functions you can actually already write a very simple AI! Here's a very basic example:<br><br>
             <div class="card card-outline-primary">
-<pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+<pre><code class="python code-block"> 
 def update(player, delta):
     # Find the nearest enemy, move towards it and shoot it
     nearest_enemy = get_nearest_enemy()
@@ -175,13 +176,13 @@ And that's it! Now to make it smarter, you might want to try to pick up pickups,
                 <h4>Printing to console</h4><br>
                 You might find it useful to print messages to the console. This is achieved by calling<br><br>
                 <div class="card card-outline-danger">
-                <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+                <pre><code class="python code-block"> 
 print(message)</code></pre></div><br>
 
                 <h4>Messages</h4><br>
                 In order to cooperate with your teammates, your bot can send 'messages', to their bots. To do this, call this function:<br><br>
                 <div class="card card-outline-danger">
-                <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+                <pre><code class="python code-block"> 
 say(string, *body)</code></pre></div><br>
                 This broadcasts a message to all other players' characters. This function accepts a string and any number of other arguments that will be sent along with the message. For example, you can write:<br><br>
                 <code>say('Hello World!')</code><br><br>
@@ -193,7 +194,7 @@ say(string, *body)</code></pre></div><br>
                 
                 In order to respond to these messages, in your script you <b>should</b> define the function<br><br>
                 <div class="card card-outline-danger">
-                <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+                <pre><code class="python code-block"> 
 respond(player, message)</code></pre></div><br>
                 which will be called when your bot receives a message. The message is an object with the following attributes:<br><br>
                 <code>source</code>, the character who sent this message<br>
@@ -204,7 +205,7 @@ respond(player, message)</code></pre></div><br>
                 coordinate your actions. This will prove invaluable when trying to clear more difficult waves.<br>
             Here's an example with messaging.<br><br>
             <div class="card card-outline-primary">
-<pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem">
+<pre><code class="python code-block">
 target = None
 
 # Response function for received messages.
@@ -247,33 +248,77 @@ Similarly, you can access the <code>attack_delay</code> and <code>attack_timer</
       <div class="card-header card-inverse card-success" style="color:#ffffff">
         <h4> Scripting Reference </h4>
         </div>
-      <div class="card-block">
-        <b>Warning, this is all outdated</b><br>
-        <b>Must define:</b><br>
-        <code>update(player, delta)</code><br><br>
-
-        <b>Can define:</b><br>
-        <code>respond(player, message)</code><br><br>
-
-        <b>Can access as libraries</b><br>
+        <div class="card-block">
+        <div class="card card-outline-danger">
+        <pre><code class="python code-block">
+update(player, delta)</code></pre></div><br>
+        <b>Must</b> be defined. This function is called each frame (30 times per second).<br>
+        <code>player</code> - current player's entity<br>
+        <code>delta</code> - time in seconds since the last frame<br>
+        <br>
+        <div class="card card-outline-danger">
+        <pre><code class="python code-block">
+respond(player, message)</code></pre></div><br>
+        <b>Should</b> be defined. This function is called whenever some player calls <code>say()</code>. If this function is not defined, the default behaviour is to do nothing when a message is received.<br>
+        <code>player</code> - current player's entity<br>
+        <code>message</code> - message object that was received<br>
+        <br>
+        <b>The following libraries can be used without having to <code>import</code> them.</b><br>
         <code>math</code><br>
         <code>random</code><br>
-        <code>sys</code><br>
-        <b><code>__builtins__</code></b>:<br>
+        <code>sys</code><br><br>
+        
+        <b>The following built in keywords are allowed</b>:<br>
         <code>abs</code>, <code>all</code>, <code>any</code>, <code>ascii</code>, <code>bin</code>, <code>bool</code>, <code>bytearray</code>, <code>bytes</code>, <code>callable</code>, <code>chr</code>, <code>classmethod</code>, <code>complex</code>, <code>delattr</code>, <code>dict</code>, <code>dir</code>, <code>divmod</code>, <code>enumerate</code>, <code>filter</code>, <code>float</code>, <code>format</code>, <code>frozenset</code>, <code>getattr</code>, <code>globals</code>, <code>hasattr</code>, <code>hash</code>, <code>help</code>, <code>hex</code>, <code>id</code>, <code>int</code>, <code>isinstance</code>, <code>issubclass</code>, <code>iter</code>, <code>len</code>, <code>list</code>, <code>locals</code>, <code>map</code>, <code>max</code>, <code>min</code>, <code>next</code>, <code>object</code>, <code>oct</code>, <code>ord</code>, <code>pow</code>, <code>property</code>, <code>range</code>, <code>repr</code>, <code>reversed</code>, <code>round</code>, <code>set</code>, <code>setattr</code>, <code>slice</code>, <code>sorted</code>, <code>staticmethod</code>, <code>str</code>, <code>sum</code>, <code>super</code>, <code>tuple</code>, <code>type</code>, <code>vars</code>, <code>zip
             </code>
         <br><br>
-        <b>Can access as lists:</b><br>
-        <code>enemies_visible</code><br>
-        <code>enemies_attackable</code><br>
-        <code>pickups_visible</code><br><br>
+        Note that <code>import</code> is not allowed for security reasons.<br><br>
+
+        <b>The following lists can be accessed</b>:<br>
+        <code class="code_main">enemies_visible</code> - 
+        Contains enemies within the player's visible range (given by <code>range_visible</code>).<br>
+        <code class="code_main">enemies_attackable</code> - 
+        Contains enemies within the player's attackable range (given by <code>range_attackable</code>).<br>
+        <code class="code_main">pickups_visible</code> - 
+        Contains pickups within the player's visible range (given by <code>range_visible</code>).<br><br>
 
         <b>Can access</b><br>
         <code>core</code><br><br>
 
-        <b>Can access as attributes (prepend with <code>player.</code>):</b><br>
-        (can also access most of these things for enemies and stuff)<br>
-        stuff in <b>bold</b> can be modified.<br>
+        <b>Base entity attributes</b><br>
+        <code class="code-main">tag</code> - identification number of given entity.<br>
+        <code class="code-main">pos</code> - position vector of given entity.<br>
+        <code class="code-main">vel</code> - velocity vector of given entity.<br>
+        <code class="code-main">speed</code> - maximum speed of given entity.<br>
+        <code class="code-main">size</code> - size vector of given entity.<br>
+        <code class="code-main">healthMax</code> - maximum health of given entity.<br>
+        <code class="code-main">health</code> - current health of given entity.<br><br>
+
+        <b>Player attributes</b><br>
+        <a data-toggle="collapse" class="clink" data-target="#p-entity">Inherited from Entity (click to collapse)</a>
+        <div class="collapse" id="p-entity">
+        <code class="code-main">tag</code> - identification number of given entity.<br>
+        <code class="code-main">pos</code> - position vector of given entity.<br>
+        <code class="code-main">vel</code> - velocity vector of given entity.<br>
+        <code class="code-main">speed</code> - maximum speed of given entity.<br>
+        <code class="code-main">size</code> - size vector of given entity.<br>
+        <code class="code-main">healthMax</code> - maximum health of given entity.<br>
+        <code class="code-main">health</code> - current health of given entity.<br><br>
+        </div><br>
+
+        Unique:<br>
+        <code>name</code><br>
+        <code>color</code><br>
+        <code>ammo</code><br>
+        <code>speed</code><br>
+        <code>damage</code><br>
+        <code>range_visible</code><br>
+        <code>range_attackable</code><br>
+        <code>attack_delay</code><br>
+        <code>attack_timer</code><br><br>
+
+        <b>Enemy attributes</b><br>
+        Inherited from Entity:<br>
         <code>tag</code><br>
         <code>pos</code><br>
         <code>vel</code><br>
@@ -282,20 +327,7 @@ Similarly, you can access the <code>attack_delay</code> and <code>attack_timer</
         <code>healthMax</code><br>
         <code>health</code><br><br>
 
-        For players, can also access:<br>
-        <code>name</code><br>
-        <code>color</code><br>
-        <code>ammo</code><br>
-        <code>speed</code><br>
-        <code>damage</code><br>
-
-        <code>range_visible</code><br>
-        <code>range_attackable</code><br>
-        <code>attack_delay</code><br>
-        <code>attack_timer</code><br><br>
-
-        For enemies, can also access:<br>
-
+        Unique:<br>
         <code>enemy_type</code><br>
         <code>is_boss</code><br>
         <code>range_visible</code><br>
@@ -303,11 +335,20 @@ Similarly, you can access the <code>attack_delay</code> and <code>attack_timer</
         <code>attack_delay</code><br>
         <code>attack_timer</code><br><br>
 
-        For pickups, can also access:<br>
+        <b>Pickup attributes</b><br>
+        Inherited from Entity:<br>
+        <code>tag</code><br>
+        <code>pos</code><br>
+        <code>vel</code><br>
+        <code>speed</code><br>
+        <code>size</code><br>
+        <code>healthMax</code><br>
+        <code>health</code><br><br>
+
+        Unique:<br>
         <code>pickup_type</code><br>
         <code>value</code><br><br>
 
-        <b>Can call:</b> (stuff in bold is probably pretty useful)<br>
         <b><code>print(message)</code></b><br>
         <b><code>shoot(enemy)</code></b><br>
         <b><code>get_nearest_enemy(enemy_type=None)</code></b><br>
