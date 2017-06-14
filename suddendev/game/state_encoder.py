@@ -112,7 +112,7 @@ class StateEncoder(json.JSONEncoder):
                 body = self.serializeEntity(e.body[0]);
             elif e.event_type == EventType.PLAYER_DEATH:
                 body = self.serializePlayer(e.body[0]);
-            elif e.event_type == EventType.POWERUP_SPAWN or e.event_type == EventType.POWERUP_USED:
+            elif e.event_type == EventType.PICKUP_SPAWN or e.event_type == EventType.PICKUP_USED:
                 body = self.serializePickup(e.body[0]);
             elif e.event_type == EventType.GAME_END or e.event_type == EventType.PRINT or e.event_type == EventType.ERROR:
                 body = e.body[0]

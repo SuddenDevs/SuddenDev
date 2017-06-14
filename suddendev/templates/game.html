@@ -287,13 +287,21 @@
                                           fill: "black",
                                           align: "center"});
 
-        var circle = new PIXI.Graphics();
-        circle.beginFill(data.color);
-        circle.drawCircle(0, 0, data.range_visible);
-        particle_layer.addChildAt(circle, 0);
-        circle.position = data.pos;
-        circle.alpha = 0.15;
-        circle.blendMode = PIXI.BLEND_MODES.LIGHTEN;
+        var attack_area = new PIXI.Graphics();
+        attack_area.lineStyle(4, data.color);
+        attack_area.drawCircle(0, 0, data.range_visible);
+        particle_layer.addChildAt(attack_area, 0);
+        attack_area.position = data.pos;
+        attack_area.alpha = 0.15;
+        attack_area.blendMode = PIXI.BLEND_MODES.EXCLUSION;
+
+        var visible_area = new PIXI.Graphics();
+        visible_area.beginFill(data.color);
+        visible_area.drawCircle(0, 0, data.range_attackable);
+        particle_layer.addChildAt(visible_area, 0);
+        visible_area.position = data.pos;
+        visible_area.alpha = 0.15;
+        visible_area.blendMode = PIXI.BLEND_MODES.LIGHTEN;
 
         //Glow
         player.container.filters = [new PIXI.filters.GlowFilter(6, 0.8, 0, data.color, 1)];
@@ -313,7 +321,10 @@
         player.container.addChild(name);
         player.ammo = ammo;
         player.name = name;
-        player.visible_area = circle;
+        particle_layer.addChildAt(visible_area, 0);
+        particle_layer.addChildAt(attack_area, 0);
+        player.visible_area = visible_area;
+        player.attack_area = attack_area;
       }
 
       function create_core(data) {
@@ -543,7 +554,48 @@
       }
 
       function clearup_player(tag) {
-        entity_layer.removeChild(playerDict[tag].container);
+        var p = playerDict[tag];
+        var emitter = new PIXI.particles.Emitter(
+                particle_layer,
+                [p.sprite.generateCanvasTexture()],
+                {
+                        color: {
+                          start: "0xffffff",
+                          end: "0xffffff"
+                        },
+                        alpha: {
+                                start: 0.9,
+                                end: 0.8
+                        },
+                        scale: {
+                                start: 0.7,
+                                end: 0.5
+                        },
+                        speed: {
+                                start: 150,
+                                end: 0
+                        },
+                        lifetime: {
+                                min: 0.4,
+                                max: 0.2
+                        },
+                        startRotation: {
+                          min: 0,
+                          max: 360
+                        },
+                        frequency: 0.0001,
+                        emitterLifetime: 0.01,
+                        maxParticles: 7,
+                        pos: {
+                                x: p.container.x,
+                                y: p.container.y
+                        },
+                        addAtBack: false,
+                        spawnType: "point",
+                }
+        );
+        entity_layer.removeChild(p.container);
+        emitter.playOnceAndDestroy();
         delete playerDict[tag];
       }
 
@@ -897,10 +949,13 @@
             case "Enemy_Death":
               clearup_enemy(body.tag);
               break;
-            case "Powerup_Spawn":
+            case "Player_Death":
+              clearup_player(body.tag);
+              break;
+            case "Pickup_Spawn":
               create_pickup(body);
               break;
-            case "Powerup_Used":
+            case "Pickup_Used":
               clearup_pickup(body.tag);
               break;
             case "Game_End":
@@ -972,8 +1027,6 @@
         mainText.visible = true;
 
         game_data.splice(0, 1);
-
-        //Wait...
       }
 
       function game_terminate() {
@@ -1069,6 +1122,7 @@
           update_entity(player, data, delta);
           player.ammo.text = data.ammo.toString();
           player.visible_area.position = data.pos;
+          player.attack_area.position = data.pos;
           if (player.message) {
             player.message.timer -= delta;
             if (player.message.timer <= 0) {

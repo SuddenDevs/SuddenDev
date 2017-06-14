@@ -83,7 +83,7 @@ class Game:
             player.pos = self.get_random_spawn(player.size)
             player.pos = self.core.pos\
                          + Vector(math.cos(angle), math.sin(angle))\
-                         * (self.core.size + player.size)
+                         * (self.core.size + player.size * 2)
             self.players.append(player)
 
     def events_add(self, event):
@@ -140,7 +140,7 @@ class Game:
             # Pickup pickups
             for pu in self.pickups:
                 if pu.intersects(p):
-                    self.events_add(Event(EventType.POWERUP_USED, pu))
+                    self.events_add(Event(EventType.PICKUP_USED, pu))
                     pu.pickup(p)
                     self.pickups.remove(pu)
 
@@ -167,7 +167,7 @@ class Game:
             pu = Pickup(self.get_random_spawn(self.gc.POW_SIZE), random.choice(pickupTypes))
             self.pickups.append(pu)
             self.pickup_count += 1
-            self.events_add(Event(EventType.POWERUP_SPAWN, pu))
+            self.events_add(Event(EventType.PICKUP_SPAWN, pu))
 
     def spawn_enemies(self):
         #Enemy Spawning
