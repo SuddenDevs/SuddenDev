@@ -26,7 +26,8 @@
                     "RESULT":'result',"UPDATE":'update',"TEST":'test',
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
                     "PLAY":'play', "ERROR":'message_error',
-                    "ROOM_MSG":"message_room", "GAME_RESULT":'message_result'};
+                    "ROOM_MSG":"message_room", "GAME_RESULT":'message_result',
+                    "TROPHY":"message_trophy"};
 
       var editor = null;
       var socket = null;
@@ -35,6 +36,7 @@
       var currentTab = 0;
       var playerID = {{user.id}};
       var players = [];
+      var trophyQueue = [];
 
       //Stage/shape drawer initialised, can be used in multiple functions
       var stage = null;
@@ -91,6 +93,9 @@
           socket.on(EVENTS.GAME_RESULT, function(data) {
             printToConsole(data, "#0F0");
           });
+          socket.on(EVENTS.TROPHY, function(data) {
+            trophyQueue.push(data);
+          })
         });
         window.onbeforeunload = function(e) {
             socket.emit(EVENTS.LEFT, {});
@@ -1025,6 +1030,7 @@
             text = "Core Destroyed"; 
             clearup_core();
             fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+            displayTrophies();
             break;
           case "Lose_Players":
             if (players.length > 1) {
@@ -1033,16 +1039,19 @@
               text = "You Died"
             }
             fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+            displayTrophies();
             break;
           case "Lose_Timeout":
             text = "Time up!"
             fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
+            displayTrophies();
             break;
           case "Win":
             text = "Wave " + wave_current + " complete!"
             fade.tint = PIXI.utils.rgb2hex([0, 1, 0]);
             break;
           default:
+            displayTrophies();
             text = "What happened?"
             console.log("Unknown ending: " + result);
         }
@@ -1051,6 +1060,13 @@
         mainText.visible = true;
 
         game_data.splice(0, 1);
+      }
+
+      function displayTrophies() {
+        while (trophyQueue.length > 0) {
+          printToConsole(trophyQueue[0], "#c99c20");
+          trophyQueue.splice(0, 1);
+        }
       }
 
       function game_terminate() {
@@ -1243,17 +1259,17 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col" style="flex: 0 0 auto; width: 800px; padding: 0; margin: 15px">
-          <div class="row" style="height:50px; margin:0">
-            <span>Your secret key is <code style="display:inline-block">{{ game_id }}</code></span>
+        <div class="col mainCol gameCol">
+          <div class="row topRow noMargin">
+            <span>Your secret key is <code class="inlineBlock">{{ game_id }}</code></span>
           </div>
-          <div class="row" style="margin:0">
+          <div class="row noMargin">
             <div id="gameDiv">
-              <canvas id="gameCanvas" width="800px" height="600px" style="display:block"></canvas>
+              <canvas id="gameCanvas" class="block" width="800px" height="600px"></canvas>
             </div>
           </div>
-          <div class="row" style="margin-top:10px">
-            <div class="col">
+          <div class="row btnRow">
+            <div class="col noPadding">
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
                   <button class="btn btn-outline-danger" onclick="leaveGame()">Leave Game</button>
@@ -1267,9 +1283,9 @@
             </div>
           </div>
         </div>
-        <div class="col" style="padding: 0; margin: 15px">
-          <div class="row" style="height:50px;width:100%">
-            <ul id="edit-tab" class="nav nav-tabs" style="width: 100%">
+        <div class="col mainCol">
+          <div class="row topRow noMargin">
+            <ul id="edit-tab" class="nav nav-tabs fullWidth">
                <li class="nav-item active" onClick="setEditorTab(0)">
                   <button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)">Player 1</button>
                 </li>
@@ -1284,23 +1300,23 @@
                 </li>
             </ul>
           </div>
-          <div class="row" style="height:600px; width: 100%;">
-            <div id="editor" class="greyBorder" style="width: 100%; height:70%; box-sizing: border-box; border-top: none"></div>
-            <div style="padding-top: 15px; width: 100%; height:30%; box-sizing: border-box">
-              <div class="card" style="height: 100%; width: 100%">
-                <div id="console" class="console card-block"></div>
+          <div class="row fullWidth noMargin midRow">
+            <div id="editor" class="greyBorder fullWidth"></div>
+            <div class="fullWidth consoleContainer">
+              <div class="card fullWidth fullHeight">
+                <div id="console" class="card-block"></div>
               </div>
             </div>
           </div>
-          <div class="row" style="width: 100%; margin-top: 10px">
-            <div class="col" style="padding: 0">
+          <div class="row btnRow">
+            <div class="col noPadding">
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
                   <button class="btn btn-outline-warning" onclick="revertCode()">Revert Changes</button>
                 </div>
                 <div class="btn-group">
                   <button class="btn btn-outline-info" onclick="submitCode()">Save Code</button>
-                  <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button"><b>Show me the docs!</b></a>
+                  <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button">Show me the docs!</a>
                 </div>
               </div>
             </div>

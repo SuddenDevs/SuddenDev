@@ -4,14 +4,6 @@
   border-color: #ccc;  
 }
 
-div.console{
-  overflow-y: auto;
-  overflow-x: hidden;
-  word-wrap: break-word;
-  padding: 10px;
-  text-align: left;
-}
-
 span.console{
   word-wrap: break-word;
   display: block;
@@ -22,4 +14,79 @@ span.console{
 .hidden{
   pointer-events: none;
   background-color: transparent;
+}
+
+.btn{
+  font-weight: bold;
+}
+
+.topRow{
+  height: 50px;
+  width: 100%;
+}
+
+.midRow{
+  height: 600px;
+}
+
+.mainCol{
+  margin: 15px;
+  padding: 0;
+}
+
+.gameCol{
+  width: 800px;
+  flex: 0 0 auto;
+}
+
+.inlineBlock{
+  display: inline-block;
+}
+
+.block{
+  display: block;
+}
+
+.btnRow{
+  width: 100%;
+  margin-top: 10px;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+}
+
+.fullWidth{
+  width: 100%;
+}
+
+.fullHeight{
+  height: 100%;
+}
+
+.noMargin{
+  margin:0;
+}
+
+.noPadding{
+  padding:0;
+}
+
+.consoleContainer{
+  padding-top: 15px;
+  height:30%;
+  box-sizing: border-box;
+}
+
+#editor{
+  height:70%;
+  box-sizing: border-box;
+  border-top: none;
+}
+
+#console{
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  padding: 10px;
+  text-align: left;
 }
