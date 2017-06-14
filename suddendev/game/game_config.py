@@ -60,6 +60,8 @@ class GameConfig:
     BOSS_STATS_SCALE = 10
     BOSS_WAVE_MULTIPLES = 5
 
+    BOSS_MINION_NUM = 5
+
     # Player
     P_SPEED = 80
     P_RANGE_VISIBLE = 300
@@ -72,10 +74,7 @@ class GameConfig:
 # Check the documentation to read more about how to script your bot!
 timer = 0
 timer_message = 3
-messages = ["Howdy, noobs.", "I can't read.", "How are you?",
-            "Script me, please.", "I wish I could script.", "Get away from my baby!",
-            "How dare you!", "I just wanted a hug.", "Take me to your leader.",
-            ":)", ":("]
+messages = ["Script me, please.", "I wish I could script.", "Read the docs!"]
 
 def update(player, delta):
     global timer

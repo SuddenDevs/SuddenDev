@@ -149,6 +149,22 @@ class Game:
             if e.health <= 0:
                 self.enemies.remove(e)
                 self.events_add(Event(EventType.ENEMY_DEATH, e))
+                if e.is_boss:
+                    # TODO make less ugly
+                    # Temporarily fake that we're in a lower wave to spawn non-boss enemies
+                    temp_gc = self.gc
+                    self.gc = GameConfig(self.wave - 1)
+                    self.wave -= 1
+                    types = [EnemyType.CORE_KILLER, EnemyType.PLAYER_KILLER]
+                    for i in range(self.gc.BOSS_MINION_NUM):
+                        position = Vector(e.pos.x, e.pos.y)
+                        position.x += random.randint(-e.size * 2, e.size * 2)
+                        position.y += random.randint(-e.size * 2, e.size * 2)
+                        self.gc.enemy_types.append(random.choice(types))
+                        self.spawn_enemy(position)
+                    self.wave += 1
+                    self.gc = temp_gc
+                    
             else:
                 pos = self.clamp_pos(e.update(delta))
                 if not self.collides_with_walls(pos, e.size):
@@ -168,22 +184,24 @@ class Game:
             self.pickup_count += 1
             self.events_add(Event(EventType.PICKUP_SPAWN, pu))
 
+    def spawn_enemy(self, position=None):
+        enemy_type=random.choice(self.gc.enemy_types)
+        self.gc.enemy_types.remove(enemy_type)
+        enemy = Enemy(self, enemy_type=enemy_type)
+        if position is None:
+            enemy.pos = random_pos_edge(enemy.size,
+                                        self.map.width, self.map.height)
+        else:
+            enemy.pos = position
+        self.enemies.append(enemy)
+        self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
+
     def spawn_enemies(self):
         #Enemy Spawning
         if (self.enemy_spawn_timer <= 0
             and self.gc.enemy_types
             and random.random() < self.gc.ENEMY_SPAWN_PROBABILITY):
-
-            # Spawn Enemy
-            # TODO: make this better
-            # Only spawn core killers and player killers for now
-            enemy_type=random.choice(self.gc.enemy_types)
-            self.gc.enemy_types.remove(enemy_type)
-            enemy = Enemy(self, enemy_type=enemy_type)
-            enemy.pos = random_pos_edge(enemy.size,
-                                        self.map.width, self.map.height)
-            self.enemies.append(enemy)
-            self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
+            self.spawn_enemy()
 
     def clamp_pos(self, pos):
         if pos.x < 0:
