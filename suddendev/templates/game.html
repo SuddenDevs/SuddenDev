@@ -969,10 +969,14 @@
               create_attack(body[0].pos, body[1].pos);
               break;
             case "Print":
-              printToConsole(body, "#F0F");
+                if (body[1].player_id == playerID) {
+                    printToConsole(body[0], "#F0F");
+                }
               break;
             case "Error":
-              printToConsole(body, "#F00");
+                if (body[1].player_id == playerID) {
+                    printToConsole(body[0], "#F00");
+                }
               break;
             case "Message_Sent":
               //printToConsole(body.source.name + " sent message: " + body.string, "#ABC");

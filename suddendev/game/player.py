@@ -18,8 +18,9 @@ import signal
 import traceback
 
 class Player(Entity):
-    def __init__(self, name, color, game, script):
+    def __init__(self, name, color, game, script, player_id):
         super().__init__()
+        self.player_id = player_id
         self.name = name
         self.color = color
         self.vel = Vector(random.random(), random.random())
@@ -116,7 +117,7 @@ class Player(Entity):
             del listing[0]
             del listing[0]
             # Set color to red to signify the bot is broken
-            self.game.events_add(Event(EventType.ERROR, listing))
+            self.game.events_add(Event(EventType.ERROR, listing, self))
             self.color = Color3(255,0,0)
             return False
 
@@ -157,7 +158,7 @@ class Player(Entity):
             del listing[0]
             del listing[0]
             # Set color to red to signify the bot is broken
-            self.game.events_add(Event(EventType.ERROR, listing))
+            self.game.events_add(Event(EventType.ERROR, listing, self))
             self.color = Color3(255,0,0)
             self.try_apply_script(self.game.gc.P_ERROR_SCRIPT, self.game)
 

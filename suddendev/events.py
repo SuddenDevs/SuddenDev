@@ -87,8 +87,10 @@ def test(message):
     player_jsons = get_players_in_room(game_id)
     player_names = []
     player_scripts = []
+    player_ids = []
     for player in player_jsons:
         player_names.append(player['name'])
+        player_ids.append(player['id'])
 
         # use the submitted script
         if player['id'] == player_id:
@@ -98,7 +100,7 @@ def test(message):
 
     wave = get_room_wave(game_id)
     fsio.emit('message_room', 'Testing against wave ' + str(wave), room=flask.request.sid, namespace=NAMESPACE)
-    handle = test_round.delay(game_id, player_names, player_scripts, NAMESPACE, flask.request.sid, wave=wave)
+    handle = test_round.delay(game_id, player_names, player_scripts, player_ids, NAMESPACE, flask.request.sid, wave=wave)
     cleared = handle.get()
     fsio.emit('message_result', 'Test run successfully!', room=flask.request.sid, namespace=NAMESPACE)
 
@@ -141,15 +143,17 @@ def manage_player_leaves(player_id):
 def run_game_if_everyone_ready(game_id):
     if all_players_are_ready(game_id):
         player_jsons = get_players_in_room(game_id)
+        player_ids = []
         player_names = []
         player_scripts = []
         for player in player_jsons:
+            player_ids.append(player['id'])
             player_names.append(player['name'])
             player_scripts.append(player['script'])
 
         fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
         wave = get_room_wave(game_id)
-        handle = play_game.delay(game_id, player_names, player_scripts, NAMESPACE, game_id, wave=1)
+        handle = play_game.delay(game_id, player_names, player_scripts, player_ids, NAMESPACE, game_id, wave=1)
         highest_wave = handle.get()
         set_room_wave(game_id, highest_wave + 1)
         fsio.emit('message_result', 'Run complete!', room=game_id, namespace=NAMESPACE)

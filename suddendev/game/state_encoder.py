@@ -42,6 +42,7 @@ class StateEncoder(json.JSONEncoder):
 
     def serializePlayer(self, p):
         json = self.serializeEntity(p)
+        json['player_id'] = p.player_id
         json['name'] = p.name
         json['ammo'] = p.ammo
         json['range_visible'] = p.range_visible
@@ -117,7 +118,10 @@ class StateEncoder(json.JSONEncoder):
             elif e.event_type == EventType.GAME_END:
                 body = e.body[0].value
             elif e.event_type == EventType.PRINT or e.event_type == EventType.ERROR:
-                body = e.body[0]
+                body = [
+                        e.body[0],
+                        self.serializePlayer(e.body[1])
+                        ]
             elif e.event_type == EventType.ATTACK:
                 body = [
                         self.serializeEntity(e.body[0]),
