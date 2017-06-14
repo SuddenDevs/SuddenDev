@@ -179,7 +179,7 @@ class Game:
                     e.pos = pos
 
     def spawn_pickups(self):
-        # pickupTypes = [PickupType.AMMO_UP, PickupType.HEALTH_UP]
+        # pickupTypes = [PickupType.AMMO, PickupType.HEALTH]
         pickupTypes = [pickup for _, pickup in PickupType.__members__.items()]
 
         #Pickup Spawning

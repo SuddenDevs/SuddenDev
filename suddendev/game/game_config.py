@@ -104,8 +104,8 @@ def update(player, delta):
 
     # Powerups
     POW_SIZE = 14
-    POW_AMMO_UP_VALUE = 10
-    POW_HEALTH_UP_VALUE = 50 
+    POW_AMMO_VALUE = 10
+    POW_HEALTH_VALUE = 50 
 
     # Limit of powerups spawned per wave
     BASE_POW_LIMIT = 15

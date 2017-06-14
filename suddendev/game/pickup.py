@@ -11,15 +11,15 @@ class Pickup(Entity):
         self.size = gc.POW_SIZE
         self.value = 0
 
-        if self.pickup_type == PickupType.AMMO_UP:
-            self.value = gc.POW_AMMO_UP_VALUE
-        elif self.pickup_type == PickupType.HEALTH_UP:
-            self.value = gc.POW_HEALTH_UP_VALUE
+        if self.pickup_type == PickupType.AMMO:
+            self.value = gc.POW_AMMO_VALUE
+        elif self.pickup_type == PickupType.HEALTH:
+            self.value = gc.POW_HEALTH_VALUE
 
     def pickup(self, player):
-        if self.pickup_type == PickupType.AMMO_UP:
+        if self.pickup_type == PickupType.AMMO:
             player.ammo += self.value
-        elif self.pickup_type == PickupType.HEALTH_UP:
+        elif self.pickup_type == PickupType.HEALTH:
             player.health = min(self.healthMax, player.health + self.value)
 
     def intersects(self, player):
@@ -28,5 +28,5 @@ class Pickup(Entity):
         return distance <= radii
 
 class PickupType(Enum):
-    AMMO_UP = 'ammo'
-    HEALTH_UP = 'health'
+    AMMO = 'ammo'
+    HEALTH = 'health'
