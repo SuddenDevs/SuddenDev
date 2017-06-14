@@ -7,7 +7,8 @@
 	  <center>
 	    <a href="{{ url_for('.index') }}">
               <img style="max-width:50%; max-height:50%;" src="{{ url_for('static', filename='logo.png')}}">
-	    </a>
+            </a><br>
+            <img src="{{url_for('static', filename='subtitle.gif')}}">
 	  </center>
         </div>
       </div>
@@ -23,9 +24,13 @@
     <div class="container">
       <div class="row align-items-center">
         <div class="col">
-      	  <a href="{{ url_for('.home') }}">
-            <img style="max-width:50%; max-height:50%;" src="{{ url_for('static', filename='logo.png')}}">
-      	  </a>
+	  <a href="{{ url_for('.home') }}">
+            <div>
+              <img style="max-width:50%; max-height:50%;" src="{{ url_for('static', filename='logo.png')}}">
+              <br>
+              <img src="{{url_for('static', filename='subtitle.gif')}}" style="display:inline-block; horizontal-align: middle;">
+            </div>
+	  </a>
         </div>
         <div class="col-md-1">
           <img src="{{ picture }}" class="rounded-circle img-fluid">
