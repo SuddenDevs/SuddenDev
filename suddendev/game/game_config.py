@@ -109,9 +109,12 @@ def update(player, delta):
     POW_HEALTH_UP_VALUE = 50 
 
     # Limit of powerups spawned per wave
-    POW_LIMIT = 15
+    BASE_POW_LIMIT = 15
+
     POW_SPAWN_DELAY = 3
     POW_SPAWN_PROBABILITY = 0.02
+
+    POW_LIMIT_SCALE = 2
 
     def __init__(self, wave):
         if wave <= 0:
@@ -138,6 +141,8 @@ def update(player, delta):
         self.ENEMY_DAMAGE = self.BASE_ENEMY_DAMAGE + scale * self.ENEMY_DAMAGE_SCALE
         self.ENEMY_SPAWN_DELAY = self.BASE_ENEMY_SPAWN_DELAY + scale * self.ENEMY_SPAWN_DELAY_SCALE
         self.ENEMY_SPAWN_PROBABILITY = self.BASE_ENEMY_SPAWN_PROBABILITY + scale * self.ENEMY_SPAWN_PROBABILITY_SCALE
+
+        self.POW_LIMIT = self.BASE_POW_LIMIT + scale * POW_LIMIT_SCALE
 
         self.set_spawn_enemies(wave)
 
