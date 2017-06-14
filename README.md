@@ -71,5 +71,5 @@ If you are looking to try deploying the code to a Heroku app yourself you'll nee
 
 - add the postgresql add-on to your heroku app
 - run 'heroku run python clear-db.py' to initialise the database
-- set the APP_SETTINGS and SECRET_KEY envvars on the app, e.g. 'heroku config:set APP_SETTINGS=suddendev.config.ProductionConfig'
+- set the APP_SETTINGS envvars on the app, e.g. 'heroku config:set APP_SETTINGS=suddendev.config.ProductionConfig'
 - update the deploy settings in .travis.yml to deploy to your Heroku app and use your own encrypted Heroku API key

@@ -7,7 +7,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.environ['SECRET_KEY']
+    SECRET_KEY = os.urandom(32)
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     CELERY_BROKER_URL = os.environ['REDIS_URL']
     CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
