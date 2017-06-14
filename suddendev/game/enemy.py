@@ -91,7 +91,9 @@ class Enemy(Entity):
         nearest_player, distance = get_nearest(self, players, True)
 
         # Go towards him and start shooting
-        move_to(self, nearest_player)
+        if distance_to(self, nearest_player) > self.range_attackable:
+            move_to(self, nearest_player)
+
         enemy_shoot(self, nearest_player)
 
         return super().update(delta)
