@@ -37,11 +37,13 @@ class Map:
         self.height = height
 
 class Game:
-    def __init__(self, wave, player_names, scripts):
+    def __init__(self, wave, player_names, scripts, player_ids):
         self.walls = []
         self.events = []
         self.enemies = []
         self.pickups = []
+
+        self.stats = {}
 
         self.wave = wave
         self.gc = GameConfig(wave)
@@ -64,24 +66,30 @@ class Game:
         self.core.health = self.core.healthMax
 
         #Players
-        self.init_players(player_names, scripts)
+        self.init_players(player_names, scripts, player_ids)
 
         self.events_add(Event(EventType.GAME_START))
 
-    def init_players(self, player_names, scripts):
+    def init_players(self, player_names, scripts, player_ids):
         player_count = len(player_names)
         self.players = []
         for i in range(player_count):
             name = player_names[i]
             script = scripts[i]
+            player_id = player_ids[i]
 
             angle = i * 2 * math.pi / player_count - math.pi/2
-            player = Player(name, random_color3(), self, script)
+            player = Player(name, random_color3(), self, script, player_id)
             player.pos = self.get_random_spawn(player.size)
             player.pos = self.core.pos\
                          + Vector(math.cos(angle), math.sin(angle))\
                          * (self.core.size + player.size * 2)
+            self.init_player_stats(player_id)
             self.players.append(player)
+
+    def init_player_stats(self, player_id):
+        self.stats[player_id] = dict()
+        self.stats[player_id]['kills'] = 0
 
     def events_add(self, event):
         self.events.append(event)

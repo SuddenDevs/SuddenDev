@@ -23,20 +23,25 @@
              </ol>
           </b>
         </div>
+      {% elif not user.wave10_trophy %}
+        <div class="alert alert-success">
+          <strong>Great Start!</strong>
+          <p>Your journey has just begun! Try and recruit a few others and remember
+	  that the <a href="{{ url_for('.docs') }}">docs</a> are the key to success.</p>
+        </div>
+      {% elif not user.wave15_trophy %}
+        <div class="alert alert-success">
+          <strong>Impressive!</strong>
+          <p>You're on your way to mastery! Read up on messaging and really think about
+	  some top-level strategies and the different roles you can play.</p>
+        </div>
       {% else %}
         <div class="alert alert-success">
-          <strong>Not bad!</strong>
-          <p>You're on your way to mastery! Few things you should check out to get there:</p>
-          <br>
-          <b>
-            <ol>
-	      <li>Read up on <a href="{{ url_for('.docs') }}">messaging</a></li>
-              <br>
-	      <li>Grab some other people, 3 ideally</li>
-              <br>
-              <li>Write some super-cool strategies</li>
-             </ol>
-          </b>
+          <strong>Insane!</strong>
+          <p>You've done what even us (the devs) struggled to do. There infinite waves
+	  so keep pushing from here and experiment. What's the optimal strategy?</p>
+
+	  <p>Also, please don't forget to throw some feedback our way on <b>suddendevcontact@gmail.com</b></p>
         </div>
       {% endif %}
 

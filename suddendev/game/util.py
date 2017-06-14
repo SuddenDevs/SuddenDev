@@ -12,7 +12,7 @@ def user_print(self, message):
     if self is None or message is None:
         return
 
-    self.game.events_add(Event(EventType.PRINT, str(message)))
+    self.game.events_add(Event(EventType.PRINT, str(message), self))
 
 def shoot(self, enemy):
     _shoot(self, enemy, is_player=True)
@@ -42,6 +42,10 @@ def _shoot(self, enemy, is_player):
             # Add event
             self.game.events_add(Event(EventType.ATTACK, self, enemy))
 
+            from .enemy import Enemy
+            if isinstance(enemy, Enemy) and enemy.health <= 0:
+                self.game.stats[self.player_id]['kills'] += 1
+
 # Broadcasts a message to all players, excluding the sender. string has to be
 # set in order for the message to be sent. If only one argument is provided as
 # the body, the argument is unpacked from a list to the object itself for convenience.
@@ -69,7 +73,15 @@ def _say(self, string, to_self, body):
                     p.script_respond(p.dummy, msg)
                     signal.alarm(0)
                 except Exception:
-                    self.game.add_error(traceback.format_exc())
+                    # Format traceback
+                    exp, val, tb = sys.exc_info()
+                    listing = traceback.format_exception(exp, val, tb)
+
+                    del listing[0]
+                    del listing[0]
+                    # Set color to red to signify the bot is broken
+                    self.game.events_add(Event(EventType.ERROR, listing, self))
+                    self.color = Color3(255,0,0)
                     p.script_respond = None
 
 # Returns distance from self to the target's position.

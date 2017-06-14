@@ -1,0 +1,20 @@
+.code-main {
+    font-size: 20px;
+}
+
+.code-block {
+    font-size: 18px; 
+    padding-left: 1rem;
+}
+
+.card-inverse, .card-success {
+  color: #ffffff;
+}
+
+.python {
+  background-color:#ffffff;
+}
+
+.clink {
+    color: #1111ff;
+}

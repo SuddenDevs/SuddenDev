@@ -6,10 +6,10 @@ import datetime
 import time
 
 class GameInstance:
-    def __init__(self, game_id, player_names, scripts, wave=1):
+    def __init__(self, game_id, player_names, scripts, player_ids, wave=1):
         self.game_id = game_id
         self.start_time = datetime.datetime.now()
-        self.game = Game(wave, player_names, scripts)
+        self.game = Game(wave, player_names, scripts, player_ids)
 
     #Generator
     def run(self):
@@ -45,3 +45,6 @@ class GameInstance:
     def was_cleared(self):
         """Returns a boolean indicating whether the wave was cleared, after gameplay."""
         return self.game.was_cleared()
+
+    def get_stats(self):
+        return self.game.stats
