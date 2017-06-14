@@ -38,17 +38,17 @@ class GameConfig:
     # Probability of an enemy spawning on each frame, if the enemy limit has
     # not been reached. The expected number of frames between enemy spawn is
     # given by 1/ENEMY_SPAWN_PROBABILITY, given by the Binomial distribution.
-    BASE_ENEMY_SPAWN_PROBABILITY = 0.1
+    BASE_ENEMY_SPAWN_PROBABILITY = 0.05
 
     # Difficulty scaling
     # Increased by x = x + wave_number * scale
-    ENEMY_HEALTH_SCALE = 20
+    ENEMY_HEALTH_SCALE = 10
     ENEMY_SPEED_SCALE = 1
-    ENEMY_DAMAGE_SCALE = 2
+    ENEMY_DAMAGE_SCALE = 1
     ENEMY_RANGE_ATTACKABLE_SCALE = 1
     ENEMY_RANGE_VISIBLE_SCALE = 10
     ENEMY_SPAWN_DELAY_SCALE = 0
-    ENEMY_SPAWN_PROBABILITY_SCALE = 0.1
+    ENEMY_SPAWN_PROBABILITY_SCALE = 0.01
 
     # How many enemies of each type should be spawned each wave
     BASE_ENEMY_TYPE_LIMIT = 2
@@ -67,8 +67,8 @@ class GameConfig:
     P_AMMO = 10
     P_DAMAGE = 75
     P_ATTACK_DELAY = 10
-    P_DEFAULT_SCRIPT = """
-# Default script
+    P_ERROR_SCRIPT = """
+# Script that runs when the user submitted script is broken.
 # Check the documentation to read more about how to script your bot!
 timer = 0
 timer_message = 3
@@ -78,14 +78,22 @@ messages = ["Howdy, noobs.", "I can't read.", "How are you?",
             ":)", ":("]
 
 def update(player, delta):
-    # Find the nearest enemy, move towards it and shoot it
     global timer
     global timer_message
     timer += delta
     if timer >= timer_message:
         timer_message = random.random() * 2 + 3
         timer = 0
-        say(messages[random.randrange(len(messages))])
+        say(random.choice(messages))
+"""
+    P_DEFAULT_SCRIPT = """
+# Default script
+# Check the documentation to read more about how to script your bot!
+def update(player, delta):
+    # Find the nearest enemy, move towards it and shoot it
+    nearest = get_nearest_enemy()
+    move_to(nearest)
+    shoot(nearest)
 """
 
     # Entity
