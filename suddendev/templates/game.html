@@ -689,18 +689,6 @@
         emitter.playOnceAndDestroy();
       }
 
-      function find_entity(tag) {
-        //Players
-        if (tag in playerDict) {
-          return playerDict[tag];
-        } else if (tag in enemies) {
-          return enemies[tag];
-        } else if (core.tag == tag) {
-          return core;
-        }
-        return null;
-      }
-
       //Update player details/scripts
       function updateRoom(data) {
         var room = JSON.parse(data);
@@ -933,6 +921,7 @@
             game_data_current.splice(0, 1);
           } else {
             //Waiting for more data...
+            console.log("Waiting for data...")
           }
         } else if (timer_end > 0) {
           var param = Math.min(timer_end / TIME_AFTER_END, 1);

@@ -77,13 +77,22 @@
             <h4> The Basics </h4><br>
             In your script, you only need to define one function:<br><br>
             <div class="card card-outline-danger">
-            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
-update(player, delta)</code></pre></div>
+            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:2rem">
+def update(player, delta):
+  #insert behaviour here</code></pre></div>
             <br>
             This function will be called 30 times per second when the game is running. What you write in it will determine how your triangle behaves.
             The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
-            We've provided some built-in functions to help you get started:<br><br>
+            To move around, you can set the <code>vel</code> property of your player. For example, move to the right:
+            <div class="card card-outline-danger">
+            <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
+def update(player, delta):
+  player.vel = Vector(10, 0)
+            </code></pre></div>
+            <br>
+            The unit of distance in this game is the pixel, so a speed of 10 means 10 pixels per second. We've provided some built-in functions to help you with handling vectors, distances, and movement.
+            
             <div class="card card-outline-danger">
             <pre><code class="python" style="background-color:#ffffff; font-size:18px; padding-left:3rem"> 
 move_to(position)
