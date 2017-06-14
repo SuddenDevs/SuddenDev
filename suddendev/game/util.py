@@ -12,7 +12,7 @@ def user_print(self, message):
     if self is None or message is None:
         return
 
-    self.game.events_add(Event(EventType.PRINT, str(string)))
+    self.game.events_add(Event(EventType.PRINT, str(message)))
 
 def shoot(self, enemy):
     _shoot(self, enemy, is_player=True)
