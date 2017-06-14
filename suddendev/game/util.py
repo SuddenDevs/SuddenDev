@@ -3,6 +3,7 @@ from .entity import Entity
 from .message import Message
 from .event import Event, EventType
 from .enemy_type import EnemyType
+from .color import Color3
 import sys
 import signal
 import traceback

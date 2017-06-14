@@ -1033,7 +1033,6 @@
             text = "Core Destroyed"; 
             clearup_core();
             fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
-            displayTrophies();
             break;
           case "Lose_Players":
             if (players.length > 1) {
@@ -1042,21 +1041,21 @@
               text = "You Died"
             }
             fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
-            displayTrophies();
             break;
           case "Lose_Timeout":
             text = "Time up!"
             fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
-            displayTrophies();
             break;
           case "Win":
             text = "Wave " + wave_current + " complete!"
             fade.tint = PIXI.utils.rgb2hex([0, 1, 0]);
             break;
           default:
-            displayTrophies();
             text = "What happened?"
             console.log("Unknown ending: " + result);
+        }
+        if (result != "Win") {
+          displayTrophies();
         }
 
         mainText.text = text;
