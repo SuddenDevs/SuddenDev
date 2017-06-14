@@ -763,11 +763,8 @@
         scripts.push({"script":player.script, "id":player.id, "name":player.name});
         var t = document.getElementById("tab" + (players.length - 1));
         t.innerHTML = player.name.substring(0, TAB_NAME_CHAR_LIMIT);
-        if (t.classList.contains("disabled")) {
-          t.classList.remove("disabled");
-          if (players.length - 1 == 0) {
-            editor.setValue(scripts[0].script);
-          }
+        if (t.classList.contains("hidden")) {
+          t.classList.remove("hidden");
         }
         return true;
       }
@@ -1189,16 +1186,17 @@
       }
 
       function setEditorTab(tabi) {
-        var tabs = document.getElementsByClassName("tabBtn");
-        tabs[currentTab].classList.toggle("disabled");
-        tabs[currentTab].classList.toggle("active");
-        tabs[tabi].classList.toggle("active");
-        tabs[currentTab].classList.toggle("disabled");
-        scripts[currentTab].script = editor.getValue();
+        var oldt = document.getElementById("tab" + currentTab);
+        oldt.classList.remove("active");
+        var newt = document.getElementById("tab" + tabi);
+        newt.classList.add("active");
+        if (oldt === "tab0") {
+          scripts[0].script = editor.getValue();
+        }
+        currentTab = tabi;
         editor.setValue(scripts[tabi].script);
         editor.setReadOnly(tabi != 0);
         editor.focus();
-        currentTab = tabi;
       }
 
       //Initialise the editor
@@ -1267,31 +1265,26 @@
           </div>
         </div>
         <div class="col" style="padding: 0; margin: 15px">
-          <div class="row" style="height:50px;width:100%;margin:0">
-            <ul id="edit-tab" class="nav nav-tabs" style="position:absolute;">
+          <div class="row" style="height:50px;width:100%">
+            <ul id="edit-tab" class="nav nav-tabs" style="width: 100%">
                <li class="nav-item active" onClick="setEditorTab(0)">
                   <button id="tab0" class="nav-link active" onClick="setEditorTab(0)">Player 1</button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab1" class="nav-link noEvents" onclick="setEditorTab(1)">Player 2</button>
+                  <button id="tab1" class="nav-link hidden" onclick="setEditorTab(1)"></button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab2" class="nav-link noEvents" onclick="setEditorTab(2)">Player 3</button>
+                  <button id="tab2" class="nav-link hidden" onclick="setEditorTab(2)"></button>
                 </li>
                 <li class="nav-item">
-                  <button id="tab3" class="nav-link noEvents" onclick="setEditorTab(3)">Player 4</button>
+                  <button id="tab3" class="nav-link hidden" onclick="setEditorTab(3)"></button>
                 </li>
             </ul>
-            <script>
-              $(function() {
-                $("#edit-tab a:last").tab("show")
-              })
-            </script>
           </div>
-          <div class="row" style="height:600px; width: 100%; display: flex; flex-direction: column; align-content: stretch">
-            <div id="editor" class="greyBorder" style="width: 100%; flex: 7 1 auto; box-sizing: border-box;"></div>
-            <div style="display: flex; align-content: stretch; flex-direction: column; padding-top: 15px; width: 100%; flex: 3 1 auto; box-sizing: border-box;">
-              <div class="card" style="flex: 1 1 auto">
+          <div class="row" style="height:600px; width: 100%;">
+            <div id="editor" class="greyBorder" style="width: 100%; height:70%; box-sizing: border-box; border-top: none"></div>
+            <div style="padding-top: 15px; width: 100%; height:30%; box-sizing: border-box">
+              <div class="card" style="height: 100%; width: 100%">
                 <div id="console" class="console card-block"></div>
               </div>
             </div>
