@@ -37,7 +37,7 @@ class Player(Entity):
         signal.signal(signal.SIGALRM, timeout_handler)
 
         if not self.try_apply_script(script, self.game):
-            self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, self.game)
+            self.try_apply_script(self.game.gc.P_ERROR_SCRIPT, self.game)
 
     def reset_dummy(self):
         self.dummy.tag = self.tag 
@@ -149,7 +149,7 @@ class Player(Entity):
             signal.alarm(0)
         except Exception:
             # If script is broken, set color to red to signify the bot is broken
-            # and reset to default script
+            # and reset to error script
             # Format traceback
             exp, val, tb = sys.exc_info()
             listing = traceback.format_exception(exp, val, tb)
@@ -159,7 +159,7 @@ class Player(Entity):
             # Set color to red to signify the bot is broken
             self.game.events_add(Event(EventType.ERROR, listing))
             self.color = Color3(255,0,0)
-            self.try_apply_script(self.game.gc.P_DEFAULT_SCRIPT, self.game)
+            self.try_apply_script(self.game.gc.P_ERROR_SCRIPT, self.game)
 
         # Check for sanity (restrict velocity)
         if Vector.Length(self.dummy.vel) > self.speed:
