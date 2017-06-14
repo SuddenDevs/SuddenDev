@@ -9,37 +9,28 @@
       <br>
       {% if not user.wave5_trophy %}
         <div class="alert alert-success">
-          <strong>Looks like you're new here, so let's get you up to speed!</strong>
+          <strong>Looks like you're new here. Let's get you up to speed!</strong>
           <p>The documentation is your survival companion.<br>
-          But who wants to read that, eh? Open the docs in a tab, for reference, and follow these simple steps:</p>
-          <br>
-          <b>
-            <ol>
-              <li>Create a game and play around with the default script</li>
-              <br>
-              <li>Invite friends to join your team</li>
-              <br>
-              <li>Use messages to craft advanced strategies</li>
-             </ol>
-          </b>
+          Open the <a href="{{ url_for('.docs') }}">docs<a>, create a game, and grab some snacks.
+          Sit down with your friends and start cooking up some killer scripts.
         </div>
       {% elif not user.wave10_trophy %}
         <div class="alert alert-success">
-          <strong>Great Start!</strong>
-          <p>Your journey has just begun! Try and recruit a few others and remember
-	  that the <a href="{{ url_for('.docs') }}">docs</a> are the key to success.</p>
+          <strong>You're getting the hang of this!</strong>
+          <p>You are still a young triangle. Try and recruit some friends - they're the secret to success!
+	  Don't forget about the <a href="{{ url_for('.docs') }}">docs</a>, though.</p>
         </div>
       {% elif not user.wave15_trophy %}
         <div class="alert alert-success">
-          <strong>Impressive!</strong>
-          <p>You're on your way to mastery! Read up on messaging and really think about
-	  some top-level strategies and the different roles you can play.</p>
+          <strong>You beat Wave 10? Impressive!</strong>
+          <p>You're on your way to mastery! Read up on messaging and think about
+	  some high-level strategies. Consider assigning different roles to your teammates.</p>
         </div>
       {% else %}
         <div class="alert alert-success">
           <strong>Insane!</strong>
-          <p>You've done what even us (the devs) struggled to do. There infinite waves
-	  so keep pushing from here and experiment. What's the optimal strategy?</p>
+          <p>You've done what even us (the devs) struggled to do. There are infinite waves
+	  so keep pushing and experimentng. What's the optimal strategy?</p>
 
 	  <p>Also, please don't forget to throw some feedback our way on <b>suddendevcontact@gmail.com</b></p>
         </div>
@@ -77,7 +68,7 @@
             {% if user.wave10_trophy %}
               <p class="card-text">You subdued Wave 10. No big deal.</p>
             {% else %}
-              <p class="card-text">Now we're getting somewhere. Wave 10 is waiting for you.</p>
+              <p class="card-text">Going up in the world? Not so fast! Wave 10 is waiting for you.</p>
             {% endif %} 
           </div>
         </div>
