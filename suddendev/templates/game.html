@@ -1235,8 +1235,11 @@
         s.innerHTML = data + "\n";
         s.classList.add("console");
         s.style.color = color;
+        var scrollAtBottom = c.scrollHeight - c.clientHeight <= c.scrollTop + 1;
         c.appendChild(s);
-        c.scrollTop = c.scrollHeight;
+        if (scrollAtBottom) {
+          c.scrollTop = c.scrollHeight;
+        }
       }
 
       function toggleClasses(id, classes, add) {
