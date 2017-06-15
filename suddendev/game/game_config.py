@@ -63,6 +63,10 @@ class GameConfig:
     BOSS_MINION_NUM = 5
 
     # Player
+    # How many messages a player can send per frame.
+    P_MESSAGE_LIMIT = 5
+
+    # Attributes
     P_SPEED = 80
     P_RANGE_VISIBLE = 200
     P_RANGE_ATTACKABLE = 80

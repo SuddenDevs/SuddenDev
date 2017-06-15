@@ -96,8 +96,6 @@ class StateEncoder(json.JSONEncoder):
         json = {
                 'source' : self.serializePlayer(message.source),
                 'string' : message.string,
-                'to_self' : message.to_self,
-                'body' : message.body
                 }
         return json
 
