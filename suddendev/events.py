@@ -124,6 +124,7 @@ def play(message):
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
     set_player_ready(game_id, player_id)
+    update_players(game_id)
 
     # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)

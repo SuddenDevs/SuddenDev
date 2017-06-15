@@ -27,7 +27,7 @@
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
                     "PLAY":'play', "ERROR":'message_error',
                     "ROOM_MSG":"message_room", "GAME_RESULT":'message_result',
-                    "TROPHY":"message_trophy", "READY": 'ready'};
+                    "TROPHY":"message_trophy"};
 
       var editor = null;
       var socket = null;
@@ -95,9 +95,6 @@
           });
           socket.on(EVENTS.TROPHY, function(data) {
             trophyQueue.push(data);
-          });
-          sockey.on(EVENTS.READY, function(data) {
-            readyPlayer(data);
           });
         });
         window.onbeforeunload = function(e) {
@@ -178,11 +175,6 @@
           grid.lineTo(renderer.width, i * cell_size);
         }
         background_layer.addChildAt(grid, 0);
-      }
-
-      function readyPlayer(id) {
-        i = getScript(id);
-        toggleClasses("tab" + i, ["ready"], true);
       }
 
       function game_start() {
@@ -705,7 +697,6 @@
       function updateRoom(data) {
         var room = JSON.parse(data);
 
-        var i;
         //Check if player has joined
         for (var i = 0; i < room.players.length; i++) {
           if (room.players[i].id == playerID) {
@@ -718,7 +709,7 @@
         for (var j = 0; j < room.players.length; j++) {
           tryAddPlayer(room.players[j]);
           if (room.players[j].id != playerID) {
-            var s = getScript(room.players[j].id);
+            var s = getPlayer(room.players[j].id);
             players[s].script = room.players[j].script;
             players[s].name = room.players[j].name;
             if (currentTab == s) {
@@ -726,8 +717,6 @@
             }
           }
         }
-
-        i = 0;
 
         //Check if players have left
         if (players.length > room.players.length) {
@@ -748,6 +737,8 @@
                 if (k >= players.length) {
                   tabs[k].innerHTML = "";
                   tabs[k].classList.add("hidden");
+                  tabs[k].classList.remove("ready");
+                  tabs[k].classList.remove("activeReady")
                   if (k == currentTab) {
                     setEditorTab(0);
                   }
@@ -760,9 +751,22 @@
             }
           }
         }
+
+        //Check if players are ready
+        for (var i = 0; i < room.players.length; i++) {
+          var j = getPlayer(room.players[i].id);
+          if (room.players[i].status === 'ready') {
+            var t = document.getElementById("tab" + j);
+            if (t.classList.contains("active")) {
+              t.classList.add("activeReady");
+            } else {
+              t.classList.add("ready");
+            }
+          }
+        }
       }
 
-      function getScript(id) {
+      function getPlayer(id) {
         for (var i = 0; i < players.length; i++) {
           if (players[i].id == id) {
             return i;
@@ -1069,8 +1073,8 @@
       function endGame() {
         toggleClasses("testBtn", ["greyOut", "noEvents", "active"], false);
         toggleClasses("readyBtn", ["greyOut", "noEvents", "active"], false);
-        for (var i = 0; i < scripts.length; i++) {
-          toggleClasses("tab" + i, ["ready"], false);
+        for (var i = 0; i < players.length; i++) {
+          toggleClasses("tab" + i, ["ready", "activeReady"], false);
         }
         while (trophyQueue.length > 0) {
           printToConsole(trophyQueue[0], "#c99c20");
@@ -1217,8 +1221,16 @@
       function setEditorTab(tabi) {
         var oldt = document.getElementById("tab" + currentTab);
         oldt.classList.remove("active");
+        if (oldt.classList.contains("activeReady")) {
+          oldt.classList.remove("activeReady");
+          oldt.classList.add("ready");
+        }
         var newt = document.getElementById("tab" + tabi);
         newt.classList.add("active");
+        if (newt.classList.contains("ready")) {
+          newt.classList.remove("ready");
+          newt.classList.add("activeReady");
+        }
         if (oldt === "tab0") {
           players[0].script = editor.getValue();
         }
