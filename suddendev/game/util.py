@@ -59,6 +59,12 @@ def say_also_to_self(self, string, *body):
 
 def _say(self, string, to_self, body):
     if self is not None and string is not None:
+        # Limit how many messages can be sent per frame.
+        if self.message_count >= self.message_limit:
+            return
+
+        self.message_count += 1
+
         if len(body) == 1:
             body = body[0]
         msg = Message(source=self, string=string, to_self=to_self, body=body)

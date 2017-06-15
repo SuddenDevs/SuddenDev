@@ -34,6 +34,9 @@ class Player(Entity):
         self.attack_delay = self.game.gc.P_ATTACK_DELAY
         self.attack_timer = 0
 
+        self.message_limit = self.game.gc.P_MESSAGE_LIMIT
+        self.message_count = 0
+
         # Register the handler for timing out user scripts
         signal.signal(signal.SIGALRM, timeout_handler)
 
@@ -58,6 +61,9 @@ class Player(Entity):
         self.dummy.attack_delay = self.attack_delay
         self.dummy.attack_timer = self.attack_timer
         self.dummy.ammo = self.ammo
+
+        self.dummy.message_limit = self.message_limit
+        self.dummy.message_count = 0
 
     def get_in_range(self, entities, dist):
         in_range = []
@@ -142,6 +148,8 @@ class Player(Entity):
 
         if self.attack_timer > 0:
             self.attack_timer -= 1
+
+        self.message_count = 0
 
         # Execute on Dummy Entity
         try:
