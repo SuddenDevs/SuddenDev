@@ -1320,7 +1320,8 @@
                 </div>
                 <div class="btn-group">
                   <button class="btn btn-outline-info" onclick="submitCode()">Commit</button>
-                  <button class="btn btn-outline-info" data-toggle="modal" data-target="#docModal">Show me the docs!</a>
+                  <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button" target="_blank">Help!</a>
+                  <!-- Modal Button: <button class="btn btn-outline-info" data-toggle="modal" data-target="#docModal">Show me the docs!</button> !-->
                 </div>
               </div>
             </div>
