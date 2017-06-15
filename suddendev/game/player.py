@@ -27,7 +27,7 @@ class Player(Entity):
         self.vel = Vector(random.random(), random.random())
         self.game = game
 
-        self.speed = self.game.gc.P_SPEED
+        self.speed_max = self.game.gc.P_SPEED
         self.range_visible = self.game.gc.P_RANGE_VISIBLE
         self.range_attackable = self.game.gc.P_RANGE_ATTACKABLE
         self.ammo = self.game.gc.P_AMMO
@@ -49,10 +49,10 @@ class Player(Entity):
         self.dummy.tag = self.tag 
         self.dummy.pos = self.pos 
         self.dummy.vel = self.vel 
-        self.dummy.speed = self.speed 
+        self.dummy.speed_max = self.speed_max
         self.dummy.size = self.size 
         self.dummy.health = self.health 
-        self.dummy.healthMax = self.healthMax 
+        self.dummy.health_max = self.health_max 
 
         self.dummy.name = self.name 
         self.dummy.color = self.color 
@@ -70,9 +70,16 @@ class Player(Entity):
     def get_in_range(self, entities, dist):
         in_range = []
         for p in entities:
-            if distance_to(self, p) <= dist:
-                in_range.append(p)
+            if distance_to(self, p) <= dist + p.size:
+                in_range.append(p.dummy)
         return in_range                
+
+    def player_list(self):
+        result = []
+        for p in self.game.players:
+            result.append(p.dummy)
+
+        return result
 
     def pickups_visible(self):
         return self.get_in_range(self.game.pickups, self.range_visible)
@@ -89,11 +96,13 @@ class Player(Entity):
 
         self.scope = {
             'math' : math,
+            'map_width' : self.game.get_map_width(),
+            'map_height' : self.game.get_map_height(),
             'Vector' : Vector,
             'PickupType' : PickupType,
             'EnemyType' : EnemyType,
             'Path' : Path,
-            'core' : game.core,
+            'core' : game.core.dummy,
             'random' : random,
             'sys' : sys,
 
@@ -155,6 +164,9 @@ class Player(Entity):
 
         self.message_count = 0
 
+        # Reset dummy
+        self.reset_dummy()
+
         # Execute on Dummy Entity
         try:
             signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
@@ -175,13 +187,10 @@ class Player(Entity):
             self.try_apply_script(self.game.gc.P_ERROR_SCRIPT, self.game)
 
         # Check for sanity (restrict velocity)
-        if Vector.Length(self.dummy.vel) > self.speed:
-            self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed
+        if Vector.Length(self.dummy.vel) > self.speed_max:
+            self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed_max
 
         self.vel = self.dummy.vel
-
-        # Reset dummy
-        self.reset_dummy()
 
         # Apply Motion
         return super().update(delta)
@@ -190,6 +199,7 @@ class Player(Entity):
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
         self.scope['pickups_visible'] = self.pickups_visible()
+        self.scope['players'] = self.player_list()
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)

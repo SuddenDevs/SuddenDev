@@ -62,8 +62,8 @@ class Game:
         #Core
         self.core = Core()
         self.core.pos = Vector(self.map.width/2, self.map.height/2)
-        self.core.healthMax = self.gc.CORE_HEALTH
-        self.core.health = self.core.healthMax
+        self.core.health_max = self.gc.CORE_HEALTH
+        self.core.health = self.core.health_max
 
         #Players
         self.init_players(player_names, scripts, player_ids)
@@ -170,7 +170,7 @@ class Game:
                         position.y += random.randint(-e.size * 2, e.size * 2)
                         self.gc.enemy_types.append(random.choice(types))
                         e = self.spawn_enemy(position)
-                        e.speed = 40
+                        e.speed_max = 40
                         e.damage = 1
                         e.attack_delay = 15
                         e.size = 5
@@ -234,6 +234,17 @@ class Game:
             if w.intersects(center, size):
                 return True
         return False
+    
+    def find_by_tag(self, tag):
+        for e in self.enemies:
+            if e.tag == tag:
+                return e
+        for e in self.players:
+            if e.tag == tag:
+                return e
+        if self.core.tag == tag:
+            return self.core
+        return None
 
     def get_random_spawn(self, size):
         """ Generates a random position that does not collide with any walls. """
@@ -246,3 +257,9 @@ class Game:
 
     def was_cleared(self):
         return self.cleared
+
+    def get_map_width(self):
+        return self.map.width
+
+    def get_map_height(self):
+        return self.map.height

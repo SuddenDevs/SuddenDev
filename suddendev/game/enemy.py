@@ -11,7 +11,7 @@ class Enemy(Entity):
         super().__init__()
         self.game = game
         self.pos = Vector(0,0)
-        self.speed = self.game.gc.ENEMY_SPEED
+        self.speed_max = self.game.gc.ENEMY_SPEED
 
         self.range_visible = self.game.gc.ENEMY_RANGE_VISIBLE
         self.range_attackable = self.game.gc.ENEMY_RANGE_ATTACKABLE
@@ -19,9 +19,9 @@ class Enemy(Entity):
         self.attack_delay = self.game.gc.ENEMY_ATTACK_DELAY
         self.attack_timer = 0
         self.size = self.game.gc.ENEMY_SIZE
-        self.healthMax = self.game.gc.ENEMY_HEALTH
-        self.health = self.healthMax
-        self.enemy_type=enemy_type
+        self.health_max = self.game.gc.ENEMY_HEALTH
+        self.health = self.health_max
+        self.enemy_type = enemy_type
 
         self.is_boss = self.game.wave % self.game.gc.BOSS_WAVE_MULTIPLES == 0
     
@@ -62,7 +62,7 @@ class Enemy(Entity):
 
         # If health < 50%, run away, otherwise run towards
         # Bosses never run from anyone
-        if self.is_boss or self.health >= self.healthMax / 2:
+        if self.is_boss or self.health >= self.health_max / 2:
             if distance > self.range_attackable:
                 move_to(self, nearest_player)
 

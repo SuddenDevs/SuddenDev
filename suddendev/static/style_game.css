@@ -4,11 +4,25 @@
   border-color: #ccc;  
 }
 
+.ready{
+  color: #fff !important;
+  background-color: #6bd66b !important;
+  border-color: #6bd66b !important;
+}
+
+.activeReady{
+  color: #6bd66b !important;
+  background-color: #fff !important;
+  border-color: #ccc !important;
+  font-weight: bold !important;
+}
+
 span.console{
   word-wrap: break-word;
   display: block;
   width: inherit;
   word-wrap: break-word;
+  font-family: "Courier New";
 }
 
 .hidden{

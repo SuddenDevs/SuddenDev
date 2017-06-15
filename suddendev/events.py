@@ -112,10 +112,9 @@ def test(message):
             player_scripts.append(player['script'])
 
     wave = get_room_wave(game_id)
-    fsio.emit('message_room', 'Testing against wave ' + str(wave), room=flask.request.sid, namespace=NAMESPACE)
+    fsio.emit('message_local', 'Testing against wave ' + str(wave), room=flask.request.sid, namespace=NAMESPACE)
     handle = test_round.delay(game_id, player_names, player_scripts, player_ids, NAMESPACE, flask.request.sid, wave=wave)
     cleared = handle.get()
-    fsio.emit('message_result', 'Test run successfully!', room=flask.request.sid, namespace=NAMESPACE)
 
 @socketio.on('play', namespace=NAMESPACE)
 def play(message):
@@ -124,6 +123,7 @@ def play(message):
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
     set_player_ready(game_id, player_id)
+    update_players(game_id)
 
     # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)

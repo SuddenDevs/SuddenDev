@@ -27,7 +27,7 @@
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
                     "PLAY":'play', "ERROR":'message_error',
                     "ROOM_MSG":"message_room", "GAME_RESULT":'message_result',
-                    "TROPHY":"message_trophy"};
+                    "TROPHY":"message_trophy", "LOCAL":'message_local'};
 
       var editor = null;
       var socket = null;
@@ -85,17 +85,20 @@
             updateRoom(data);
           });
           socket.on(EVENTS.ROOM_MSG, function(data) {
-            printToConsole(data, "#00F");
+            printToConsole("[ROOM]: " + data, "#00F");
           });
+          socket.on(EVENTS.LOCAL, function(data) {
+            printToConsole("[LOCAL]: " + data, "#666");
+          })
           socket.on(EVENTS.ERROR, function(data) {
-            printToConsole(data, "#F00");
+            printToConsole("[ERR]: " + data, "#F00");
           });
           socket.on(EVENTS.GAME_RESULT, function(data) {
-            printToConsole(data, "#0F0");
+            printToConsole("[RES]: " + data, "#0F0");
           });
           socket.on(EVENTS.TROPHY, function(data) {
             trophyQueue.push(data);
-          })
+          });
         });
         window.onbeforeunload = function(e) {
             socket.emit(EVENTS.LEFT, {});
@@ -180,7 +183,6 @@
       function game_start() {
         clear_current_game_data();
         fade.visible = false;
-        resetPause();
 
         //Get the next game in the queue
         game_data_current = game_data[0];
@@ -697,7 +699,6 @@
       function updateRoom(data) {
         var room = JSON.parse(data);
 
-        var i;
         //Check if player has joined
         for (var i = 0; i < room.players.length; i++) {
           if (room.players[i].id == playerID) {
@@ -710,7 +711,7 @@
         for (var j = 0; j < room.players.length; j++) {
           tryAddPlayer(room.players[j]);
           if (room.players[j].id != playerID) {
-            var s = getScript(room.players[j].id);
+            var s = getPlayer(room.players[j].id);
             players[s].script = room.players[j].script;
             players[s].name = room.players[j].name;
             if (currentTab == s) {
@@ -718,8 +719,6 @@
             }
           }
         }
-
-        i = 0;
 
         //Check if players have left
         if (players.length > room.players.length) {
@@ -740,6 +739,8 @@
                 if (k >= players.length) {
                   tabs[k].innerHTML = "";
                   tabs[k].classList.add("hidden");
+                  tabs[k].classList.remove("ready");
+                  tabs[k].classList.remove("activeReady")
                   if (k == currentTab) {
                     setEditorTab(0);
                   }
@@ -752,9 +753,22 @@
             }
           }
         }
+
+        //Check if players are ready
+        for (var i = 0; i < room.players.length; i++) {
+          var j = getPlayer(room.players[i].id);
+          if (room.players[i].status === 'ready') {
+            var t = document.getElementById("tab" + j);
+            if (t.classList.contains("active")) {
+              t.classList.add("activeReady");
+            } else {
+              t.classList.add("ready");
+            }
+          }
+        }
       }
 
-      function getScript(id) {
+      function getPlayer(id) {
         for (var i = 0; i < players.length; i++) {
           if (players[i].id == id) {
             return i;
@@ -805,7 +819,7 @@
       function game_test() {
         game_terminate();
         socket.emit(EVENTS.TEST, editor.getValue());
-        toggleClasses("testBtn", ["noEvents"], true);
+        toggleClasses("testBtn", ["active", "noEvents"], true);
         toggleClasses("readyBtn", ["greyOut", "noEvents"], true);
         test = true;
       }
@@ -973,12 +987,12 @@
               break;
             case "Print":
                 if (body[1].player_id == playerID) {
-                    printToConsole(body[0], "#F0F");
+                    printToConsole("[PRINT]: " + body[0], "#F0F");
                 }
               break;
             case "Error":
                 if (body[1].player_id == playerID) {
-                    printToConsole(body[0], "#F00");
+                    printToConsole("[ERR]: " + body[0], "#F00");
                 }
               break;
             case "Message_Sent":
@@ -1059,10 +1073,13 @@
       }
 
       function endGame() {
-        toggleClasses("testBtn", ["greyOut", "noEvents"], false);
+        toggleClasses("testBtn", ["greyOut", "noEvents", "active"], false);
         toggleClasses("readyBtn", ["greyOut", "noEvents", "active"], false);
+        for (var i = 0; i < players.length; i++) {
+          toggleClasses("tab" + i, ["ready", "activeReady"], false);
+        }
         while (trophyQueue.length > 0) {
-          printToConsole(trophyQueue[0], "#c99c20");
+          printToConsole("[TROPHY]: " + trophyQueue[0], "#c99c20");
           trophyQueue.splice(0, 1);
         }
       }
@@ -1178,36 +1195,19 @@
         }
       }
 
-      function resetPause() {
-        var b = document.getElementById("pauseBtn");
-        b.innerHTML = "Pause";
-        b.classList.remove("active");
-      }
-
-      //Pause game, update pause button
-      function togglePause() {
-        var on = false;
-        if (inGame) {
-          if (ticker.started) {
-            ticker.stop();
-            mainText.visible = true;
-            mainText.text = "Paused";
-            draw();
-          } else {
-            ticker.start();
-            mainText.visible = false;
-          }
-        }
-        var b = document.getElementById("pauseBtn");
-        b.innerHTML = (b.innerHTML === "Pause") ? "Unpause" : "Pause";
-        b.classList.toggle("active");
-      }
-
       function setEditorTab(tabi) {
         var oldt = document.getElementById("tab" + currentTab);
         oldt.classList.remove("active");
+        if (oldt.classList.contains("activeReady")) {
+          oldt.classList.remove("activeReady");
+          oldt.classList.add("ready");
+        }
         var newt = document.getElementById("tab" + tabi);
         newt.classList.add("active");
+        if (newt.classList.contains("ready")) {
+          newt.classList.remove("ready");
+          newt.classList.add("activeReady");
+        }
         if (oldt === "tab0") {
           players[0].script = editor.getValue();
         }
@@ -1235,8 +1235,11 @@
         s.innerHTML = data + "\n";
         s.classList.add("console");
         s.style.color = color;
+        var scrollAtBottom = c.scrollHeight - c.clientHeight <= c.scrollTop + 1;
         c.appendChild(s);
-        c.scrollTop = c.scrollHeight;
+        if (scrollAtBottom) {
+          c.scrollTop = c.scrollHeight;
+        }
       }
 
       function toggleClasses(id, classes, add) {
@@ -1271,9 +1274,6 @@
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
                   <button class="btn btn-outline-danger" onclick="leaveGame()">Leave Game</button>
-                </div>
-                <div class="btn-group">
-                  <button id="pauseBtn" class="btn btn-outline-info" onclick="togglePause()">Pause</button>
                 </div>
                 <div class="btn-group">
                   <button id="testBtn" class="btn btn-outline-info" onclick="game_test()">Test Code</button>
@@ -1312,10 +1312,10 @@
             <div class="col noPadding">
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
-                  <button class="btn btn-outline-warning" onclick="revertCode()">Revert Changes</button>
+                  <button class="btn btn-outline-warning" onclick="revertCode()">Revert</button>
                 </div>
                 <div class="btn-group">
-                  <button class="btn btn-outline-info" onclick="submitCode()">Commit Changes</button>
+                  <button class="btn btn-outline-info" onclick="submitCode()">Commit</button>
                   <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button">Show me the docs!</a>
                 </div>
               </div>

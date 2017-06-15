@@ -5,6 +5,11 @@ class Vector:
         self.x = float(x)
         self.y = float(y)
 
+    def __eq__(self, v):
+        epsilon = 0.005
+        return (math.fabs(self.x - v.x) < epsilon and
+                math.fabs(self.y - v.y) < epsilon)
+
     def __add__(self, val):
         return Vector( self[0] + val[0], self[1] + val[1] )
     

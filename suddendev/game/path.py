@@ -6,17 +6,56 @@ class Path:
     # of both.
     def __init__(self, *points):
         self.points = []
-
-        for p in points:
-            if isinstance(p, Vector):
-                self.points.append(p)
-            elif isinstance(p, tuple):
-                self.points.append(Vector(p[0], p[1]))
-
         self.current_index = None
+        self.set_points(points)
 
-        if self.points:
-            self.current_index = 0
+    # Converts argument to a vector, either from a vector or from a (x,y) tuple.
+    def arg_to_vector(self, point):
+        if isinstance(point, Vector):
+            return point
+        elif isinstance(point, tuple):
+            return Vector(point[0], point[1])
+
+        return None
+
+    # Returns whether a given point is in the path.
+    def contains_point(self, point):
+        vector = self.arg_to_vector(point)
+        for p in self.points:
+            if p == vector:
+                return True
+
+        return False
+
+    # Adds a new point to the path.
+    def add_point(self, point):
+        vector = self.arg_to_vector(point)
+        if vector is not None:
+            self.points.append(vector)
+            if self.current_index is None:
+                self.current_index = 0
+
+    # Sets path's points to the given list of points.
+    def set_points(self, points):
+        changed = False
+
+        if len(points) != len(self.points):
+            changed = True
+        else:
+            for i in range(len(points)):
+                p = self.arg_to_vector(points[i])
+                if p != self.points[i]:
+                    changed = True
+                    break
+
+        if changed:
+            for p in points:
+                self.add_point(p)
+            if self.points:
+                self.current_index = 0
+            else:
+                self.current_index = None
+
 
     # Returns true if path is either finished or there are no points in the path.
     def is_empty(self):

@@ -1,5 +1,5 @@
 from .vector import Vector
-from .entity import Entity
+from .entity import Entity, Dummy
 from .message import Message
 from .event import Event, EventType
 from .enemy_type import EnemyType
@@ -26,11 +26,15 @@ def _shoot(self, enemy, is_player):
     if self is None or enemy is None:
         return
 
+    enemy = self.game.find_by_tag(enemy.tag)
+    if enemy is None:
+        return
+
     # What is dead may never die
     if enemy.health <= 0:
         return
 
-    if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable and self.attack_timer == 0):
+    if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable + enemy.size and self.attack_timer == 0):
         if not is_player or self.ammo > 0:
             # Point towards the target
             self.vel = enemy.pos - self.pos
@@ -103,13 +107,19 @@ def distance_to(self, target):
 
     if isinstance(target, Entity):
         target = target.pos
+    elif isinstance(target, Dummy):
+        target = self.game.find_by_tag(target.tag)
+        if target is not None:
+            target = target.pos
+        else:
+            return sys.maxsize
     elif not isinstance(target, Vector):
         return sys.maxsize
 
     return Vector.Distance(self.pos, target)
 
 # Sets the velocity vector, scaled to the given speed, pointing to the target.
-# If speed is not given, defaults to self.speed.
+# If speed is not given, defaults to self.speed_max.
 def move_to(self, target, speed=None):
     if self is None or target is None:
         #user_print(self, '\'None\' type passed to move_to')
@@ -117,11 +127,17 @@ def move_to(self, target, speed=None):
 
     if isinstance(target, Entity):
         target = target.pos
+    elif isinstance(target, Dummy):
+        target = self.game.find_by_tag(target.tag)
+        if target is not None:
+            target = target.pos
+        else:
+            return
     elif not isinstance(target, Vector):
         return
 
     if speed is None:
-        speed = self.speed
+        speed = self.speed_max
 
     # Prevent spazzing out
     if is_at(self.pos, target):
@@ -139,7 +155,7 @@ def move_from(self, target, speed=None):
         return
 
     if speed is None:
-        speed = self.speed
+        speed = self.speed_max
 
     self.vel = Vector.Normalize(self.pos - target) * speed
 
