@@ -16,7 +16,7 @@
       var NAMEOFFS = 10;
       var EDITFONTSIZE = 15;
       var FRAMERATE = 60;
-      var WAITTEXT = "Press ready to begin!";
+      var WAITTEXT = "Press Test Code to try out your AI, or Start Game to begin!";
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
       var TIME_AFTER_END = 2; //How long to continue animating after round
@@ -147,7 +147,7 @@
           dropShadowAngle: Math.PI / 6,
           dropShadowDistance: 1,
           wordWrap: true,
-          wordWrapWidth: 440
+          wordWrapWidth: 600
         });
 
         mainText = new PIXI.Text(WAITTEXT, style);
@@ -204,7 +204,6 @@
 
         if (test) {
           toggleClasses("testBtn", ["greyOut", "noEvents"], false);
-          toggleClasses("readyBtn", ["noEvents"], false);
         }
 
         draw();
@@ -807,7 +806,7 @@
         game_terminate();
         socket.emit(EVENTS.TEST, editor.getValue());
         toggleClasses("testBtn", ["noEvents"], true);
-        toggleClasses("readyBtn", ["noEvents"], true);
+        toggleClasses("readyBtn", ["greyOut", "noEvents"], true);
         test = true;
       }
 
@@ -1019,9 +1018,10 @@
       function game_end(result) {
         timer_end = TIME_AFTER_END;
         inGame = false;
-        if (test) {
-          test = false;
+        if (result != "Win" || test) {
+          endGame();
         }
+        test=false;
         fade.visible = true;
         fade.alpha = 0;
         var text
@@ -1051,9 +1051,6 @@
             text = "What happened?"
             console.log("Unknown ending: " + result);
         }
-        if (result != "Win") {
-          endGame();
-        }
 
         mainText.text = text;
         mainText.visible = true;
@@ -1063,7 +1060,7 @@
 
       function endGame() {
         toggleClasses("testBtn", ["greyOut", "noEvents"], false);
-        toggleClasses("readyBtn", ["noEvents"], false);
+        toggleClasses("readyBtn", ["greyOut", "noEvents", "active"], false);
         while (trophyQueue.length > 0) {
           printToConsole(trophyQueue[0], "#c99c20");
           trophyQueue.splice(0, 1);
@@ -1277,8 +1274,10 @@
                 </div>
                 <div class="btn-group">
                   <button id="pauseBtn" class="btn btn-outline-info" onclick="togglePause()">Pause</button>
+                </div>
+                <div class="btn-group">
                   <button id="testBtn" class="btn btn-outline-info" onclick="game_test()">Test Code</button>
-                  <button id="readyBtn" class="btn btn-outline-success" onclick="readyUp()">Ready</button>
+                  <button id="readyBtn" class="btn btn-outline-success" onclick="readyUp()">Start Game</button>
                 </div>
               </div>
             </div>
@@ -1316,7 +1315,7 @@
                   <button class="btn btn-outline-warning" onclick="revertCode()">Revert Changes</button>
                 </div>
                 <div class="btn-group">
-                  <button class="btn btn-outline-info" onclick="submitCode()">Save Code</button>
+                  <button class="btn btn-outline-info" onclick="submitCode()">Commit Changes</button>
                   <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button">Show me the docs!</a>
                 </div>
               </div>
