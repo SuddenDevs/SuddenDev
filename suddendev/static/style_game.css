@@ -16,6 +16,14 @@ span.console{
   background-color: transparent;
 }
 
+.noEvents{
+  pointer-events: none;
+}
+
+.greyOut{
+  color: #aaa;
+}
+
 .btn{
   font-weight: bold;
 }

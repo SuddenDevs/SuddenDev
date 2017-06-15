@@ -203,8 +203,8 @@
         create_core(first.core);
 
         if (test) {
-          toggleClasses("testBtn", ["inactive", "noEvents"], false);
-          toggleClasses("readyBtn", ["inactive", "noEvents"], false);
+          toggleClasses("testBtn", ["greyOut", "noEvents"], false);
+          toggleClasses("readyBtn", ["noEvents"], false);
         }
 
         draw();
@@ -806,8 +806,8 @@
       function game_test() {
         game_terminate();
         socket.emit(EVENTS.TEST, editor.getValue());
-        toggleClasses("testBtn", ["noEvents", "inactive"], true);
-        toggleClasses("readyBtn", ["noEvents", "inactive"], true);
+        toggleClasses("testBtn", ["noEvents"], true);
+        toggleClasses("readyBtn", ["noEvents"], true);
         test = true;
       }
 
@@ -841,7 +841,7 @@
       function readyUp() {
         submitCode();
         toggleClasses("readyBtn", ["active", "noEvents"], true);
-        toggleClasses("testBtn", ["noEvents","inactive"], true);
+        toggleClasses("testBtn", ["greyOut", "noEvents"], true);
         socket.emit(EVENTS.PLAY, {});
         test = false;
       }
@@ -1019,10 +1019,7 @@
       function game_end(result) {
         timer_end = TIME_AFTER_END;
         inGame = false;
-        if (!test) {
-          toggleClasses("readyBtn", ["active", "noEvents"], false);
-          toggleClasses("testBtn", ["inactive", "noEvents"], false);
-        } else {
+        if (test) {
           test = false;
         }
         fade.visible = true;
@@ -1055,7 +1052,7 @@
             console.log("Unknown ending: " + result);
         }
         if (result != "Win") {
-          displayTrophies();
+          endGame();
         }
 
         mainText.text = text;
@@ -1064,7 +1061,9 @@
         game_data.splice(0, 1);
       }
 
-      function displayTrophies() {
+      function endGame() {
+        toggleClasses("testBtn", ["greyOut", "noEvents"], false);
+        toggleClasses("readyBtn", ["noEvents"], false);
         while (trophyQueue.length > 0) {
           printToConsole(trophyQueue[0], "#c99c20");
           trophyQueue.splice(0, 1);
