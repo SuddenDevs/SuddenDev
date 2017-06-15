@@ -31,7 +31,7 @@ class Entity():
     #Forward property changes to dummy
     def __setattr__(self, name, value):
         super().__setattr__(name, value)
-        if name != 'dummy':
+        if name != 'dummy' and name != 'game':
             self.dummy.__setattr__(name, value)
 
     def injure(self, damage):

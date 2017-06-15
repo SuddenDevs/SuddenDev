@@ -25,6 +25,7 @@ class Player(Entity):
         self.color = color
         self.vel = Vector(random.random(), random.random())
         self.game = game
+
         self.speed = self.game.gc.P_SPEED
         self.range_visible = self.game.gc.P_RANGE_VISIBLE
         self.range_attackable = self.game.gc.P_RANGE_ATTACKABLE

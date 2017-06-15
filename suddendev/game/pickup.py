@@ -10,6 +10,7 @@ class Pickup(Entity):
         self.pos = pos
         self.size = gc.POW_SIZE
         self.value = 0
+        self.health = 0
 
         if self.pickup_type == PickupType.AMMO:
             self.value = gc.POW_AMMO_VALUE
