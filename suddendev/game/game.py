@@ -242,6 +242,9 @@ class Game:
         for e in self.players:
             if e.tag == tag:
                 return e
+        for e in self.pickups:
+            if e.tag == tag:
+                return e
         if self.core.tag == tag:
             return self.core
         return None

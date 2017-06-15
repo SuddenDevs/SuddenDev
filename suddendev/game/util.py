@@ -171,7 +171,7 @@ def get_nearest_enemy(self, enemy_type=None):
                 valid.append(e)
         return get_nearest(self, valid)
 
-def get_nearest_pickup_Type(self, pickup_type):
+def get_nearest_pickup_type(self, pickup_type):
     pickups = self.pickups_visible()
     valid = []
     for p in pickups:
