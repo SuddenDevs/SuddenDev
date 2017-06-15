@@ -88,28 +88,28 @@ def test(message):
     player_names = []
     player_scripts = []
     player_ids = []
-    if len(player_jsons) < 2:
-        player = player_jsons[0]
-        for i in range(4):
-            player_names.append(player['name'])
-            player_ids.append(player['id'])
+    # if len(player_jsons) < 2:
+        # player = player_jsons[0]
+        # for i in range(4):
+            # player_names.append(player['name'])
+            # player_ids.append(player['id'])
 
-            # use the submitted script
-            if player['id'] == player_id:
-                player_scripts.append(message)
-            else:
-                player_scripts.append(player['script'])
+            # # use the submitted script
+            # if player['id'] == player_id:
+                # player_scripts.append(message)
+            # else:
+                # player_scripts.append(player['script'])
 
-    else:
-        for player in player_jsons:
-            player_names.append(player['name'])
-            player_ids.append(player['id'])
+    # else:
+    for player in player_jsons:
+        player_names.append(player['name'])
+        player_ids.append(player['id'])
 
-            # use the submitted script
-            if player['id'] == player_id:
-                player_scripts.append(message)
-            else:
-                player_scripts.append(player['script'])
+        # use the submitted script
+        if player['id'] == player_id:
+            player_scripts.append(message)
+        else:
+            player_scripts.append(player['script'])
 
     wave = get_room_wave(game_id)
     fsio.emit('message_room', 'Testing against wave ' + str(wave), room=flask.request.sid, namespace=NAMESPACE)
@@ -160,17 +160,17 @@ def run_game_if_everyone_ready(game_id):
         player_names = []
         player_scripts = []
     
-        if len(player_jsons) < 2:
-            player = player_jsons[0]
-            for i in range(4):
-                player_names.append(player['name'])
-                player_ids.append(player['id'])
-                player_scripts.append(player['script'])
-        else:
-            for player in player_jsons:
-                player_names.append(player['name'])
-                player_ids.append(player['id'])
-                player_scripts.append(player['script'])
+        # if len(player_jsons) < 2:
+            # player = player_jsons[0]
+            # for i in range(4):
+                # player_names.append(player['name'])
+                # player_ids.append(player['id'])
+                # player_scripts.append(player['script'])
+        # else:
+        for player in player_jsons:
+            player_names.append(player['name'])
+            player_ids.append(player['id'])
+            player_scripts.append(player['script'])
 
         fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
         wave = get_room_wave(game_id)

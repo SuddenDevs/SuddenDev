@@ -127,11 +127,43 @@
             <img src="{{url_for('static', filename='tut/tut_visible_range.png')}}">
             <br>
 
-            <p>We provide a list of enemies and pickups, namely <code>enemies_visible</code> and <code>pickups_visible</code> to operate on. It's up to you what to do with them! Should you avoid, move towards, attack, or tell other players what you see through messsages?
+            <p>We provide a list of enemies and pickups, namely <code>enemies_visible</code> and <code>pickups_visible</code> to operate on. These are always available in your code.
+            <h4>Combat</h4>
+            <p>
+            Your triangle's ammo is displayed on a tiny label just below the health bar:
             </p>
-            <h5>Combat</h5>
-shoot(entity)</code></pre></div>
+            <img src="{{url_for('static', filename='tut/tut_ammo_label.png')}}">
             <br>
+            You can attack an enemy by calling <code>shoot(some_enemy)</code>. For example, to always attack the nearest enemy:
+            <div class="card card-outline-danger">
+            <pre><code class="python code-block">def update(player, delta):
+  e = get_nearest_enemy()
+  shoot(e)</code></pre></div>
+            <br>
+            <img src="{{url_for('static', filename='tut/tut_shoot_nearest.gif')}}">
+            <br><br>
+            <p>
+              You can call <code>shoot</code> however often you like, but whether it has an effect is limited by the game logic. Shots can only be fired once every <code>player.attack_delay</code> seconds, always causing <code>player.damage</code> damage, and only if <code>player.ammo</code> is greater than 0.
+            </p>
+            <h4>Pickups</h4>
+            <p>
+            Health pickups are red on white and ammo pickups are green:
+            </p>
+            <img src="{{url_for('static', filename='tut/tut_health_ammo.gif')}}">
+            <br>
+            <p>
+            You can check the type of a pickup with the <code>.pickup_type</code> propety, which is either <code>PickupType.AMMO</code> or <code>PickupType.HEALTH</code>.
+            You can collect pickups by moving near them. For example, move to the nearest ammo pickup:
+            </p>
+            <div class="card card-outline-danger">
+            <pre><code class="python code-block">def update(player, delta):
+  ammo = get_nearest_pickup(PickupType.AMMO) #get nearest visible pickup by type
+  if player.ammo == 0:
+    move_to(ammo) #nothing will happen if 'ammo' is None</code></pre></div>
+            <br>
+            <img src="{{url_for('static', filename='tut/tut_grab_ammo.gif')}}">
+            <br><br>
+
             Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a pickup that you want to grab, call<br><br>
 
             <code>move_to(somePickup.pos)</code> to move to its position, or you can pass in the object reference itself<br>

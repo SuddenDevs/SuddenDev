@@ -111,7 +111,6 @@ def distance_to(self, target):
 # If speed is not given, defaults to self.speed.
 def move_to(self, target, speed=None):
     if self is None or target is None:
-        self.vel = Vector(0, 0)
         #user_print(self, '\'None\' type passed to move_to')
         return
 
