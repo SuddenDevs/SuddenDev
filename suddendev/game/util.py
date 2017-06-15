@@ -171,29 +171,28 @@ def get_nearest_enemy(self, enemy_type=None):
                 valid.append(e)
         return get_nearest(self, valid)
 
-# Gets nearest enemy within attackable range.
-def get_nearest_attackable_enemy(self, enemy_type=None):
-    if enemy_type is None:
-        return get_nearest(self, self.enemies_attackable())
-    else:
-        enemies = self.enemies_attackable()
-        valid = []
-        for e in enemies:
-            if e.enemy_type == enemy_type:
-                valid.append(e)
-        return get_nearest(self, valid)
+def get_nearest_pickup_Type(self, pickup_type):
+    pickups = self.pickups_visible()
+    valid = []
+    for p in pickups:
+        if p.pickup_type == pickup_type:
+            valid.append(p)
+    return get_nearest(self, valid)
 
 # Gets nearest pickup of the given type, or of any type if none is given.
-def get_nearest_pickup(self, pickup_type=None):
-    if pickup_type is None:
-        return get_nearest(self, self.pickups_visible())
-    else:
-        pickups = self.pickups_visible()
-        valid = []
-        for p in pickups:
-            if p.pickup_type == pickup_type:
-                valid.append(p)
-        return get_nearest(self, valid)
+def get_nearest_pickup(self):
+    pickups = self.pickups_visible()
+    valid = []
+    for p in pickups:
+        if p.pickup_type:
+            valid.append(p)
+    return get_nearest(self, valid)
+
+def get_nearest_ammo(self):
+    return get_nearest_pickup_type(self, PickupType.AMMO)
+
+def get_nearest_health(self):
+    return get_nearest_pickup_type(self, PickupType.HEALTH)
 
 # Given self and a list of entities, returns the nearest entity and the 
 # distance to that entity
