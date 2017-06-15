@@ -5,6 +5,7 @@ from .sandbox import builtins
 from .color import Color3
 from .event import Event, EventType
 from .util import *
+from .path import Path
 from .game_config import GameConfig as gc
 from .enemy_type import EnemyType
 
@@ -91,6 +92,7 @@ class Player(Entity):
             'Vector' : Vector,
             'PickupType' : PickupType,
             'EnemyType' : EnemyType,
+            'Path' : Path,
             'core' : game.core,
             'random' : random,
             'sys' : sys,
@@ -107,6 +109,7 @@ class Player(Entity):
             'get_farthest' : partial(get_farthest, self),
             'distance_to' : partial(distance_to, self),
             'print' : partial(user_print, self),
+            'follow_path' : partial(follow_path, self),
 
             '__builtins__' : builtins
         }

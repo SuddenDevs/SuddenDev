@@ -4,6 +4,7 @@ from .message import Message
 from .event import Event, EventType
 from .enemy_type import EnemyType
 from .color import Color3
+from .path import Path
 import sys
 import signal
 import traceback
@@ -123,8 +124,7 @@ def move_to(self, target, speed=None):
         speed = self.speed
 
     # Prevent spazzing out
-    distance_thresh = 3
-    if distance_to(self, target) < distance_thresh:
+    if is_at(self.pos, target):
         speed = 0.01
 
     self.vel = Vector.Normalize(target - self.pos) * speed
@@ -224,3 +224,21 @@ def get_farthest(self, entities, with_distance=False):
         return farthest, farthest_distance
     else:
         return farthest
+
+# Moves according to the given path. If loop is true, will go back to the beginning
+# once the end of the path is reached.
+def follow_path(self, path, loop=False):
+    if self is None or not isinstance(path, Path) or path.is_empty():
+        return
+
+    target = path.current_target()
+    move_to(self, target)
+    if is_at(self.pos, path.current_target()):
+        path.set_next_target(loop)
+
+def is_at(v1, v2):
+    if v1 is None or v2 is None:
+        return False
+
+    distance_thresh = 3
+    return Vector.Distance(v1, v2) <= distance_thresh

@@ -128,6 +128,7 @@ def play(message):
     # TODO: guard against no player entry
     player_name = get_name_of_player(player_id)
     if player_name is not None:
+        fsio.emit('ready', str(player_id), room=game_id, namespace=NAMESPACE)
         fsio.emit('message_room', player_name + ' is ready to go!', room=game_id, namespace=NAMESPACE)
 
     run_game_if_everyone_ready(game_id)
