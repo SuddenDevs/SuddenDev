@@ -10,7 +10,7 @@ class GameConfig:
     FRAME_INTERVAL_DISPLAY = 1/FRAMERATE_DISPLAY
 
     # Timeout in seconds before the user script is rejected
-    SCRIPT_TIMEOUT = 3
+    SCRIPT_TIMEOUT = 1
 
     # Packet size in number of game states
     BATCHSIZE = 500

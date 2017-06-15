@@ -196,4 +196,4 @@ class TimeoutException(Exception):
 # Handler for SIGALRM for timing out user scripts.
 def timeout_handler(signum, frame):
     raise TimeoutException('Function timed out. Allowed time for functions is ' +
-            str(gc.SCRIPT_TIMEOUT) + ' seconds.')
+            str(gc.SCRIPT_TIMEOUT) + ' second.')
