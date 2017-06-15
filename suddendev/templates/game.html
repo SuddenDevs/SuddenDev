@@ -76,6 +76,8 @@
             connectToGame();
           });
           socket.on(EVENTS.PLAYERID, function(data) {
+            console.log("received id: " + parseInt(data).toString());
+            console.log("vs : " + playerID.toString());
             playerID = parseInt(data);
           });
           socket.on(EVENTS.RESULT, function(data) {

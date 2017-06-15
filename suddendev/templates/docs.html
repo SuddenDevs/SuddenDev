@@ -23,7 +23,20 @@
           <li><a href="#getting-started">Getting Started</a><br></li>
           <li><a href="#gameplay-basics">Gameplay Basics</a><br></li>
           <li><a href="#scripting-tutorial">Scripting Tutorial</a><br></li>
-          <li><a href="#tips-and-tricks">Tips and Tricks</a><br></li>
+          <ul>
+            <li><a href="#tut-update">The Update Function</a><br></li>
+            <li><a href="#tut-movement">Movement</a><br></li>
+            <li><a href="#tut-sight">Sight</a><br></li>
+            <li><a href="#tut-combat">Combat</a><br></li>
+            <li><a href="#tut-pickups">Pickups</a><br></li>
+            <li><a href="#tut-entities">Entities</a><br></li>
+            <li><a href="#tut-example">Example</a><br></li>
+          </ul>
+          <li><a href="#testing-debugging">Tips and Tricks</a><br></li>
+          <ul>
+            <li><a href="#testing-printing">Printing and Chatting</a><br></li>
+            <li><a href="#testing-private">Private Testing</a><br></li>
+          </ul>
           <li><a href="#scripting-reference">Scripting Reference</a><br></li>
 
       </ul>
@@ -67,7 +80,7 @@
             This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
             The language is <b>Python 3.6</b>, which has ample learning resources elsewhere on the internet, so we're going to focus here on the specifics of <b>sudden_dev</b>.<br><br>
 
-            <h4> The Update Function </h4>
+            <h4 id="tut-update"> The Update Function </h4>
             In your script, you only need to define one function:<br>
             <div class="card card-outline-danger">
             <pre><code class="python code-block">def update(player, delta):
@@ -79,7 +92,7 @@
             <p>
             The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
-            <h4> Movement </h4>
+            <h4 id="tut-movement"> Movement </h4>
             <code>(0, 0)</code> is the top left corner of the <code>map</code>. To move around, you can set the <code>vel</code> (velocity) property of your player. For example, to move always to the right:<br>
             <div class="card card-outline-danger">
             <pre><code class="python code-block">def update(player, delta):
@@ -96,14 +109,21 @@
             </p>
             <div class="card card-outline-danger">
             <pre><code class="python code-block">def update(player, delta):
-  move_to(core.pos) #set velocity to move at full speed towards 'core.pos'</code></pre></div>
+  move_to(core) #set velocity to move at full speed towards the core</code></pre></div>
+            <br>
+            <p>
+            Or towards the top 
+            </p>
+            <div class="card card-outline-danger">
+            <pre><code class="python code-block">def update(player, delta):
+  move_to(core) #set velocity to move at full speed towards the core</code></pre></div>
             <br>
             <p>
             Or move away from the nearest enemy:
             </p>
             <div class="card card-outline-danger">
             <pre><code class="python code-block">def update(player, delta):
-  move_from(get_nearest_enemy().pos)</code></pre></div>
+  move_from(get_nearest_enemy())</code></pre></div>
             <img src="{{url_for('static', filename='tut/tut_move_from.gif')}}">
             <br>
             <p>
@@ -113,7 +133,7 @@
             <pre><code class="python code-block">dist_to = Vector.Length(player.pos - something.pos)</code></pre></div><br>
             <p> The full helper interface is documented below in the Reference section.</p>
 
-            <h4>Sight</h4>
+            <h4 id="tut-sight">Sight</h4>
             <p>
             There are 4 basic entities in the world:
             </p>
@@ -132,7 +152,7 @@
             <br>
 
             <p>We provide a list of enemies and pickups, namely <code>enemies_visible</code> and <code>pickups_visible</code> to operate on. These are always available in your code.
-            <h4>Combat</h4>
+            <h4 id="tut-combat">Combat</h4>
             <p>
             Your triangle's ammo is displayed on a tiny label just below the health bar:
             </p>
@@ -149,7 +169,7 @@
             <p>
             You can call <code>shoot</code> however often you like, but whether it has an effect is limited by the game logic. Shots can only be fired once every <code>player.attack_delay</code> seconds, always causing <code>player.damage</code> damage, and only if <code>player.ammo</code> is greater than 0 <b>and</b> the target is within <code>player.range_attackable</code>.
             </p>
-            <h4>Pickups</h4>
+            <h4 id="tut-pickups">Pickups</h4>
             <p>
             Health pickups are red on white and ammo pickups are green:
             </p>
@@ -168,7 +188,7 @@
             <img src="{{url_for('static', filename='tut/tut_grab_ammo.gif')}}">
             <br><br>
 
-            <h4>Entities</h4>
+            <h4 id="tut-entities">Entities</h4>
             The core, pickups, players, and enemies are all entities. All entities have some common properties, like <code>pos</code>, <code>health</code>, and <code>size</code>. 
             <p>
             You can refer to these entities freely throughout your code:
@@ -193,11 +213,10 @@ get_nearest(entities) #finds the nearest entity in a list of entities</code></pr
 
             Check out the <a href="#scripting-reference">Scripting Reference</a> below.<br><br>
 
-            <h4>Example</h4>
+            <h4 id="tut-example">Example</h4>
             You now know the basics about moving, seeing, and fighting. Time to start experimenting!
             <div class="card card-outline-primary">
-<pre><code class="python code-block"> 
-def update(player, delta):
+<pre><code class="python code-block">def update(player, delta):
     # Find the nearest enemy, move towards it and shoot it
     nearest_enemy = get_nearest_enemy()
     move_to(nearest_enemy)
@@ -207,6 +226,28 @@ def update(player, delta):
       ammo = get_nearest_ammo()
       move_to(ammo)</code></pre></div><br>
         </div>
+</div>
+
+<div id="testing-debugging" class="card m-3">
+    <div class="card-header card-inverse card-success">
+      <h4>Testing and Debugging</h4>
+    </div>
+
+    <div class="card-block">
+          <h4 id="testing-printing">Printing & Chatting</h4>
+          <code>print(msg)</code> will log <code>msg</code> in the onscreen console.
+          <code>chat(msg)</code> will put <code>msg</code> in a chat bubble above your triangle.
+
+          <h4 id="testing-private">Private Testing</h4>
+          <p>
+          When playing <b>sudden_dev</b>, you'll probably be in a room with other players, but you won't always want to wait.
+          Clicking 'Test Code' will run a private game that only you can see, but using the scripts submitted by your friends for the other characters.
+          This means you can catch errors without waiting for the other triangles to ready up.
+          </p>
+          <img src="{{url_for('static', filename='tut/tut_test_code.png')}}">
+          <br>
+
+    </div>
 </div>
 
 <div id="tips-and-tricks" class="card m-3" style="margin: 1.5rem">

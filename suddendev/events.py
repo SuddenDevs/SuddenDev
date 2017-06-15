@@ -161,13 +161,6 @@ def run_game_if_everyone_ready(game_id):
         player_names = []
         player_scripts = []
     
-        # if len(player_jsons) < 2:
-            # player = player_jsons[0]
-            # for i in range(4):
-                # player_names.append(player['name'])
-                # player_ids.append(player['id'])
-                # player_scripts.append(player['script'])
-        # else:
         for player in player_jsons:
             player_names.append(player['name'])
             player_ids.append(player['id'])
