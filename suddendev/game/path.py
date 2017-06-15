@@ -21,6 +21,9 @@ class Path:
     # Returns whether a given point is in the path.
     def contains_point(self, point):
         vector = self.arg_to_vector(point)
+        if vector is None:
+            return False
+
         for p in self.points:
             if p == vector:
                 return True
@@ -34,6 +37,17 @@ class Path:
             self.points.append(vector)
             if self.current_index is None:
                 self.current_index = 0
+
+    # Removes a new point from the path.
+    def remove_point(self, point):
+        vector = self.arg_to_vector(point)
+        if vector is  None:
+            return
+
+        for p in self.points:
+            if p == vector:
+                self.points.remove(p)
+                return
 
     # Sets path's points to the given list of points.
     def set_points(self, points):
