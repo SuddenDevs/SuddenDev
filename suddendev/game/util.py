@@ -3,6 +3,7 @@ from .entity import Entity, Dummy
 from .message import Message
 from .event import Event, EventType
 from .enemy_type import EnemyType
+from .pickup import PickupType
 from .color import Color3
 from .path import Path
 import sys
@@ -151,6 +152,12 @@ def move_from(self, target, speed=None):
 
     if isinstance(target, Entity):
         target = target.pos
+    elif isinstance(target, Dummy):
+        target = self.game.find_by_tag(target.tag)
+        if target is not None:
+            target = target.pos
+        else:
+            return
     elif not isinstance(target, Vector):
         return
 
