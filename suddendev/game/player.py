@@ -71,7 +71,7 @@ class Player(Entity):
         in_range = []
         for p in entities:
             if distance_to(self, p) <= dist:
-                in_range.append(p)
+                in_range.append(p.dummy)
         return in_range                
 
     def pickups_visible(self):
@@ -93,7 +93,7 @@ class Player(Entity):
             'PickupType' : PickupType,
             'EnemyType' : EnemyType,
             'Path' : Path,
-            'core' : game.core,
+            'core' : game.core.dummy,
             'random' : random,
             'sys' : sys,
 

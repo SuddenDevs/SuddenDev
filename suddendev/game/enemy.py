@@ -21,7 +21,7 @@ class Enemy(Entity):
         self.size = self.game.gc.ENEMY_SIZE
         self.healthMax = self.game.gc.ENEMY_HEALTH
         self.health = self.healthMax
-        self.enemy_type=enemy_type
+        self.enemy_type = enemy_type
 
         self.is_boss = self.game.wave % self.game.gc.BOSS_WAVE_MULTIPLES == 0
     

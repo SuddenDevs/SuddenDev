@@ -1,5 +1,5 @@
 from .vector import Vector
-from .entity import Entity
+from .entity import Entity, Dummy
 from .message import Message
 from .event import Event, EventType
 from .enemy_type import EnemyType
@@ -24,6 +24,10 @@ def enemy_shoot(self, enemy):
 
 def _shoot(self, enemy, is_player):
     if self is None or enemy is None:
+        return
+
+    enemy = self.game.find_by_tag(enemy.tag)
+    if enemy is None:
         return
 
     # What is dead may never die
@@ -103,6 +107,12 @@ def distance_to(self, target):
 
     if isinstance(target, Entity):
         target = target.pos
+    elif isinstance(target, Dummy):
+        target = self.game.find_by_tag(target.tag)
+        if target is not None:
+            target = target.pos
+        else:
+            return sys.maxsize
     elif not isinstance(target, Vector):
         return sys.maxsize
 
@@ -117,6 +127,12 @@ def move_to(self, target, speed=None):
 
     if isinstance(target, Entity):
         target = target.pos
+    elif isinstance(target, Dummy):
+        target = self.game.find_by_tag(target.tag)
+        if target is not None:
+            target = target.pos
+        else:
+            return
     elif not isinstance(target, Vector):
         return
 

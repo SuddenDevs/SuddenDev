@@ -234,6 +234,17 @@ class Game:
             if w.intersects(center, size):
                 return True
         return False
+    
+    def find_by_tag(self, tag):
+        for e in self.enemies:
+            if e.tag == tag:
+                return e
+        for e in self.players:
+            if e.tag == tag:
+                return e
+        if self.core.tag == tag:
+            return self.core
+        return None
 
     def get_random_spawn(self, size):
         """ Generates a random position that does not collide with any walls. """
