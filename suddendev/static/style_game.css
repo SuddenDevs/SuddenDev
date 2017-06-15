@@ -4,6 +4,10 @@
   border-color: #ccc;  
 }
 
+.ready{
+  background-color: #0a0;
+}
+
 span.console{
   word-wrap: break-word;
   display: block;

@@ -27,7 +27,7 @@
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
                     "PLAY":'play', "ERROR":'message_error',
                     "ROOM_MSG":"message_room", "GAME_RESULT":'message_result',
-                    "TROPHY":"message_trophy"};
+                    "TROPHY":"message_trophy", "READY": 'ready'};
 
       var editor = null;
       var socket = null;
@@ -95,7 +95,10 @@
           });
           socket.on(EVENTS.TROPHY, function(data) {
             trophyQueue.push(data);
-          })
+          });
+          sockey.on(EVENTS.READY, function(data) {
+            readyPlayer(data);
+          });
         });
         window.onbeforeunload = function(e) {
             socket.emit(EVENTS.LEFT, {});
@@ -175,6 +178,11 @@
           grid.lineTo(renderer.width, i * cell_size);
         }
         background_layer.addChildAt(grid, 0);
+      }
+
+      function readyPlayer(id) {
+        i = getScript(id);
+        toggleClasses("tab" + i, ["ready"], true);
       }
 
       function game_start() {
@@ -805,7 +813,7 @@
       function game_test() {
         game_terminate();
         socket.emit(EVENTS.TEST, editor.getValue());
-        toggleClasses("testBtn", ["noEvents"], true);
+        toggleClasses("testBtn", ["active", "noEvents"], true);
         toggleClasses("readyBtn", ["greyOut", "noEvents"], true);
         test = true;
       }
@@ -1059,7 +1067,7 @@
       }
 
       function endGame() {
-        toggleClasses("testBtn", ["greyOut", "noEvents"], false);
+        toggleClasses("testBtn", ["greyOut", "noEvents", "active"], false);
         toggleClasses("readyBtn", ["greyOut", "noEvents", "active"], false);
         while (trophyQueue.length > 0) {
           printToConsole(trophyQueue[0], "#c99c20");
@@ -1312,10 +1320,11 @@
             <div class="col noPadding">
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
-                  <button class="btn btn-outline-warning" onclick="revertCode()">Revert Changes</button>
+                  <button class="btn btn-outline-warning" onclick="revertCode()">Revert</button>
                 </div>
                 <div class="btn-group">
-                  <button class="btn btn-outline-info" onclick="submitCode()">Commit Changes</button>
+                  <button class="btn btn-outline-info" onclick="editor.execCommand('showSettingsMenu')" role="button">Settings</button>
+                  <button class="btn btn-outline-info" onclick="submitCode()">Commit</button>
                   <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button">Show me the docs!</a>
                 </div>
               </div>
