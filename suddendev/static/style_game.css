@@ -99,6 +99,15 @@ span.console{
   box-sizing: border-box;
 }
 
+div.key{
+  padding: 10px;
+  display: inline-block;
+}
+
+span.key{
+  text-align: center;
+}
+
 #editor{
   height:70%;
   box-sizing: border-box;
