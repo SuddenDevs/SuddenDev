@@ -169,7 +169,13 @@ class Game:
                         position.x += random.randint(-e.size * 2, e.size * 2)
                         position.y += random.randint(-e.size * 2, e.size * 2)
                         self.gc.enemy_types.append(random.choice(types))
-                        self.spawn_enemy(position)
+                        e = self.spawn_enemy(position)
+                        e.speed = 40
+                        e.damage = 1
+                        e.attack_delay = 15
+                        e.size = 5
+                        e.maxHealth = 20
+                        e.health = 20
                     self.wave += 1
                     self.gc = temp_gc
                     
@@ -203,6 +209,7 @@ class Game:
             enemy.pos = position
         self.enemies.append(enemy)
         self.events_add(Event(EventType.ENEMY_SPAWN, enemy))
+        return enemy
 
     def spawn_enemies(self):
         #Enemy Spawning

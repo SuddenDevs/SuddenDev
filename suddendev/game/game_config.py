@@ -22,17 +22,17 @@ class GameConfig:
     MAP_HEIGHT = 600
 
     # Core
-    CORE_HEALTH = 400
+    CORE_HEALTH = 500
 
     # Enemy
-    ENEMY_ATTACK_DELAY = 30
+    ENEMY_ATTACK_DELAY = 25
 
-    BASE_ENEMY_SPEED = 30
+    BASE_ENEMY_SPEED = 25
     BASE_ENEMY_SPAWN_DELAY = 1
     BASE_ENEMY_LIMIT = 10
     BASE_ENEMY_RANGE_VISIBLE = 200
     BASE_ENEMY_RANGE_ATTACKABLE = 30
-    BASE_ENEMY_DAMAGE = 10
+    BASE_ENEMY_DAMAGE = 5
     BASE_ENEMY_HEALTH = 100
 
     # Probability of an enemy spawning on each frame, if the enemy limit has
@@ -56,19 +56,19 @@ class GameConfig:
 
     BOSS_SIZE_SCALE = 3
     BOSS_HEALTH_SCALE = 10
-    BOSS_DAMAGE_SCALE = 10
+    BOSS_DAMAGE_SCALE = 8
     BOSS_STATS_SCALE = 10
     BOSS_WAVE_MULTIPLES = 5
 
-    BOSS_MINION_NUM = 5
+    BOSS_MINION_NUM = 10
 
     # Player
     P_SPEED = 80
-    P_RANGE_VISIBLE = 200
-    P_RANGE_ATTACKABLE = 80
+    P_RANGE_VISIBLE = 180
+    P_RANGE_ATTACKABLE = 90
     P_AMMO = 10
-    P_DAMAGE = 75
-    P_ATTACK_DELAY = 10
+    P_DAMAGE = 50
+    P_ATTACK_DELAY = 12
     P_ERROR_SCRIPT = """
 # Script that runs when the user submitted script is broken.
 # Check the documentation to read more about how to script your bot!
@@ -135,7 +135,7 @@ def update(player, delta):
             self.ENEMY_HEALTH = self.BASE_ENEMY_HEALTH + scale * self.ENEMY_HEALTH_SCALE
 
         self.ENEMY_RANGE_VISIBLE = self.BASE_ENEMY_RANGE_VISIBLE + scale * self.ENEMY_RANGE_VISIBLE_SCALE + self.ENEMY_SIZE
-        self.ENEMY_SPEED = self.BASE_ENEMY_SPEED + scale * self.ENEMY_SPEED_SCALE
+        self.ENEMY_SPEED = self.BASE_ENEMY_SPEED #+ scale * self.ENEMY_SPEED_SCALE
         self.ENEMY_RANGE_ATTACKABLE = self.BASE_ENEMY_RANGE_ATTACKABLE + scale * self.ENEMY_RANGE_ATTACKABLE_SCALE + self.ENEMY_SIZE
         self.ENEMY_DAMAGE = self.BASE_ENEMY_DAMAGE + scale * self.ENEMY_DAMAGE_SCALE
         self.ENEMY_SPAWN_DELAY = self.BASE_ENEMY_SPAWN_DELAY + scale * self.ENEMY_SPAWN_DELAY_SCALE
