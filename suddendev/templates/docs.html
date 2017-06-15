@@ -36,7 +36,7 @@
       </div>
 
       <div class="card-block">
-            <p>This is a game about scripting with friends in a world of feisty triangles.
+            <p>This is a game about scripting (in Python 3.6) with friends in a world of feisty triangles.
             </p>
 
             <h5> Objective </h5>
@@ -65,7 +65,7 @@
     </div>
       <div class="card-block">
             This is a game about writing scripts. Your script will tell your triangle what to do and where to go.
-            The language is <b>Python</b>, which has ample learning resources elsewhere on the internet, so we're going to focus here on the specifics of <b>sudden_dev</b>.<br><br>
+            The language is <b>Python 3.6</b>, which has ample learning resources elsewhere on the internet, so we're going to focus here on the specifics of <b>sudden_dev</b>.<br><br>
 
             <h4> The Update Function </h4>
             In your script, you only need to define one function:<br>
@@ -80,7 +80,7 @@
             The <code>player</code> object is a reference to your character, and <code>delta</code> is the time, in seconds, since the last frame. This will be really handy later on.
 
             <h4> Movement </h4>
-            To move around, you can set the <code>vel</code> (velocity) property of your player. For example, to move always to the right:<br>
+            <code>(0, 0)</code> is the top left corner of the <code>map</code>. To move around, you can set the <code>vel</code> (velocity) property of your player. For example, to move always to the right:<br>
             <div class="card card-outline-danger">
             <pre><code class="python code-block">def update(player, delta):
   player.vel = Vector(20, 0)</code></pre></div>
@@ -89,7 +89,9 @@
             <p>
             The actual speed of your player will always be capped at <code>player.speed_max</code>.
             </p>
-            The unit of distance in this game is the pixel, so a speed of 20 means 20 pixels per second. We've provided some convenience functions to help you with handling vectors, distance calculations, and movement.
+            <p>
+            The unit of distance in this game is the pixel, so a speed of 20 means 20 pixels per second.
+            The map is <code>map.width</code> wide and <code>map.height</code> tall. We've provided some convenience functions to help you with handling vectors, distance calculations, and movement.
             For example, move towards the core:
             </p>
             <div class="card card-outline-danger">
@@ -145,7 +147,7 @@
             <img src="{{url_for('static', filename='tut/tut_shoot_nearest.gif')}}">
             <br><br>
             <p>
-              You can call <code>shoot</code> however often you like, but whether it has an effect is limited by the game logic. Shots can only be fired once every <code>player.attack_delay</code> seconds, always causing <code>player.damage</code> damage, and only if <code>player.ammo</code> is greater than 0.
+            You can call <code>shoot</code> however often you like, but whether it has an effect is limited by the game logic. Shots can only be fired once every <code>player.attack_delay</code> seconds, always causing <code>player.damage</code> damage, and only if <code>player.ammo</code> is greater than 0 <b>and</b> the target is within <code>player.range_attackable</code>.
             </p>
             <h4>Pickups</h4>
             <p>
@@ -166,72 +168,44 @@
             <img src="{{url_for('static', filename='tut/tut_grab_ammo.gif')}}">
             <br><br>
 
-            Everything in the game is an <b>Entity</b> - pickups, players, enemies, and the core. Every entity has a attributes that you can read such as position, velocity and health. So if you have a reference to a pickup that you want to grab, call<br><br>
+            <h4>Entities</h4>
+            The core, pickups, players, and enemies are all entities. All entities have some common properties, like <code>pos</code>, <code>health</code>, and <code>size</code>. 
+            <p>
+            You can refer to these entities freely throughout your code:
+            </p>
+            <ul>
+              <li> <code>core</code> - the centrepiece which you are defending<br></li>
+              <li> <code>players</code> - list of other friendly triangles<br></li>
+              <li> <code>enemies_visible</code> - list of enemies that your triangle can see<br> </li>
+              <li> <code>enemies_attackable</code> - list of enemies that your triangle can attack<br> </li>
+              <li> <code>pickups_visible</code> - list of pickups that your triangle can see<br><br> </li>
+            </ul>
 
-            <code>move_to(somePickup.pos)</code> to move to its position, or you can pass in the object reference itself<br>
-            <code>move_to(somePickup)</code>, to achieve the same thing.<br><br>
-
-            to make your character move towards the pickup. This function just sets the velocity of your character to be towards the pickup.
-
-            also moves your bot towards the pickup. Similarly, you can use<br><br>
+            <p>
+            These lists are ordinary Python lists. You might want to find the closest enemy or pickup of a certain kind - for that we provide some helper functions:
+            </p>
             <div class="card card-outline-danger">
-            <pre><code class="python code-block"> 
-move_from(entity)</code></pre></div><br>
-            which makes your character move away from the entity. All of these functions optionally accept speed as a parameter, so calling<br><br>
-            <code>move_to(pickup, 80)</code><br><br>
-            makes your character go towards the pickup with speed 80.<br><br>
-            
-            <h4>How do you get hold of these entities?</h4><br>
-            You have access to these lists, which you can freely use in your code:<br>
-            <code>enemies_visible</code>, which contains all the enemy entities that your character can see<br>
-            <code>enemies_attackable</code>, which contains all the enemy entities that your character can attack<br>
-            <code>pickups_visible</code>, which contrains all the pickups that your character can see<br><br>
+            <pre><code class="python code-block">get_nearest_enemy()
+get_nearest_pickup()
+get_nearest_ammo()
+get_nearest_health()
+get_nearest(entities) #finds the nearest entity in a list of entities</code></pre></div><br> 
 
-            You can access and iterate through these lists just like in ordinary Python. Often you might want to find the nearest object in the list, for example, the nearest visible enemy. You might want to make use of these functions:<br><br>
+            Check out the <a href="#scripting-reference">Scripting Reference</a> below.<br><br>
 
-            <div class="card card-outline-danger">
-            <pre><code class="python code-block"> 
-get_nearest_enemy()
-get_nearest_attackable_enemy()
-get_nearest_pickup()</code></pre></div><br> 
-            You can also pass in a <code>PickupType</code> to <code>get_nearest_pickup()</code> to specify which pickup you're interested in, i.e.<br><br>
-
-            <div class="card card-outline-info">
-            <pre><code class="python code-block"> 
-get_nearest_pickup(PickupType.AMMO)
-get_nearest_pickup(PickupType.HEALTH)</code></pre></div><br>
-
-            Similarly, <code>get_nearest_enemy()</code> and <code>get_nearest_attackable_enemy()</code> accept an <code>EnemyType</code> as a parameter, i.e. call<br><br>
-
-<div class="card card-outline-info">
-<pre><code class="python code-block"> 
-get_nearest_enemy(EnemyType.CORE_KILLER)</code></pre></div><br>
-
-            to get the nearest visible enemy of type <code>CORE_KILLER</code>. For a full list of <code>EnemyType</code>s, check the <a href="#scripting-reference">Scripting Reference</a> below.<br><br>
-
-            Your own character is also an entity and you can also access its attributes. The character is passed in as the first argument in your <code>update</code> function, so if your function starts with<br><br>
-            <code>update(player, delta)</code><br><br>
-            then you can access your own entity as <code>player</code>. Here are some attributes you might find useful:<br><br>
-            <code>health</code><br>
-            <code>ammo</code><br>
-            <code>pos</code><br>
-            <code>range_visible</code><br>
-            <code>range_attackable</code><br><br>
-            You would then access these for example as<br><br>
-            <code>player.ammo</code><br><br>
-            For a full list of attributes, check out the <a href="#scripting-reference">Scripting Reference</a> below.<br><br>
-
-            With these functions you can actually already write a very simple AI! Here's a very basic example:<br><br>
+            <h4>Example</h4>
+            You now know the basics about moving, seeing, and fighting. Time to start experimenting!
             <div class="card card-outline-primary">
 <pre><code class="python code-block"> 
 def update(player, delta):
     # Find the nearest enemy, move towards it and shoot it
     nearest_enemy = get_nearest_enemy()
     move_to(nearest_enemy)
-    shoot(nearest_enemy)</code></pre></div><br>
-                
-And that's it! Now to make it smarter, you might want to try to pick up pickups, avoid enemies if your health is low or shoot only if your ammo is high.<br><br>
-
+    shoot(nearest_enemy)
+    
+    if player.ammo == 0: #look for ammo if you're out of bullets
+      ammo = get_nearest_ammo()
+      move_to(ammo)</code></pre></div><br>
         </div>
 </div>
 
