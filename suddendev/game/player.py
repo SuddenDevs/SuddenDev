@@ -96,8 +96,8 @@ class Player(Entity):
 
         self.scope = {
             'math' : math,
-            'map_width' : self.game.map.width,
-            'map_height' : self.game.map.height,
+            'map_width' : self.game.get_map_width(),
+            'map_height' : self.game.get_map_height(),
             'Vector' : Vector,
             'PickupType' : PickupType,
             'EnemyType' : EnemyType,

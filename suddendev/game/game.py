@@ -257,3 +257,11 @@ class Game:
 
     def was_cleared(self):
         return self.cleared
+
+    def get_map_width(self):
+        return self.map.width
+
+    def get_map_height(self):
+        return self.map.height
+        :wq
+        :
