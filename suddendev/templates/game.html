@@ -1316,10 +1316,30 @@
                 </div>
                 <div class="btn-group">
                   <button class="btn btn-outline-info" onclick="submitCode()">Commit</button>
-                  <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button">Show me the docs!</a>
+                  <button class="btn btn-outline-info" data-toggle="modal" data-target="#docModal">Show me the docs!</a>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="docModal" class="modal fade" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div id="getting-started" class="card m-3">
+              <div class="card-header card-inverse card-success">
+                <!-- Cheat Sheet Header !-->
+                <h4 style="color:#fff"> Cheat Sheet </h4>  
+              </div>
+              <div class="card-block">
+                <!-- Cheat Sheet Content !-->
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a href="{{ url_for('.docs') }}" class="btn btn-outline-info" role="button" target="_blank">Open the Full Docs</a>
           </div>
         </div>
       </div>
