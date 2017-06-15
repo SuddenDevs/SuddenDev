@@ -70,7 +70,7 @@ class Player(Entity):
     def get_in_range(self, entities, dist):
         in_range = []
         for p in entities:
-            if distance_to(self, p) <= dist:
+            if distance_to(self, p) <= dist + p.size:
                 in_range.append(p.dummy)
         return in_range                
 

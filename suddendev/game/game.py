@@ -263,5 +263,3 @@ class Game:
 
     def get_map_height(self):
         return self.map.height
-        :wq
-        :
