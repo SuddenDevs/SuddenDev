@@ -34,7 +34,7 @@ def _shoot(self, enemy, is_player):
     if enemy.health <= 0:
         return
 
-    if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable and self.attack_timer == 0):
+    if (Vector.Distance(enemy.pos, self.pos) <= self.range_attackable + enemy.size and self.attack_timer == 0):
         if not is_player or self.ammo > 0:
             # Point towards the target
             self.vel = enemy.pos - self.pos
