@@ -62,8 +62,8 @@ class Game:
         #Core
         self.core = Core()
         self.core.pos = Vector(self.map.width/2, self.map.height/2)
-        self.core.healthMax = self.gc.CORE_HEALTH
-        self.core.health = self.core.healthMax
+        self.core.health_max = self.gc.CORE_HEALTH
+        self.core.health = self.core.health_max
 
         #Players
         self.init_players(player_names, scripts, player_ids)
@@ -170,7 +170,7 @@ class Game:
                         position.y += random.randint(-e.size * 2, e.size * 2)
                         self.gc.enemy_types.append(random.choice(types))
                         e = self.spawn_enemy(position)
-                        e.speed = 40
+                        e.speed_max = 40
                         e.damage = 1
                         e.attack_delay = 15
                         e.size = 5

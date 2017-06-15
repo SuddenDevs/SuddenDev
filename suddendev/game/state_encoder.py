@@ -30,7 +30,7 @@ class StateEncoder(json.JSONEncoder):
                 'pos': self.serializeVector(entity.pos),
                 'vel': self.serializeVector(entity.vel),
                 'size': entity.size,
-                'healthMax': entity.healthMax,
+                'healthMax': entity.health_max,
                 'health': entity.health
                 }
 

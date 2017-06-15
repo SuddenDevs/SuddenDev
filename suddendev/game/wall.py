@@ -4,7 +4,7 @@ from .vector import Vector
 class Wall(Entity):
     def __init__(self, pos, dim):
         super().__init__()
-        self.speed = 0
+        self.speed_max = 0
         self.pos = pos
         self.dim = dim
 

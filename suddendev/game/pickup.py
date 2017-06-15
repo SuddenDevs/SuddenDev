@@ -21,7 +21,7 @@ class Pickup(Entity):
         if self.pickup_type == PickupType.AMMO:
             player.ammo += self.value
         elif self.pickup_type == PickupType.HEALTH:
-            player.health = min(self.healthMax, player.health + self.value)
+            player.health = min(self.health_max, player.health + self.value)
 
     def intersects(self, player):
         distance = Vector.Distance(self.pos, player.pos)

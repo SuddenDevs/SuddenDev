@@ -13,10 +13,10 @@ def entity_init(self):
     self.tag = next_tag()
     self.pos = gc.E_POS
     self.vel = gc.E_VEL
-    self.speed = gc.E_SPEED
+    self.speed_max = gc.E_SPEED
     self.size = gc.E_SIZE
-    self.healthMax = gc.E_HEALTHMAX
-    self.health = self.healthMax
+    self.health_max = gc.E_HEALTHMAX
+    self.health = self.health_max
     self.vel_prev = self.vel
 
 class Dummy():

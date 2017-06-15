@@ -119,7 +119,7 @@ def distance_to(self, target):
     return Vector.Distance(self.pos, target)
 
 # Sets the velocity vector, scaled to the given speed, pointing to the target.
-# If speed is not given, defaults to self.speed.
+# If speed is not given, defaults to self.speed_max.
 def move_to(self, target, speed=None):
     if self is None or target is None:
         #user_print(self, '\'None\' type passed to move_to')
@@ -137,7 +137,7 @@ def move_to(self, target, speed=None):
         return
 
     if speed is None:
-        speed = self.speed
+        speed = self.speed_max
 
     # Prevent spazzing out
     if is_at(self.pos, target):
@@ -155,7 +155,7 @@ def move_from(self, target, speed=None):
         return
 
     if speed is None:
-        speed = self.speed
+        speed = self.speed_max
 
     self.vel = Vector.Normalize(self.pos - target) * speed
 

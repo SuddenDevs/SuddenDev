@@ -27,7 +27,7 @@ class Player(Entity):
         self.vel = Vector(random.random(), random.random())
         self.game = game
 
-        self.speed = self.game.gc.P_SPEED
+        self.speed_max = self.game.gc.P_SPEED
         self.range_visible = self.game.gc.P_RANGE_VISIBLE
         self.range_attackable = self.game.gc.P_RANGE_ATTACKABLE
         self.ammo = self.game.gc.P_AMMO
@@ -49,10 +49,10 @@ class Player(Entity):
         self.dummy.tag = self.tag 
         self.dummy.pos = self.pos 
         self.dummy.vel = self.vel 
-        self.dummy.speed = self.speed 
+        self.dummy.speed_max = self.speed_max
         self.dummy.size = self.size 
         self.dummy.health = self.health 
-        self.dummy.healthMax = self.healthMax 
+        self.dummy.health_max = self.health_max 
 
         self.dummy.name = self.name 
         self.dummy.color = self.color 
@@ -175,8 +175,8 @@ class Player(Entity):
             self.try_apply_script(self.game.gc.P_ERROR_SCRIPT, self.game)
 
         # Check for sanity (restrict velocity)
-        if Vector.Length(self.dummy.vel) > self.speed:
-            self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed
+        if Vector.Length(self.dummy.vel) > self.speed_max:
+            self.dummy.vel = Vector.Normalize(self.dummy.vel) * self.speed_max
 
         self.vel = self.dummy.vel
 
