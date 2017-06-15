@@ -27,7 +27,7 @@
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
                     "PLAY":'play', "ERROR":'message_error',
                     "ROOM_MSG":"message_room", "GAME_RESULT":'message_result',
-                    "TROPHY":"message_trophy"};
+                    "TROPHY":"message_trophy", "LOCAL":'message_local'};
 
       var editor = null;
       var socket = null;
@@ -85,13 +85,16 @@
             updateRoom(data);
           });
           socket.on(EVENTS.ROOM_MSG, function(data) {
-            printToConsole(data, "#00F");
+            printToConsole("[ROOM]: " + data, "#00F");
           });
+          socket.on(EVENTS.LOCAL, function(data) {
+            printToConsole("[LOCAL]: " + data, "#666");
+          })
           socket.on(EVENTS.ERROR, function(data) {
-            printToConsole(data, "#F00");
+            printToConsole("[ERR]: " + data, "#F00");
           });
           socket.on(EVENTS.GAME_RESULT, function(data) {
-            printToConsole(data, "#0F0");
+            printToConsole("[RES]: " + data, "#0F0");
           });
           socket.on(EVENTS.TROPHY, function(data) {
             trophyQueue.push(data);
@@ -180,7 +183,6 @@
       function game_start() {
         clear_current_game_data();
         fade.visible = false;
-        resetPause();
 
         //Get the next game in the queue
         game_data_current = game_data[0];
@@ -985,12 +987,12 @@
               break;
             case "Print":
                 if (body[1].player_id == playerID) {
-                    printToConsole(body[0], "#F0F");
+                    printToConsole("[PRINT]: " + body[0], "#F0F");
                 }
               break;
             case "Error":
                 if (body[1].player_id == playerID) {
-                    printToConsole(body[0], "#F00");
+                    printToConsole("[ERR]: " + body[0], "#F00");
                 }
               break;
             case "Message_Sent":
@@ -1077,7 +1079,7 @@
           toggleClasses("tab" + i, ["ready", "activeReady"], false);
         }
         while (trophyQueue.length > 0) {
-          printToConsole(trophyQueue[0], "#c99c20");
+          printToConsole("[TROPHY]: " + trophyQueue[0], "#c99c20");
           trophyQueue.splice(0, 1);
         }
       }
@@ -1193,31 +1195,6 @@
         }
       }
 
-      function resetPause() {
-        var b = document.getElementById("pauseBtn");
-        b.innerHTML = "Pause";
-        b.classList.remove("active");
-      }
-
-      //Pause game, update pause button
-      function togglePause() {
-        var on = false;
-        if (inGame) {
-          if (ticker.started) {
-            ticker.stop();
-            mainText.visible = true;
-            mainText.text = "Paused";
-            draw();
-          } else {
-            ticker.start();
-            mainText.visible = false;
-          }
-        }
-        var b = document.getElementById("pauseBtn");
-        b.innerHTML = (b.innerHTML === "Pause") ? "Unpause" : "Pause";
-        b.classList.toggle("active");
-      }
-
       function setEditorTab(tabi) {
         var oldt = document.getElementById("tab" + currentTab);
         oldt.classList.remove("active");
@@ -1294,9 +1271,6 @@
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
                   <button class="btn btn-outline-danger" onclick="leaveGame()">Leave Game</button>
-                </div>
-                <div class="btn-group">
-                  <button id="pauseBtn" class="btn btn-outline-info" onclick="togglePause()">Pause</button>
                 </div>
                 <div class="btn-group">
                   <button id="testBtn" class="btn btn-outline-info" onclick="game_test()">Test Code</button>
