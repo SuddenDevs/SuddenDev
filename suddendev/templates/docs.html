@@ -12,7 +12,7 @@
   {{ suddendev_header() }}
   <div class="container">
     <center>
-      <h2>A co-op survival game where your code plays for you.</h2><br>
+      <h2>A co-op game where your code keeps you alive.</h2><br>
     </center>
   <div id="toc" class="card m-3">
       <div class="card-header card-inverse card-success">
@@ -87,6 +87,8 @@
             <img src="{{url_for('static', filename='tut/tut_move_right.gif')}}">
             <br>
             <p>
+            The actual speed of your player will always be capped at <code>player.speed_max</code>.
+            </p>
             The unit of distance in this game is the pixel, so a speed of 20 means 20 pixels per second. We've provided some convenience functions to help you with handling vectors, distance calculations, and movement.
             For example, move towards the core:
             </p>
