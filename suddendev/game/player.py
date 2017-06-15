@@ -74,6 +74,13 @@ class Player(Entity):
                 in_range.append(p.dummy)
         return in_range                
 
+    def player_list(self):
+        result = []
+        for p in self.game.players:
+            result.append(p.dummy)
+
+        return result
+
     def pickups_visible(self):
         return self.get_in_range(self.game.pickups, self.range_visible)
 
@@ -89,6 +96,8 @@ class Player(Entity):
 
         self.scope = {
             'math' : math,
+            'map_width' : self.game.map.width,
+            'map_height' : self.game.map.height,
             'Vector' : Vector,
             'PickupType' : PickupType,
             'EnemyType' : EnemyType,
@@ -155,6 +164,9 @@ class Player(Entity):
 
         self.message_count = 0
 
+        # Reset dummy
+        self.reset_dummy()
+
         # Execute on Dummy Entity
         try:
             signal.alarm(self.game.gc.SCRIPT_TIMEOUT)
@@ -180,9 +192,6 @@ class Player(Entity):
 
         self.vel = self.dummy.vel
 
-        # Reset dummy
-        self.reset_dummy()
-
         # Apply Motion
         return super().update(delta)
 
@@ -190,6 +199,7 @@ class Player(Entity):
         self.scope['enemies_visible'] = self.enemies_visible()
         self.scope['enemies_attackable'] = self.enemies_attackable()
         self.scope['pickups_visible'] = self.pickups_visible()
+        self.scope['players'] = self.player_list()
 
     def __str__(self):
         return str(self.name) + ":" + str(self.pos)
