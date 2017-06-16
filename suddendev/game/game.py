@@ -174,7 +174,7 @@ class Game:
                         e.damage = 1
                         e.attack_delay = 15
                         e.size = 5
-                        e.maxHealth = 20
+                        e.health_max = 20
                         e.health = 20
                     self.wave += 1
                     self.gc = temp_gc
