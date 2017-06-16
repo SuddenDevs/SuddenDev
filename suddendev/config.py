@@ -10,7 +10,7 @@ class Config(object):
     SECRET_KEY = os.urandom(32)
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     CELERY_BROKER_URL = os.environ['CLOUDAMQP_URL']
-    CELERY_RESULT_BACKEND = os.environ['CLOUDAMQP_URL']
+    CELERY_RESULT_BACKEND = 'rpc'
     REDIS_URL = os.environ['REDIS_URL']
 
     CLIENT_ID = '690133088753-kk72josco183eb8smpq4dgkrqmd0eovm.apps.googleusercontent.com'
