@@ -54,6 +54,7 @@ span.console{
 .mainCol{
   margin: 15px;
   padding: 0;
+  overflow: hidden;
 }
 
 .gameCol{
@@ -130,14 +131,14 @@ span.key{
   display: flex;
   flex-direction: column;
   align-content: stretch;
+  word-wrap: break-word;
   padding: 10px;
+  padding-bottom: 0;
 }
 
 #chat{
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto;
   word-wrap: break-word;
-  padding-bottom: 0;
   text-align: left;
   flex: 1 1 auto;
 }
