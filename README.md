@@ -24,6 +24,9 @@ pip install -e .
 You will need to install postgresql and create one database for development and another for running tests, named 'suddendev_dev' and 'suddendev_test' respectively.
 This can be a pain if you've not already setup postgresql. A helpful guide for ubuntu users can be found [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04).
 
+In addition, you will need to install rabbitMQ to run it locally.
+A helpful guide for this can be found [here](http://docs.celeryproject.org/en/latest/getting-started/brokers/rabbitmq.html#id4).
+
 To initially setup the created development database - and clear it out when developing - run:
 
 ```bash
@@ -39,7 +42,7 @@ Finally to run the app locally as it would be run on Heroku, simply run:
 Often for debugging, it useful to run a single app (using the dev db):
 
 ```bash
-./run-local-flask.sh
+./run-local-debug.sh
 ```
 
 ## Locally Testing
@@ -53,6 +56,8 @@ pip install tox pytest
 And in the root directory, run:
 
 ```bash
+sudo rabbitmq-server -detached
+sh run-redis &
 tox
 ```
 
