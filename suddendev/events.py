@@ -133,6 +133,15 @@ def play(message):
 
     run_game_if_everyone_ready(game_id)
 
+@socketio.on('message_chat', namespace=NAMESPACE)
+def chat(message):
+    player_id = flask_login.current_user.id
+    game_id = get_room_of_player(player_id)
+
+    player_name = get_name_of_player(player_id)
+    if player_name is not None:
+        fsio.emit('message_chat', '{ "name":"' + str(player_name) + '", "body": "' + message + '"}', room=game_id, namespace=NAMESPACE)
+
 def manage_player_leaves(player_id):
     game_id = get_room_of_player(player_id)
 

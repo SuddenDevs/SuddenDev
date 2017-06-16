@@ -1271,8 +1271,7 @@
 
       function handleChatIn(data) {
         var msg = JSON.parse(data);
-        var name = getPlayer(msg.id).name;
-        printToChat("[" + name + "]: " + msg.body);
+        printToChat("[" + msg.name + "]: " + msg.body);
       }
 
       function sendChatMessage(event) {
