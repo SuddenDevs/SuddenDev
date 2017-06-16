@@ -84,8 +84,12 @@ def test(message):
     """
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
-    
     player_jsons = get_players_in_room(game_id)
+
+    if game_id is None or player_jsons is None:
+        flask.flash("sorry something isn't quite right... try joining another game")
+        return flask.redirect(flask.url_for('.main.home'))
+
     player_names = []
     player_scripts = []
     player_ids = []
@@ -152,6 +156,8 @@ def manage_player_leaves(player_id):
         return 
 
     fsio.leave_room(game_id)
+
+    player_name = get_name_of_player(player_id)
     remove_player_from_room(game_id, player_id)
 
     if get_players_in_room(game_id) == []:
@@ -160,7 +166,6 @@ def manage_player_leaves(player_id):
         # notify players that one has left
         update_players(game_id)
 
-        player_name = get_name_of_player(player_id)
         if player_name is not None:
             fsio.emit('message_room', player_name + ' has left.', room=game_id, namespace=NAMESPACE)
 
