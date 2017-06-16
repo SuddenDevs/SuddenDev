@@ -15,8 +15,7 @@ celery_socketio = SocketIO(message_queue=Config.REDIS_URL)
 # As above for celery
 from celery import Celery
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND,
-        redis_max_connections=Config.CELERY_MAX_CONNECTIONS, broker_pool_limit=Config.CELERY_MAX_CONNECTIONS,
-        task_time_limit=5)
+        redis_max_connections=Config.CELERY_MAX_CONNECTIONS, broker_pool_limit=Config.CELERY_MAX_CONNECTIONS)
 
 # Create our main blueprint, used by our routes and events
 # which is registered to the app in create_app().

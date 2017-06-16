@@ -2,7 +2,7 @@ from . import celery, celery_socketio
 from .game_instance import GameInstance
 import time
 
-@celery.task
+@celery.task(time_limit=5, max_retries=3)
 def play_game(game_id, player_names, scripts, player_ids, colors, namespace, room, wave=1):
 
     cleared = True
@@ -17,7 +17,7 @@ def play_game(game_id, player_names, scripts, player_ids, colors, namespace, roo
     # return highest reached wave
     return current_wave - 1
 
-@celery.task
+@celery.task(time_limit=5, max_retries=3)
 def test_round(game_id, player_names, scripts, player_ids, colors, namespace, room, wave=1):
     game = GameInstance(game_id, player_names, scripts, player_ids, colors, wave=wave)
     for batch in game.run():
