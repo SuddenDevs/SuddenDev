@@ -123,9 +123,14 @@
         var data_new = JSON.parse(data).result;
         var first = data_new[0];
         var game_is_new = false;
-        toggleClasses("readyBtn", ["active", "noEvents"], true);
-        toggleClasses("testBtn", ["greyOut", "noEvents"], true);
-        document.getElementById("readyBtn").innerHTML = "Playing"
+        if (!test) {
+          toggleClasses("readyBtn", ["active", "noEvents"], true);
+          toggleClasses("testBtn", ["greyOut", "noEvents"], true);
+          document.getElementById("readyBtn").innerHTML = "Playing"
+        } else {
+          toggleClasses("testBtn", ["active"], true);
+          toggleClasses("readyBtn", ["greyOut", "noEvents"], true);
+        }
 
         //Check if this is a new game
         for (var i = 0; i < first.events.length; i++) {
