@@ -1,4 +1,4 @@
 #!/bin/bash
-sh run-redis.sh &
 sudo rabbitmq-server -detached
+sh run-redis.sh &
 heroku local
