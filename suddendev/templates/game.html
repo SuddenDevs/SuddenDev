@@ -1242,7 +1242,7 @@
         if (console) {
           c = document.getElementById("console");
         } else {
-          c = document.getElementById("chatMsgBox");
+          c = document.getElementById("chat");
         }
         var s = document.createElement("span");
         s.innerHTML = data + "\n";
@@ -1259,7 +1259,7 @@
       function toggleChatConsole() {
         var cons = document.getElementById("console");
         cons.classList.toggle("noDisplay");
-        var chat = document.getElementById("chat");
+        var chat = document.getElementById("chatContainer");
         chat.classList.toggle("noDisplay");
         var b = document.getElementById("switchBtn");
         if (cons.classList.contains("noDisplay")) {
@@ -1276,7 +1276,7 @@
 
       function sendChatMessage(event) {
         if (event.keyCode == 13) {
-          var chat = document.getElementById("chatMsgBox");
+          var chat = document.getElementById("chat");
           var input = document.getElementById("inputChat");
           socket.emit(EVENTS.CHAT, input.value);
           input.value = "";
@@ -1348,8 +1348,8 @@
             <div class="fullWidth consoleContainer">
               <div class="card fullWidth fullHeight">
                 <div id="console" class="card-block"></div>
-                <div id="chat" class="card-block noDisplay" style="">
-                  <div id="chatMsgBox"></div>
+                <div id="chatContainer" class="card-block noDisplay" style="">
+                  <div id="chat"></div>
                   <div class="greyBorder chatIn">
                     <input id="inputChat" class="fullWidth chatIn" onkeydown="sendChatMessage(event)"></input>
                   </div>
