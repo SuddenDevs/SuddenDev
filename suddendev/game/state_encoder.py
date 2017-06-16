@@ -11,7 +11,13 @@ def clamp(x):
 
 class StateEncoder(json.JSONEncoder):
     def default(self, o):
-        return self.serializeState(o)
+        result = {}
+        try:
+            result = self.serializeState(o)
+        except Exception:
+            print(str(o))
+
+        return result
 
     def serializeState(self, state):
         return { 
