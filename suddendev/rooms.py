@@ -357,6 +357,26 @@ def reset_all_players(game_id):
     redis.set(game_id, json.dumps(game_json))
     # TODO: release lock for game_id
 
+def set_player_unready(game_id, player_id):
+    # TODO: acquire lock for game_id
+    game_json_string = redis.get(game_id)
+
+    if game_json_string is None:
+        # TODO: release lock for game_id
+        return 
+
+    game_json = json.loads(game_json_string)
+
+    for player_json in game_json['players']:
+        if player_json['id'] == player_id:
+            player_json['status'] = 'editing'
+            break
+
+    redis.set(game_id, json.dumps(game_json))
+    # TODO: release lock for game_id
+
+
+
 def remove_room(game_id):
     """Remove the entry for room with given id."""
     # TODO: acquire lock for game_id

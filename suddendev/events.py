@@ -20,6 +20,7 @@ from .rooms import (
     remove_room,
     get_room_wave,
     set_room_wave,
+    set_player_unready,
 )
 
 NAMESPACE = '/game-session'
@@ -54,6 +55,15 @@ def disconnect():
     """Received when a client ungracefully leaves a room."""
     player_id = flask_login.current_user.id
     manage_player_leaves(player_id)
+
+@socketio.on('cancel', namespace=NAMESPACE)
+def cancel(message):
+    player_id = flask_login.current_user.id
+    game_id = get_room_of_player(player_id)
+
+    set_player_unready(game_id, player_id)
+    update_players(game_id)
+
 
 @socketio.on('submit', namespace=NAMESPACE)
 def submit_code(message):
