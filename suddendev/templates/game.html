@@ -135,7 +135,7 @@
           }
         }
         if (game_is_new) {
-            game_data.push(data_new); 
+            game_data.push(data_new);
             if (!inGame) {
               game_start();
             }
@@ -329,7 +329,7 @@
 
         var name = new PIXI.Text(data.name,
                                         { fontFamily:"Arial",
-                                          fontSize:"16", 
+                                          fontSize:"16",
                                           fill: "black"});
         name.anchor.x = 0.5;
         name.anchor.y = 2;
@@ -660,7 +660,7 @@
         emitter.playOnceAndDestroy();
         delete enemies[tag];
       }
-      
+
       function clearup_core() {
         var emitter = new PIXI.particles.Emitter(
                 particle_layer,
@@ -740,7 +740,7 @@
                 present = true;
               }
             }
-            
+
             if (!present) {
               players.splice(i, 1);
 
@@ -894,7 +894,7 @@
         game_layer.addChild(entity_layer);
         game_layer.width = renderer.width;
         game_layer.height = renderer.height;
-        
+
         stage.addChild(background_layer);
         stage.addChild(game_layer);
         stage.addChild(hud_layer);
@@ -913,7 +913,7 @@
           dropShadowAngle: Math.PI / 6,
           dropShadowDistance: 0,
         });
-        
+
         textStyle.fontSize = 20;
         fpsText = new PIXI.Text("", textStyle);
         fpsText.x = 10;
@@ -933,7 +933,7 @@
         hud_layer.addChildAt(fade, 0);
         fade.alpha = 0;
         fade.visible = false;
-        
+
         draw_grid();
 
         startWaiting();
@@ -957,7 +957,7 @@
         } else if (timer_end > 0) {
           var param = Math.min(timer_end / TIME_AFTER_END, 1);
           fade.alpha = 0.5 * (1 - param);
-          process_state_end(last_state, delta); 
+          process_state_end(last_state, delta);
         } else {
           ticker.stop();
           if (game_data.length > 0) {
@@ -1054,7 +1054,7 @@
         var text
         switch (result) {
           case "Lose_Core":
-            text = "Core Destroyed"; 
+            text = "Core Destroyed";
             clearup_core();
             fade.tint = PIXI.utils.rgb2hex([1, 0, 0]);
             break;
@@ -1114,7 +1114,7 @@
           a.timer = a.timer + delta;
           if (a.timer >= attack_fade) {
             particle_layer.removeChild(a.sprite);
-            attacks.splice(i, 1);   
+            attacks.splice(i, 1);
             i--;
           } else {
             a.sprite.alpha = 1 - a.timer/attack_fade;
@@ -1150,10 +1150,10 @@
       //Create equilateral triangle facing DIR
       function create_triangle(pos, dir, radius, color) {
         var shape = new PIXI.Graphics();
-       
+
         var base = 2 * radius * Math.cos(Math.PI/6);
         var height = radius * (1 +  Math.sin(Math.PI/6));
-        
+
         shape.beginFill(color);
         shape.drawPolygon([0, 0, base, 0, base/2, height, 0, 0]);
         shape.endFill();
@@ -1200,7 +1200,7 @@
             }
           }
         }
-      } 
+      }
 
       function draw_pickups(list, delta) {
         for (var i = 0; i < list.length; i++) {
@@ -1270,17 +1270,13 @@
 
       }
 
-      function toggleChatConsole() {
+      function toggleChatConsole(console) {
         var cons = document.getElementById("console");
         cons.classList.toggle("noDisplay");
         var chat = document.getElementById("chatContainer");
         chat.classList.toggle("noDisplay");
-        var b = document.getElementById("switchBtn");
-        if (cons.classList.contains("noDisplay")) {
-          b.innerHTML = "Switch to Console";
-        } else {
-          b.innerHTML = "Switch to Chat";
-        }
+        toggleClasses("chatBtn", ["active", "noEvents"], console);
+        toggleClasses("chatBtn", ["active", "noEvents"], !console);
       }
 
       function handleChatIn(data) {
@@ -1375,7 +1371,8 @@
             <div class="col noPadding">
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
-                  <button id="switchBtn" class="btn btn-outline-warning" onclick="toggleChatConsole()">Switch to Chat</button>
+                  <button id="consoleBtn" class="btn btn-outline-warning active noEvents" onclick="toggleChatConsole(true);">Console</button>
+                  <button id="chatBtn" class="btn btn-outline-warning" onclick="toggleChatConsole(false);">Chat</button>
                 </div>
                 <div class="btn-group">
                   <button class="btn btn-outline-info" onclick="submitCode()">Commit</button>
@@ -1395,7 +1392,7 @@
             <div id="getting-started" class="card m-3">
               <div class="card-header card-inverse card-success">
                 <!-- Cheat Sheet Header !-->
-                <h4 style="color:#fff"> Cheat Sheet </h4>  
+                <h4 style="color:#fff"> Cheat Sheet </h4>
               </div>
               <div class="card-block">
                 <!-- Cheat Sheet Content !-->
@@ -1410,4 +1407,3 @@
     </div>
   <script>initCanvas();initSocket();initEditor();</script>
 {% endblock %}
-  
