@@ -126,19 +126,19 @@ span.key{
   text-align: left;
 }
 
+#chatContainer{
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+  padding: 10px;
+}
+
 #chat{
   overflow-y: auto;
   overflow-x: hidden;
   word-wrap: break-word;
-  padding: 10px;
   padding-bottom: 0;
   text-align: left;
-  flex-direction: column;
-  align-content: stretch;
-  display: flex;
-}
-
-#chatMsgBox{
   flex: 1 1 auto;
 }
 
