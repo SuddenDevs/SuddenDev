@@ -2,6 +2,7 @@
 
 import json
 from .event import EventType
+from .game import Game
 
 def encodeState(game):
     return json.dumps(game, cls=StateEncoder)
@@ -11,14 +12,16 @@ def clamp(x):
 
 class StateEncoder(json.JSONEncoder):
     def default(self, o):
-        return self.serializeState(o)
+        if isinstance(o, Game):
+            return self.serializeState(o)
+
+        return {}
 
     def serializeState(self, state):
         return { 
                 'wave': state.wave,
                 'enemies': self.serializeEnemies(state.enemies),
                 'pickups': self.serializePickups(state.pickups),
-                'walls': self.serializeWalls(state.walls),
                 'players': self.serializePlayers(state.players),
                 'core': self.serializeCore(state.core),
                 'events': self.serializeEvents(state.events)

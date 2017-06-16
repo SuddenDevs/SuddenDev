@@ -58,6 +58,9 @@ def g_callback():
         return flask.redirect(flask.url_for('.home'))
     if 'code' not in flask.request.args and 'state' not in flask.request.args:
         return flask.redirect(flask.url_for('.index'))
+    if 'oauth_state' not in flask.session:
+        flask.flash('Something went wrong... Try clearing cache and signing in again.')
+        return flask.redirect(flask.url_for('.index'))
     else:
         google = get_google_auth(state=flask.session['oauth_state'])
         token = google.fetch_token(Config.TOKEN_URI, client_secret=Config.CLIENT_SECRET,
