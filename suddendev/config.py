@@ -22,7 +22,7 @@ class Config(object):
     CLIENT_SECRET = os.environ['CLIENT_SECRET']
 
     REDIS_MAX_CONNECTIONS = 10
-    CELERY_MAX_CONNECTIONS = 10
+    CELERY_MAX_CONNECTIONS = 1
 
 class ProductionConfig(Config):
     DEBUG = False
