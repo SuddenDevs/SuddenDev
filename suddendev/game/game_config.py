@@ -1,5 +1,6 @@
 from .vector import Vector
 from .enemy_type import EnemyType
+from .color import Color3
 
 class GameConfig:
     # Game steps per second
@@ -8,6 +9,13 @@ class GameConfig:
     FRAMERATE_DISPLAY = 30
     FRAME_INTERVAL_SIM = 1/FRAMERATE_SIM
     FRAME_INTERVAL_DISPLAY = 1/FRAMERATE_DISPLAY
+
+    PLAYER_COLORS = [
+            Color3(0, 174, 239),  # Blue #00aeef
+            Color3(236, 0, 140),  # Purple #ec008c
+            Color3(247, 148, 30), # Orange #f7941e
+            Color3(0, 166, 81),   # Green #00a651
+            ]
 
     # Timeout in seconds before the user script is rejected
     SCRIPT_TIMEOUT = 1

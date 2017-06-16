@@ -28,7 +28,8 @@ PLAYER_JSON_TEMPLATE = {
     'id': None,                      # the system-wide id of the player
     'name': None,                    # the display name of the player (possibly not unique)
     'script': gc.P_DEFAULT_SCRIPT,   # the most recently submitted script by the player
-    'status': 'editing'              # current player status - 'ready' locked-in waiting to run
+    'color' : '#ff00ff',             # color of current player
+    'status': 'editing',             # current player status - 'ready' locked-in waiting to run
                                      #                       - 'editing' still editing, not ready
 }
 
@@ -161,10 +162,12 @@ def add_player_to_room(game_id, player_id, name):
             # TODO: release lock for game_id
             return False, "Sorry looks like you've already joined that game! Check your other tabs."
 
+    color = gc.PLAYER_COLORS[int(game_json['player_count'] % 4)].to_hex()
     player_json = dict(PLAYER_JSON_TEMPLATE)
     player_json['id'] = player_id
     player_json['name'] = name
     player_json['script'] = User.query.get(player_id).script
+    player_json['color'] = color
     game_json['players'].append(player_json)
     game_json['player_count'] += 1
     redis.set(game_id, json.dumps(game_json))
@@ -173,6 +176,7 @@ def add_player_to_room(game_id, player_id, name):
     user_json = dict(USER_JSON_TEMPLATE)
     user_json['game_id'] = game_id
     user_json['name'] = name
+    user_json['color'] = color
     redis.set(player_id, json.dumps(user_json))
 
     return True, ""
@@ -222,6 +226,17 @@ def get_name_of_player(player_id):
     entry = redis.get(player_id)
     if entry is not None:
         return json.loads(entry)['name']
+    else:
+        return None
+
+def get_color_of_player(player_id):
+    """
+    Return the color of a player.
+    If there is no entry for the player, return None.
+    """
+    entry = redis.get(player_id)
+    if entry is not None:
+        return json.loads(entry)['color']
     else:
         return None
 
