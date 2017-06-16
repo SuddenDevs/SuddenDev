@@ -1,7 +1,7 @@
 #!/usr/bin/python3.5
 
 from .vector import Vector
-from .color import Color3, random_color3
+from .color import Color3, random_color3, from_hex
 from .player import Player
 from .enemy import Enemy
 from .pickup import Pickup, PickupType
@@ -37,7 +37,7 @@ class Map:
         self.height = height
 
 class Game:
-    def __init__(self, wave, player_names, scripts, player_ids):
+    def __init__(self, wave, player_names, scripts, player_ids, colors):
         self.walls = []
         self.events = []
         self.enemies = []
@@ -66,20 +66,21 @@ class Game:
         self.core.health = self.core.health_max
 
         #Players
-        self.init_players(player_names, scripts, player_ids)
+        self.init_players(player_names, scripts, player_ids, colors)
 
         self.events_add(Event(EventType.GAME_START))
 
-    def init_players(self, player_names, scripts, player_ids):
+    def init_players(self, player_names, scripts, player_ids, colors):
         player_count = len(player_names)
         self.players = []
         for i in range(player_count):
             name = player_names[i]
             script = scripts[i]
             player_id = player_ids[i]
+            color = from_hex(colors[i])
 
             angle = i * 2 * math.pi / player_count - math.pi/2
-            player = Player(name, random_color3(), self, script, player_id)
+            player = Player(name, color, self, script, player_id)
             player.pos = self.get_random_spawn(player.size)
             player.pos = self.core.pos\
                          + Vector(math.cos(angle), math.sin(angle))\

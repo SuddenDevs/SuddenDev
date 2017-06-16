@@ -8,6 +8,7 @@ from .game_instance import GameInstance
 from .tasks import play_game, test_round
 from .rooms import (
     get_room_of_player,
+    get_color_of_player,
     get_players_in_room,
     remove_player_from_room,
     get_room_state_json_string,
@@ -88,6 +89,7 @@ def test(message):
     player_names = []
     player_scripts = []
     player_ids = []
+    colors = []
     # if len(player_jsons) < 2:
         # player = player_jsons[0]
         # for i in range(4):
@@ -104,6 +106,7 @@ def test(message):
     for player in player_jsons:
         player_names.append(player['name'])
         player_ids.append(player['id'])
+        colors.append(player['color'])
 
         # use the submitted script
         if player['id'] == player_id:
@@ -113,7 +116,7 @@ def test(message):
 
     wave = get_room_wave(game_id)
     fsio.emit('message_local', 'Testing against wave ' + str(wave), room=flask.request.sid, namespace=NAMESPACE)
-    handle = test_round.delay(game_id, player_names, player_scripts, player_ids, NAMESPACE, flask.request.sid, wave=wave)
+    handle = test_round.delay(game_id, player_names, player_scripts, player_ids, colors, NAMESPACE, flask.request.sid, wave=wave)
     cleared = handle.get()
 
 @socketio.on('play', namespace=NAMESPACE)
@@ -137,10 +140,10 @@ def play(message):
 def chat(message):
     player_id = flask_login.current_user.id
     game_id = get_room_of_player(player_id)
-
     player_name = get_name_of_player(player_id)
+    color = get_color_of_player(player_id)
     if player_name is not None:
-        fsio.emit('message_chat', '{ "name":"' + str(player_name) + '", "body": "' + message + '"}', room=game_id, namespace=NAMESPACE)
+        fsio.emit('message_chat', '{ "name":"' + str(player_name) + '", "body": "' + message + '", "color": "#' + color + '"}', room=game_id, namespace=NAMESPACE)
 
 def manage_player_leaves(player_id):
     game_id = get_room_of_player(player_id)
@@ -169,15 +172,17 @@ def run_game_if_everyone_ready(game_id):
         player_ids = []
         player_names = []
         player_scripts = []
+        colors = []
     
         for player in player_jsons:
             player_names.append(player['name'])
             player_ids.append(player['id'])
             player_scripts.append(player['script'])
+            colors.append(player['color'])
 
         fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
         wave = get_room_wave(game_id)
-        handle = play_game.delay(game_id, player_names, player_scripts, player_ids, NAMESPACE, game_id, wave=1)
+        handle = play_game.delay(game_id, player_names, player_scripts, player_ids, colors, NAMESPACE, game_id, wave=1)
         highest_wave = handle.get()
         set_room_wave(game_id, highest_wave + 1)
 

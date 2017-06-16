@@ -6,6 +6,14 @@ class Color3:
         self.g = g
         self.b = b
 
+    def to_hex(self):
+        return "{0:02x}{1:02x}{2:02x}".format(self.r, self.g, self.b)
+
+def from_hex(value):
+    h = value.lstrip('#')
+    color = tuple(int(h[i:i+2], 16) for i in (0, 2 ,4))
+    return Color3(color[0], color[1], color[2])
+
 def random_color3():
     lightness = 0.6
     extra = random.random() * 0.5
