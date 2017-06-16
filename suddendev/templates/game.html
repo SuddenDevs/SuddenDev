@@ -28,12 +28,13 @@
                     "PLAY":'play', "ERROR":'message_error',
                     "ROOM_MSG":"message_room", "GAME_RESULT":'message_result',
                     "TROPHY":"message_trophy", "LOCAL":'message_local',
-                    "CHAT":"message_chat"};
+                    "CHAT":"message_chat", "CANCEL":'cancel'};
 
       var editor = null;
       var socket = null;
       var inGame = false;
       var test = false;
+      var ready = false;
       var currentTab = 0;
       var playerID = {{user.id}};
       var players = [];
@@ -122,6 +123,9 @@
         var data_new = JSON.parse(data).result;
         var first = data_new[0];
         var game_is_new = false;
+        toggleClasses("readyBtn", ["active", "noEvents"], true);
+        toggleClasses("testBtn", ["greyOut", "noEvents"], true);
+        document.getElementById("readyBtn").innerHTML = "Playing"
 
         //Check if this is a new game
         for (var i = 0; i < first.events.length; i++) {
@@ -852,11 +856,20 @@
 
       //Ready up
       function readyUp() {
-        submitCode();
-        toggleClasses("readyBtn", ["active", "noEvents"], true);
-        toggleClasses("testBtn", ["greyOut", "noEvents"], true);
-        socket.emit(EVENTS.PLAY, {});
-        test = false;
+        var btnText;
+        if (!ready) {
+          submitCode();
+          btnText = "Cancel"
+          socket.emit(EVENTS.PLAY, {});
+          test = false;
+        } else {
+          btnText = "Start Game";
+          socket.emit(EVENTS.CANCEL, {});
+        }
+        document.getElementById("readyBtn").innerHTML = btnText;
+        ready = !ready;
+        toggleClasses("readyBtn", ["active"], ready);
+        toggleClasses("testBtn", ["greyOut", "noEvents"], ready);
       }
 
       //Initialise gameCanvas - initialise stage, add shape drawer
@@ -1075,6 +1088,7 @@
       function endGame() {
         toggleClasses("testBtn", ["greyOut", "noEvents", "active"], false);
         toggleClasses("readyBtn", ["greyOut", "noEvents", "active"], false);
+        document.getElementById("readyBtn").innerHTML = "Start Game"
         for (var i = 0; i < players.length; i++) {
           toggleClasses("tab" + i, ["ready", "activeReady"], false);
         }
