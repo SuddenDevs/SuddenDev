@@ -102,6 +102,13 @@ class StateEncoder(json.JSONEncoder):
                 }
         return json
 
+    def serializeChatBubble(self, chat):
+        json = {
+                'source' : self.serializePlayer(chat.player),
+                'string' : chat.string
+                }
+        return json
+
     def serializeEvents(self, events):
         result = []
         for e in events:
@@ -130,6 +137,8 @@ class StateEncoder(json.JSONEncoder):
                         ]
             elif e.event_type == EventType.MESSAGE_SENT:
                 body = self.serializeMessage(e.body[0])
+            elif e.event_type == EventType.CHAT_BUBBLE:
+                body = self.serializeChatBubble(e.body[0])
 
             json['body'] = body
             result.append(json)

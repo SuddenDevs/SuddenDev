@@ -96,8 +96,8 @@ class Player(Entity):
 
         self.scope = {
             'math' : math,
-            'map_width' : self.game.get_map_width(),
-            'map_height' : self.game.get_map_height(),
+            'game_width' : self.game.get_map_width(),
+            'game_height' : self.game.get_map_height(),
             'Vector' : Vector,
             'PickupType' : PickupType,
             'EnemyType' : EnemyType,
@@ -108,6 +108,7 @@ class Player(Entity):
 
             'say' : partial(say, self),
             'say_also_to_self' : partial(say_also_to_self, self),
+            'chat' : partial(chat, self),
             'shoot' : partial(shoot, self),
             'move_to' : partial(move_to, self),
             'move_from' : partial(move_from, self),

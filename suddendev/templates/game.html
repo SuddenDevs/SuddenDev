@@ -342,6 +342,7 @@
         particle_layer.addChildAt(attack_area, 0);
         player.visible_area = visible_area;
         player.attack_area = attack_area;
+        player.message = null;
       }
 
       function create_core(data) {
@@ -505,8 +506,8 @@
         return bubble;
       }
 
-      function player_say(player, string) {
-        var p = playerDict[player.tag];
+      function player_say(data, string) {
+        var p = playerDict[data.tag];
         if (p.message) {
           p.container.removeChild(p.message.container);
           p.message = null;
@@ -514,7 +515,7 @@
 
         var msg = create_message(string);
         msg.x = -msg.width/2;
-        msg.y = -msg.height - player.size - 20;
+        msg.y = -msg.height - data.size - 20;
         p.container.addChild(msg);
         p.message = {container: msg, timer: MSG_DISPLAY_TIME};
       }
@@ -1010,7 +1011,9 @@
               break;
             case "Message_Sent":
               //printToConsole(body.source.name + " sent message: " + body.string, "#ABC");
-              player_say(body.source, body.string);
+              break;
+            case "Chat_Bubble":
+              player_say(body.source, body.string); 
               break;
             default:
               //console.log("Unknown event: " + e.name);

@@ -17,6 +17,7 @@ class EventType(Enum):
     PRINT = 'Print'
     ERROR = 'Error'
     ATTACK = 'Attack'
+    CHAT_BUBBLE = 'Chat_Bubble'
 
 class GameOverType(Enum):
     LOSE_PLAYERS = 'Lose_Players'

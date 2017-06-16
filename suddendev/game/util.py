@@ -2,6 +2,7 @@ from .vector import Vector
 from .entity import Entity, Dummy
 from .message import Message
 from .event import Event, EventType
+from .chat import Chat
 from .enemy_type import EnemyType
 from .pickup import PickupType
 from .color import Color3
@@ -62,6 +63,9 @@ def _shoot(self, enemy, is_player):
 # the body, the argument is unpacked from a list to the object itself for convenience.
 def say(self, string, *body):
     _say(self, string, False, body)
+
+def chat(self, string):
+    self.game.events_add(Event(EventType.CHAT_BUBBLE, Chat(self, string)))
 
 # Broadcasts a message to all players, including the sender.
 def say_also_to_self(self, string, *body):
