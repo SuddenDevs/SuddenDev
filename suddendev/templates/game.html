@@ -27,7 +27,8 @@
                     "SUBMIT":'submit',"LEFT":'left',"JOINED":'joined',
                     "PLAY":'play', "ERROR":'message_error',
                     "ROOM_MSG":"message_room", "GAME_RESULT":'message_result',
-                    "TROPHY":"message_trophy", "LOCAL":'message_local'};
+                    "TROPHY":"message_trophy", "LOCAL":'message_local',
+                    "CHAT":"message_chat"};
 
       var editor = null;
       var socket = null;
@@ -100,6 +101,9 @@
           });
           socket.on(EVENTS.TROPHY, function(data) {
             trophyQueue.push(data);
+          });
+          socket.on(EVENTS.CHAT, function(data){
+            handleChatIn(data);
           });
         });
         window.onbeforeunload = function(e) {
@@ -826,12 +830,6 @@
         test = true;
       }
 
-      function revertCode() {
-        if (currentTab == 0){
-          editor.setValue(players[0].script, -1);
-        }
-      }
-
       function clear_current_game_data() {
         timer = 0;
         timer_end = 0;
@@ -1232,7 +1230,20 @@
 
       //Prints to the on screen console
       function printToConsole(data, color){
-        var c = document.getElementById("console");
+        printTo(true, data, color);
+      }
+
+      function printToChat(data, color){
+        printTo(false, data, color);
+      }
+
+      function printTo(console, data, color) {
+        var c;
+        if (console) {
+          c = document.getElementById("console");
+        } else {
+          c = document.getElementById("chatMsgBox");
+        }
         var s = document.createElement("span");
         s.innerHTML = data + "\n";
         s.classList.add("console");
@@ -1241,6 +1252,35 @@
         c.appendChild(s);
         if (scrollAtBottom) {
           c.scrollTop = c.scrollHeight;
+        }
+
+      }
+
+      function toggleChatConsole() {
+        var cons = document.getElementById("console");
+        cons.classList.toggle("noDisplay");
+        var chat = document.getElementById("chat");
+        chat.classList.toggle("noDisplay");
+        var b = document.getElementById("switchBtn");
+        if (cons.classList.contains("noDisplay")) {
+          b.innerHTML = "Switch to Console";
+        } else {
+          b.innerHTML = "Switch to Chat";
+        }
+      }
+
+      function handleChatIn(data) {
+        var msg = JSON.parse(data);
+        var name = getPlayer(msg.id).name;
+        printToChat("[" + name + "]: " + msg.body);
+      }
+
+      function sendChatMessage(event) {
+        if (event.keyCode == 13) {
+          var chat = document.getElementById("chatMsgBox");
+          var input = document.getElementById("inputChat");
+          socket.emit(EVENTS.CHAT, input.value);
+          input.value = "";
         }
       }
 
@@ -1309,6 +1349,12 @@
             <div class="fullWidth consoleContainer">
               <div class="card fullWidth fullHeight">
                 <div id="console" class="card-block"></div>
+                <div id="chat" class="card-block noDisplay" style="">
+                  <div id="chatMsgBox"></div>
+                  <div class="greyBorder chatIn">
+                    <input id="inputChat" class="fullWidth chatIn" onkeydown="sendChatMessage(event)"></input>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1316,7 +1362,7 @@
             <div class="col noPadding">
               <div class="btn-toolbar justify-content-between">
                 <div class="btn-group">
-                  <button class="btn btn-outline-warning" onclick="revertCode()">Revert</button>
+                  <button id="switchBtn" class="btn btn-outline-warning" onclick="toggleChatConsole()">Switch to Chat</button>
                 </div>
                 <div class="btn-group">
                   <button class="btn btn-outline-info" onclick="submitCode()">Commit</button>

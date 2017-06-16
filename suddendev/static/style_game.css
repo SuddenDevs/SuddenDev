@@ -89,6 +89,10 @@ span.console{
   margin:0;
 }
 
+.noDisplay{
+  display:none !important;
+}
+
 .noPadding{
   padding:0;
 }
@@ -120,4 +124,37 @@ span.key{
   word-wrap: break-word;
   padding: 10px;
   text-align: left;
+}
+
+#chat{
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  padding: 10px;
+  padding-bottom: 0;
+  text-align: left;
+  flex-direction: column;
+  align-content: stretch;
+  display: flex;
+}
+
+#chatMsgBox{
+  flex: 1 1 auto;
+}
+
+div.chatIn{
+  width: inherit;
+  flex: 0 0 auto;
+  border: none;
+  border-top: solid;
+  border-top-width: thin;
+  border-top-color: #ccc;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+input.chatIn{
+  border:none;
+  padding-right: 10px;
+  padding-left: 10px;
 }
