@@ -751,10 +751,11 @@
               players.splice(i, 1);
 
               var tabs = document.getElementsByClassName("tabBtn");
+              var tabLis = document.getElementsByClassName("tabLi");
               for (var k = 1; k < MAXPLAYERS; k++) {
                 if (k >= players.length) {
                   tabs[k].innerHTML = "";
-                  tabs[k].classList.add("hidden");
+                  tabLis[k].classList.add("noDisplay");
                   tabs[k].classList.remove("ready");
                   tabs[k].classList.remove("activeReady")
                   if (k == currentTab) {
@@ -799,9 +800,12 @@
           return false;
         }
         players.push({"script":player.script, "id":player.id, "name":player.name});
-        var t = document.getElementById("tab" + (players.length - 1));
-        t.innerHTML = player.name.substring(0, TAB_NAME_CHAR_LIMIT);
-        t.classList.remove("hidden");
+        var t = document.getElementById("tabLi" + (players.length - 1));
+        var tb = document.getElementById("tab" + (players.length - 1));
+        var tc = document.getElementById("tabClr" + (players.length - 1));
+        tc.style.backgroundColor = '#' + player.color;
+        tb.innerHTML = player.name.substring(0, TAB_NAME_CHAR_LIMIT);
+        t.classList.remove("noDisplay");
         return true;
       }
 
@@ -1347,17 +1351,29 @@
         <div class="col mainCol">
           <div class="row topRow noMargin">
             <ul id="edit-tab" class="nav nav-tabs fullWidth">
-               <li class="nav-item active" onClick="setEditorTab(0)">
-                  <button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)">Player 1</button>
+               <li id="tabLi0" class="nav-item active tabLi" onClick="setEditorTab(0)">
+                 <div class="fullWidth fullHeight" style="display: flex; flex-direction: column; align-content: stretch">
+                   <button id="tab0" class="nav-link tabBtn active" onClick="setEditorTab(0)" style="flex: 0 0 auto">Player 1</button>
+                   <div id="tabClr0" style="flex: 1 1 auto; background-color: #00f;"></div>
+                 </div>
                 </li>
-                <li class="nav-item">
-                  <button id="tab1" class="nav-link tabBtn hidden" onclick="setEditorTab(1)"></button>
+                <li id="tabLi1" class="nav-item noDisplay tabLi">
+                 <div class="fullWidth fullHeight" style="display: flex; flex-direction: column; align-content: stretch">
+                  <button id="tab1" class="nav-link tabBtn" onclick="setEditorTab(1)"></button>
+                   <div id="tabClr1" style="flex: 1 1 auto; background-color: #00f;"></div>
+                 </div>
                 </li>
-                <li class="nav-item">
-                  <button id="tab2" class="nav-link tabBtn hidden" onclick="setEditorTab(2)"></button>
+                <li id="tabLi2" class="nav-item noDisplay tabLi">
+                 <div class="fullWidth fullHeight" style="display: flex; flex-direction: column; align-content: stretch">
+                  <button id="tab2" class="nav-link tabBtn" onclick="setEditorTab(2)"></button>
+                   <div id="tabClr2" style="flex: 1 1 auto; background-color: #00f;"></div>
+                 </div>
                 </li>
-                <li class="nav-item">
-                  <button id="tab3" class="nav-link tabBtn hidden" onclick="setEditorTab(3)"></button>
+                <li id="tabLi3" class="nav-item noDisplay tabLi">
+                 <div class="fullWidth fullHeight" style="display: flex; flex-direction: column; align-content: stretch">
+                  <button id="tab3" class="nav-link tabBtn" onclick="setEditorTab(3)"></button>
+                   <div id="tabClr3" style="flex: 1 1 auto; background-color: #00f;"></div>
+                 </div>
                 </li>
             </ul>
           </div>
