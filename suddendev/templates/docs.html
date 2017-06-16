@@ -331,31 +331,73 @@ Similarly, you can access the <code>attack_delay</code> and <code>attack_timer</
         <h4> Scripting Reference </h4>
         </div>
         <div class="card-block">
-        <div class="card card-outline-danger">
-        <pre><code class="python code-block">
-update(player, delta)</code></pre></div><br>
-        <b>Must</b> be defined. This function is called each frame (30 times per second).<br>
-        <code>player</code> - current player's entity<br>
-        <code>delta</code> - time in seconds since the last frame<br>
-        <br>
-        <div class="card card-outline-danger">
-        <pre><code class="python code-block">
-respond(player, message)</code></pre></div><br>
-        <b>Should</b> be defined. This function is called whenever some player calls <code>say()</code>. If this function is not defined, the default behaviour is to do nothing when a message is received.<br>
-        <code>player</code> - current player's entity<br>
-        <code>message</code> - message object that was received<br>
-        <br>
-        <b>The following libraries can be used without having to <code>import</code> them.</b><br>
-        <code>math</code><br>
-        <code>random</code><br>
-        <code>sys</code><br><br>
         
-        <b>The following built in keywords are allowed</b>:<br>
-        <code>abs</code>, <code>all</code>, <code>any</code>, <code>ascii</code>, <code>bin</code>, <code>bool</code>, <code>bytearray</code>, <code>bytes</code>, <code>callable</code>, <code>chr</code>, <code>classmethod</code>, <code>complex</code>, <code>delattr</code>, <code>dict</code>, <code>dir</code>, <code>divmod</code>, <code>enumerate</code>, <code>filter</code>, <code>float</code>, <code>format</code>, <code>frozenset</code>, <code>getattr</code>, <code>globals</code>, <code>hasattr</code>, <code>hash</code>, <code>help</code>, <code>hex</code>, <code>id</code>, <code>int</code>, <code>isinstance</code>, <code>issubclass</code>, <code>iter</code>, <code>len</code>, <code>list</code>, <code>locals</code>, <code>map</code>, <code>max</code>, <code>min</code>, <code>next</code>, <code>object</code>, <code>oct</code>, <code>ord</code>, <code>pow</code>, <code>property</code>, <code>range</code>, <code>repr</code>, <code>reversed</code>, <code>round</code>, <code>set</code>, <code>setattr</code>, <code>slice</code>, <code>sorted</code>, <code>staticmethod</code>, <code>str</code>, <code>sum</code>, <code>super</code>, <code>tuple</code>, <code>type</code>, <code>vars</code>, <code>zip
-            </code>
-        <br><br>
-        Note that <code>import</code> is not allowed for security reasons.<br><br>
+        <h4 id="reference-interface">Game Interface</h4>
+          <div class="card card-outline-danger">
+            <pre><code class="python code-block">update(player, delta)</code></pre></div>
+            <p>
+          <code>player</code> - reference to your player entity<br>
+          <code>delta</code> - time, in seconds, since the last frame<br>
+            </p>
+          <p>
+          This function must be defined globally for your script to run. <code>update</code> is called each frame (30 times per second) internally by the game simulation logic.<br>
+          </p>
+          <div class="card card-outline-danger">
+          <pre><code class="python code-block">respond(player, message)</code></pre></div>
+          <p>
+            <code>player</code> - current player's entity<br>
+            <code>message</code> - message object that was received<br>
+            <br>
+            The <code>message</code> object has three fields:<br>
+            <ul>
+              <li><code>source</code> - player who issued the message
+              <li><code>string</code> - title of the message (the first argument in a call to <code>say()</code>)</li>
+              <li><code>body</code> - data sent with the message</li>
+            </ul>
+            The <code>body</code> can be any arbitrary data. You should agree with your teammates on what data is sent with which message.
+            <code>respond</code> is called whenever another player calls <code>say()</code>. If this function is not defined, the default behaviour is to do nothing when a message is received.<br>
+          </p> 
+          <h4 id="reference-libraries">Libraries</h4>
+          <p>The included libraries are <code href="https://docs.python.org/3/library/math.html">math</code>, <code href="https://docs.python.org/3/library/random.html">random</code>, and <code>Vector</code>.
+          Think another library should be included? Message us at ...
 
+          <h5>Vectors</h5> 
+          <p>
+          The <code>Vector</code> library provides the following:
+          </p>
+          <p>
+          <code>Vector(x, y)</code> - construct a new vector with components <code>x</code> and <code>y</code><br>
+          <code>Vector.Length(vec)</code> - returns the magnitude of <code>vec</code><br>
+          <code>Vector.LengthSqrd(vec)</code> - returns the magnitue squared of <code>vec</code><br>
+          <code>Vector.Normalize(vec)</code> - if <code>vec</code> is non-zero, returns a unit vector in the same direction as <code>vec</code>, otherwise the zero-vector<br>
+          <code>Vector.DistanceSqrd(a, b)</code> - squared distance between <code>a</code> and <code>b</code><br>
+          <code>Vector.Distance(a, b)</code> - distance between <code>a</code> and <code>b</code><br>
+          <code>Vector.Dot(a, b)</code> - dot product of <code>a</code> with <code>b</code><br>
+          <code>Vector.ProjectOnto(w, v)</code> - projection of <code>w</code> onto <code>v</code><br>
+          </p>
+
+
+
+          <h4 id="reference-helpers">Helper Functions</h4>
+          <h4 id="reference-libraries">Python Built-ins</h4>
+          <p>
+          <p>
+          We've removed some of the default Python 3.6 built-ins, but these are still included:
+          </p>
+          <p>
+        <code>abs</code>, <code>all</code>, <code>any</code>, <code>ascii</code>, <code>bin</code>, <code>bool</code>, <code>bytearray</code>, <code>bytes</code>, <code>callable</code>, <code>chr</code>, <code>classmethod</code>, <code>complex</code>, <code>delattr</code>, <code>dict</code>, <code>dir</code>, <code>divmod</code>, <code>enumerate</code>, <code>filter</code>, <code>float</code>, <code>format</code>, <code>frozenset</code>, <code>getattr</code>, <code>globals</code>, <code>hasattr</code>, <code>hash</code>, <code>help</code>, <code>hex</code>, <code>id</code>, <code>int</code>, <code>isinstance</code>, <code>issubclass</code>, <code>iter</code>, <code>len</code>, <code>list</code>, <code>locals</code>, <code>map</code>, <code>max</code>, <code>min</code>, <code>next</code>, <code>object</code>, <code>oct</code>, <code>ord</code>, <code>pow</code>, <code>property</code>, <code>range</code>, <code>repr</code>, <code>reversed</code>, <code>round</code>, <code>set</code>, <code>setattr</code>, <code>slice</code>, <code>sorted</code>, <code>staticmethod</code>, <code>str</code>, <code>sum</code>, <code>super</code>, <code>tuple</code>, <code>type</code>, <code>vars</code>, <code>zip</code>
+          </p>
+          <p>
+        <code>import</code> is not allowed for security reasons.<br><br>
+          </p>
+
+        <h4 id="reference-entities">Entites</h4>
+        <h4 id="entities-players">Players</h4>
+        <p>
+        <code>players</code> is a global list of the other triangles in the game.
+        </p>
+        The local player can be accessed as the first argument of the either the <code>update</code> or the <code>respond</code> function. See <a href="#reference-interfae">Gameplay Reference</a>
+        
         <b>The following lists can be accessed</b>:<br>
         <code class="code_main">enemies_visible</code> - 
         Contains enemies within the player's visible range (given by <code>range_visible</code>).<br>
@@ -449,18 +491,6 @@ respond(player, message)</code></pre></div><br>
         <code>to_self</code><br>
         <code>string</code><br>
         <code>body</code><br>
-
-        <b>Vectors:</b><br>
-        Initialise as:<br>
-        <code>Vector(x, y)</code><br><br>
-        Vector functions:<br>
-        <code>DistanceSqrd(point1, point2)</code><br>
-        <code>Distance(point1, point2)</code><br>
-        <code>LengthSqrd(vec)</code><br>
-        <code>Length(vec)</code><br>
-        <code>Normalize(vec)</code><br>
-        <code>Dot(a, b)</code><br>
-        <code>ProjectOnto(w, v)</code><br><br>
 
         PickupType<br>
         <code>AMMO</code><br>

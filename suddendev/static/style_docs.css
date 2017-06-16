@@ -6,6 +6,13 @@
     font-size: 18px; 
     padding-left: 1rem;
 }
+.card, .card-outline-danger {
+    padding-bottom: 0rem;
+    margin-bottom: 0rem;
+}
+pre {
+  margin-bottom: 0;
+}
 
 .card-inverse, .card-success {
   color: #ffffff;
