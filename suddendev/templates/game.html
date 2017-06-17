@@ -1310,7 +1310,7 @@
           c = document.getElementById("chat");
         }
         var s = document.createElement("span");
-        s.innerHTML = data + "\n";
+        s.textContent = data + "\n";
         s.classList.add("console");
         s.style.color = color;
         var scrollAtBottom = c.scrollHeight - c.clientHeight <= c.scrollTop + 1;
