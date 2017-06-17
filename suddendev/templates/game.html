@@ -1060,7 +1060,7 @@
               //printToConsole(body.source.name + " sent message: " + body.string, "#ABC");
               break;
             case "Chat_Bubble":
-              player_say(body.source, body.string); 
+              player_say(body.source, body.string);
               break;
             default:
               //console.log("Unknown event: " + e.name);
@@ -1139,13 +1139,16 @@
         toggleClasses("testBtn", ["greyOut", "noEvents", "active"], false);
         toggleClasses("readyBtn", ["greyOut", "noEvents", "active"], false);
         document.getElementById("readyBtn").innerHTML = "Start Game"
-        for (var i = 0; i < players.length; i++) {
-          toggleClasses("tab" + i, ["ready", "activeReady"], false);
+        if (!test){
+          for (var i = 0; i < players.length; i++) {
+            toggleClasses("tab" + i, ["ready", "activeReady"], false);
+          }
         }
         while (trophyQueue.length > 0) {
           printToConsole("[TROPHY]: " + trophyQueue[0], "#c99c20");
           trophyQueue.splice(0, 1);
         }
+        ready = false;
       }
 
       function game_terminate() {
