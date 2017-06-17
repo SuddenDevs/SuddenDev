@@ -809,13 +809,16 @@
         //Check if players are ready
         for (var i = 0; i < room.players.length; i++) {
           var j = getPlayer(room.players[i].id);
+          var t = document.getElementById("tab" + j);
           if (room.players[i].status === 'ready') {
-            var t = document.getElementById("tab" + j);
             if (t.classList.contains("active")) {
               t.classList.add("activeReady");
             } else {
               t.classList.add("ready");
             }
+          } else {
+            t.classList.remove("ready");
+            t.classList.remove("activeReady");
           }
         }
       }
@@ -1270,7 +1273,7 @@
           newt.classList.remove("ready");
           newt.classList.add("activeReady");
         }
-        if (oldt === "tab0") {
+        if (currentTab == 0) {
           players[0].script = editor.getValue();
         }
         currentTab = tabi;
