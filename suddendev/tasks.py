@@ -2,7 +2,7 @@ from . import celery, celery_socketio
 from .game_instance import GameInstance
 import time
 
-@celery.task(time_limit=15, max_retries=3)
+@celery.task(time_limit=30, max_retries=3)
 def play_game(game_id, player_names, scripts, player_ids, colors, namespace, room, wave=1):
 
     cleared = True
