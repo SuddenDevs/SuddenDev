@@ -16,8 +16,8 @@
       var NAMEOFFS = 10;
       var EDITFONTSIZE = 15;
       var FRAMERATE = 60;
-      var WAIT_TEXT = "Room Key: {{ game_id }}\n\nInvite friends!";
-      var INTRO_TEXT = "Press Test Code to run your script alone, or Start Game to play as a team";
+      var WAIT_TEXT = "Room Key: {{ game_id }}";
+      var INTRO_TEXT = "Press Test Code to test your script, or Start Game when your script is ready";
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
       var TIME_AFTER_END = 2; //How long to continue animating after round
@@ -167,7 +167,7 @@
           dropShadowAngle: Math.PI / 6,
           dropShadowDistance: 1,
           wordWrap: true,
-          wordWrapWidth: 600
+          wordWrapWidth: 700
         });
 
         var style2 = new PIXI.TextStyle({
@@ -181,18 +181,17 @@
           dropShadowBlur: 10,
           dropShadowAlpha: 0.25,
           dropShadowAngle: Math.PI / 6,
-          dropShadowDistance: 2,
+          dropShadowDistance: 1,
           wordWrap: true,
           wordWrapWidth: 600
         });
 
-        mainText = new PIXI.Text(WAIT_TEXT, style);
+        mainText = new PIXI.Text(INTRO_TEXT, style);
         mainText.x = 400;
         mainText.y = 200;
         mainText.anchor.x = 0.5;
 
-        var txt = "Press Test Code to run your script alone, or Start Game to play as a team";
-        introText = new PIXI.Text(INTRO_TEXT, style2);
+        introText = new PIXI.Text(WAIT_TEXT, style2);
         introText.x = 400;
         introText.y = 500;
         introText.anchor.x = 0.5;
