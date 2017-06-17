@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from 'macros.html' import suddendev_logged_in_header %}
+{% from 'macros.html' import suddendev_logged_in_header_game %}
 
 {% block head %}
   <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style_game.css')}}">
@@ -16,7 +16,8 @@
       var NAMEOFFS = 10;
       var EDITFONTSIZE = 15;
       var FRAMERATE = 60;
-      var WAITTEXT = "Press Test Code to try out your AI, or Start Game to begin!";
+      var WAIT_TEXT = "Room Key: {{ game_id }}\n\nInvite friends!";
+      var INTRO_TEXT = "Press Test Code to run your script alone, or Start Game to play as a team";
       var MAXPLAYERS = 4;
       var HEALTHBARWIDTH = 24;
       var TIME_AFTER_END = 2; //How long to continue animating after round
@@ -46,6 +47,7 @@
       var renderer = null
       var fpsText = null;
       var mainText = null;
+      var introText = null;
 
       //Layers
       var hud_layer = null;
@@ -168,11 +170,35 @@
           wordWrapWidth: 600
         });
 
-        mainText = new PIXI.Text(WAITTEXT, style);
+        var style2 = new PIXI.TextStyle({
+          fontFamily: 'Arial',
+          fontSize: 30,
+          fill: ['#ffffff'], // gradient
+          align: 'center',
+          strokeThickness: 3,
+          dropShadow: true,
+          dropShadowColor: '#000000',
+          dropShadowBlur: 10,
+          dropShadowAlpha: 0.25,
+          dropShadowAngle: Math.PI / 6,
+          dropShadowDistance: 2,
+          wordWrap: true,
+          wordWrapWidth: 600
+        });
+
+        mainText = new PIXI.Text(WAIT_TEXT, style);
         mainText.x = 400;
         mainText.y = 200;
         mainText.anchor.x = 0.5;
+
+        var txt = "Press Test Code to run your script alone, or Start Game to play as a team";
+        introText = new PIXI.Text(INTRO_TEXT, style2);
+        introText.x = 400;
+        introText.y = 500;
+        introText.anchor.x = 0.5;
+
         hud_layer.addChild(mainText);
+        hud_layer.addChild(introText);
       }
 
       function draw_grid() {
@@ -192,6 +218,14 @@
           grid.moveTo(0, i * cell_size);
           grid.lineTo(renderer.width, i * cell_size);
         }
+
+        grid.lineStyle(2, "black", 0.15);
+        grid.moveTo(0,0);
+        grid.lineTo(renderer.width, 0);
+        grid.lineTo(renderer.width, renderer.height);
+        grid.lineTo(0, renderer.height);
+        grid.lineTo(0, 0);
+
         background_layer.addChildAt(grid, 0);
       }
 
@@ -209,6 +243,7 @@
         waveText.text = "Wave " + first.wave;
 
         mainText.visible = false;
+        introText.visible = false;
         inGame = true;
 
         //Make Players
@@ -521,7 +556,7 @@
         var msg = create_message(string);
         msg.x = -msg.width/2;
         msg.y = -msg.height - data.size - 20;
-        p.container.addChild(msg);
+        p.container.addChildAt(msg);
         p.message = {container: msg, timer: MSG_DISPLAY_TIME};
       }
 
@@ -908,6 +943,7 @@
         stage.addChild(background_layer);
         stage.addChild(game_layer);
         stage.addChild(hud_layer);
+
 
         textStyle = new PIXI.TextStyle({
           fontFamily: 'Arial',
@@ -1319,7 +1355,7 @@
     </script>
 {% endblock %}
 {% block body %}
-    {{ suddendev_logged_in_header(user.picture, user.name, user.email) }}
+    {{ suddendev_logged_in_header_game(user.picture, user.name, user.email) }}
 
     <div class="container-fluid">
       <div class="row">
