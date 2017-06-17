@@ -36,7 +36,7 @@ class GameInstance:
                 batch.append(encodeState(self.game))
                 self.game.events_flush()
 
-            if state_counter == gc.BATCHSIZE or not self.game.active:
+            if state_counter >= gc.BATCHSIZE or not self.game.active:
                 #Client Update
                 yield batch
                 batch = []
