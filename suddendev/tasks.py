@@ -11,10 +11,7 @@ def play_game(game_id, player_names, scripts, player_ids, colors, namespace, roo
         current_wave += 1
         game = GameInstance(game_id, player_names, scripts, player_ids, colors, wave=current_wave)
         for batch in game.run():
-            try:
-                celery_socketio.emit('result', '{\"result\": [ ' + ','.join(batch) + ']}', room=room, namespace=namespace)
-            except:
-                return False
+            celery_socketio.emit('result', '{\"result\": [ ' + ','.join(batch) + ']}', room=room, namespace=namespace)
         cleared = game.was_cleared()
 
     # return highest reached wave
@@ -24,10 +21,7 @@ def play_game(game_id, player_names, scripts, player_ids, colors, namespace, roo
 def test_round(game_id, player_names, scripts, player_ids, colors, namespace, room, wave=1):
     game = GameInstance(game_id, player_names, scripts, player_ids, colors, wave=wave)
     for batch in game.run():
-        try:
-            celery_socketio.emit('result', '{\"result\": [ ' + ','.join(batch) + ']}', room=room, namespace=namespace)
-        except:
-            return False
+        celery_socketio.emit('result', '{\"result\": [ ' + ','.join(batch) + ']}', room=room, namespace=namespace)
 
     # return if the test round was cleared
     return game.was_cleared()
