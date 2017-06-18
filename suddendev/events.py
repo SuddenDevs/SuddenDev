@@ -170,7 +170,10 @@ def manage_player_leaves(player_id):
         if player_name is not None:
             fsio.emit('message_room', player_name + ' has left.', room=game_id, namespace=NAMESPACE)
 
-        run_game_if_everyone_ready(game_id)
+        # TODO: we should make the game run if that was the last player not ready
+        # but we'd need to guard against running the game whilst it's already running
+        # so, for now, we'll do nothing and if a player cancels and re-readies, it
+        # should run fine
 
 def run_game_if_everyone_ready(game_id):
     if all_players_are_ready(game_id):
