@@ -5,7 +5,7 @@ import sqlalchemy
 from . import socketio, redis
 from .models import db, User
 from .game_instance import GameInstance
-from .tasks import play_game, test_round
+from .tasks import play_round
 from .rooms import (
     get_room_of_player,
     get_color_of_player,
@@ -104,19 +104,7 @@ def test(message):
     player_scripts = []
     player_ids = []
     colors = []
-    # if len(player_jsons) < 2:
-        # player = player_jsons[0]
-        # for i in range(4):
-            # player_names.append(player['name'])
-            # player_ids.append(player['id'])
 
-            # # use the submitted script
-            # if player['id'] == player_id:
-                # player_scripts.append(message)
-            # else:
-                # player_scripts.append(player['script'])
-
-    # else:
     for player in player_jsons:
         player_names.append(player['name'])
         player_ids.append(player['id'])
@@ -130,8 +118,11 @@ def test(message):
 
     wave = get_room_wave(game_id)
     fsio.emit('message_local', 'Testing against wave ' + str(wave), room=flask.request.sid, namespace=NAMESPACE)
-    handle = test_round.delay(game_id, player_names, player_scripts, player_ids, colors, NAMESPACE, flask.request.sid, wave=wave)
-    cleared = handle.get()
+
+    handle = play_round.delay(game_id, player_names, player_scripts, player_ids, colors, wave)
+    cleared, game_states = handle.get()
+    socketio.emit('result', '{\"result\": [ ' + ','.join(game_states) + ']}', room=flask.request.sid, namespace=NAMESPACE)
+
 
 @socketio.on('play', namespace=NAMESPACE)
 def play(message):
@@ -196,10 +187,19 @@ def run_game_if_everyone_ready(game_id):
             colors.append(player['color'])
 
         fsio.emit('message_room', 'Everyone is ready! Here we go...', room=game_id, namespace=NAMESPACE)
-        wave = get_room_wave(game_id)
-        handle = play_game.delay(game_id, player_names, player_scripts, player_ids, colors, NAMESPACE, game_id, wave=1)
-        highest_wave = handle.get()
-        set_room_wave(game_id, highest_wave + 1)
+
+        current_wave = 1
+        cleared = True
+
+        while cleared:
+            handle = play_round.delay(game_id, player_names, player_scripts, player_ids, colors, current_wave)
+            cleared, game_states = handle.get()
+            socketio.emit('result', '{\"result\": [ ' + ','.join(game_states) + ']}', room=game_id, namespace=NAMESPACE)
+            current_wave += 1
+
+
+        set_room_wave(game_id, current_wave)
+        highest_wave = current_wave - 1
 
         for player in player_jsons:
             player_id = player['id']

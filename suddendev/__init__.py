@@ -10,8 +10,6 @@ from .config import Config
 from flask_socketio import SocketIO
 socketio = SocketIO()
 
-celery_socketio = SocketIO(message_queue=Config.REDIS_URL)
-
 # As above for celery
 from celery import Celery
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND,
