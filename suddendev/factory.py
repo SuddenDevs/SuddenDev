@@ -18,7 +18,7 @@ def create_app():
     celery.conf.update(app.config)
 
     from suddendev import socketio
-    socketio.init_app(app, message_queue=Config.REDIS_URL)
+    socketio.init_app(app)
 
     from suddendev import login_manager
     login_manager.init_app(app)
