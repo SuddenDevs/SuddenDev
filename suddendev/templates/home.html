@@ -9,10 +9,12 @@
       <br>
       {% if not user.wave5_trophy %}
         <div class="alert alert-success">
-          <strong>Looks like you're new here. Let's get you up to speed!</strong>
+          <strong>Looks like you're new here. Welcome to the ultimate Python playground - let's get you up to speed!</strong>
           <p>The documentation is your survival companion.<br>
           Open the <a href="{{ url_for('.docs') }}">help page<a>, create a virtual room, and grab some snacks.
           Sit down with your friends and start cooking up some killer scripts.
+          Can you conquer all the waves? Below you can show off trophies that you've earned.
+          </p>
         </div>
       {% elif not user.wave10_trophy %}
         <div class="alert alert-success">
