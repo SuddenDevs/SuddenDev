@@ -1,4 +1,5 @@
-# sudden_dev
+![sudden-dev logo](logo.png)
+
 [![Build Status](https://travis-ci.org/SuddenDevs/SuddenDev.svg?branch=master)](https://travis-ci.org/SuddenDevs/SuddenDev)
 
 sudden_dev is a proof-of-concept co-op Python scripting game developed in 3 weeks.
