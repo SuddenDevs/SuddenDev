@@ -7,7 +7,7 @@ Work together as a team to code against waves as enemies.
 
 Getting to the end requires ingenuity and complex team strategies.
 
-You can check it out at [suddendev.io](suddendev.io)
+You can check it out at [suddendev.io](http://suddendev.io)
 
 It's early days, but we're hoping to take the idea further so give it a go and please send feedback our way at sudddendevcontact@gmail.com
 
