@@ -70,28 +70,3 @@ And in the root directory, run:
 ```bash
 ./run-local-tests.sh
 ```
-
-## Running it on Heroku
-
-We are using Heroku to host the application, and Travis for CI.
-
-The deployment workflow we've set-up is:
-
-- Commit to master
-- Travis runs the tests
-- If the build is successful, Travis deploys to the staging app of our Heroku pipeline
-- One of us may then choose to promote the application to production
-
-If you are looking to try deploying the code to a Heroku app yourself you'll need to:
-
-- Create you're own Heroku App, or multiple on a pipeline
-- Add the postgresql add-on to your app(s)
-- Add the redis add-on to your heroku app(s)
-- Add the CloudAMQP add-on to your heroku app(s)
-- Run 'heroku run python clear-db.py' for the app(s) to initialise the database
-- Set the APP_SETTINGS envvars on the app, e.g. 'heroku config:set APP_SETTINGS=suddendev.config.ProductionConfig'
-- Update the deploy settings in .travis.yml to deploy to your Heroku app and use your own encrypted Heroku API key
-
-Note we have not setup any kind of migration so be careful if changing the DB schema.
-
-Feel free to get in touch at suddendevcontact@gmail.com if you have any questions.
