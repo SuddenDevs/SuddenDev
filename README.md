@@ -8,7 +8,7 @@ Work together as a team to code against waves as enemies.
 
 Getting to the end requires ingenuity and complex team strategies.
 
-*You can check it out at [suddendev-staging.herokuapp.com](http://suddendev-staging.herokuapp.com)*
+**You can check it out at [suddendev-staging.herokuapp.com](http://suddendev-staging.herokuapp.com)**
 
 It's early days, but we're hoping to take the idea further so give it a go and please send feedback our way at sudddendevcontact@gmail.com
 
