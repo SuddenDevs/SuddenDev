@@ -8,15 +8,9 @@ Work together as a team to code against waves as enemies.
 
 Getting to the end requires ingenuity and complex team strategies.
 
-**You can check it out at [suddendev-staging.herokuapp.com](http://suddendev-staging.herokuapp.com)**
-
-It's early days, but we're hoping to take the idea further so give it a go and please send feedback our way at sudddendevcontact@gmail.com
-
 ## Running it locally
 
-Requires Python 3 (developed using 3.6) [pip](https://pip.pypa.io/en/stable/installing/), [postgres](https://www.postgresql.org/download/) the [heroku cli](https://devcenter.heroku.com/articles/heroku-cli), and RabbitMQ.
-
-(We're trying to make local development a bit easier...)
+Requires Python 3 (developed using 3.6) [pip](https://pip.pypa.io/en/stable/installing/), [postgres](https://www.postgresql.org/download/), the [heroku cli](https://devcenter.heroku.com/articles/heroku-cli), and RabbitMQ.
 
 Using a [virtualenv](https://virtualenv.pypa.io/en/stable/)
 is recommended. Once virtualenv is installed you can create a virtual environment for Python 3 and activate
